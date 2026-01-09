@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>雲端同步記帳</title>
+    <title>雲端記帳 V7.2</title>
     <style>
-        :root { --primary: #4a90e2; --bg: #f5f7fa; --success: #2ecc71; --danger: #e74c3c; }
+        :root { --primary: #4a90e2; --bg: #f5f7fa; --success: #2ecc71; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; box-sizing: border-box; }
-        h2 { text-align: center; margin-top: 0; color: #333; font-size: 1.2rem; }
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; font-weight: bold; }
         input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
@@ -18,21 +17,16 @@
         #sub-category-container { display: none; background: #f0f7ff; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
         button#submitBtn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
         .dashboard { margin-top: 25px; border-top: 2px dashed #eee; padding-top: 20px; }
-        .dashboard-item { margin-bottom: 15px; }
-        .budget-input-group { display: flex; gap: 5px; margin-top: 5px; }
-        .budget-input-group input { flex: 2; }
-        .dash-btn { flex: 1; padding: 8px; font-size: 13px; border-radius: 5px; border: none; cursor: pointer; color: white; }
-        .btn-input { background: var(--success); }
-        .btn-modify { background: #95a5a6; }
-        .info-box { background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .info-label { font-size: 14px; color: #7f8c8d; }
+        .info-box { background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .info-value { font-size: 18px; font-weight: bold; color: #2c3e50; }
-        #status { margin-top: 10px; text-align: center; font-size: 13px; min-height: 18px; }
+        #status { margin-top: 10px; text-align: center; font-size: 13px; color: gray; }
+        .btn-group { display: flex; gap: 5px; margin-top: 5px; }
+        .dash-btn { flex: 1; padding: 10px; border-radius: 5px; border: none; color: white; cursor: pointer; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>💰 雲端同步記帳 V7</h2>
+        <h2>💰 雲端記帳 V7.2</h2>
         <div class="form-group"><label>📅 日期</label><input type="date" id="date"></div>
         <div class="form-group">
             <label>🏷️ 主類別</label>
@@ -50,24 +44,20 @@
         <div class="form-group" id="sub-category-container"><label>🔍 子項目</label><select id="sub-category"></select></div>
         <div class="form-group"><label>💵 金額</label><input type="number" id="amount" placeholder="0" inputmode="decimal"></div>
         <div class="form-group"><label>📝 備註</label><input type="text" id="note" placeholder="選填..."></div>
+        
         <button id="submitBtn" onclick="submitData()">確認送出</button>
-        <div id="status">正在同步雲端數值...</div>
+        <div id="status">正在同步雲端...</div>
 
         <div class="dashboard">
-            <div class="dashboard-item">
-                <label>🏁 每月固定預算</label>
-                <div class="budget-input-group">
-                    <input type="number" id="input_starting" placeholder="輸入預算" inputmode="decimal">
-                    <button class="dash-btn btn-input" onclick="updateBudget('input')">輸入</button>
-                    <button class="dash-btn btn-modify" onclick="updateBudget('modify')">修改</button>
-                </div>
+            <label>🏁 每月固定預算</label>
+            <input type="number" id="input_starting" placeholder="輸入預算">
+            <div class="btn-group">
+                <button class="dash-btn" style="background:#2ecc71" onclick="updateBudget('input')">輸入</button>
+                <button class="dash-btn" style="background:#95a5a6" onclick="updateBudget('modify')">修改</button>
             </div>
-            <div class="dashboard-item">
-                <div class="info-box"><span class="info-label">📉 當月剩餘金額</span><span class="info-value" id="disp_monthly_rem">0</span></div>
-            </div>
-            <div class="dashboard-item">
-                <div class="info-box"><span class="info-label">🏦 累積剩餘金額</span><span class="info-value" id="disp_accumulated_rem">0</span></div>
-            </div>
+            <br>
+            <div class="info-box"><span>📉 當月剩餘</span><span class="info-value" id="disp_monthly_rem">0</span></div>
+            <div class="info-box"><span>🏦 累積剩餘</span><span class="info-value" id="disp_accumulated_rem">0</span></div>
         </div>
     </div>
 
@@ -76,39 +66,20 @@
         let currentMainCat = "";
         const subData = { "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"], "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"], "住": ["手機費", "網路費", "電費", "水費", "瓦斯費", "租車位費", "管理費", "稅費"], "行": ["油錢", "停車費", "住宿費", "租車費", "交通費", "修車費"], "育": ["學費", "書費", "教育費", "AI費"], "樂": ["娛樂費", "電視費", "教育費"], "金": ["存款", "股票", "虛擬幣"], "雜": ["保險費", "其他"] };
 
-        document.getElementById('date').valueAsDate = new Date();
-
-        window.onload = loadDashboard;
+        window.onload = function() {
+            document.getElementById('date').valueAsDate = new Date();
+            loadDashboard();
+        };
 
         async function loadDashboard() {
-            const status = document.getElementById('status');
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 document.getElementById('input_starting').value = data.budget;
                 document.getElementById('disp_monthly_rem').innerText = Number(data.monthlyRem).toLocaleString();
                 document.getElementById('disp_accumulated_rem').innerText = Number(data.accumulatedRem).toLocaleString();
-                status.innerText = "☁️ 雲端同步已就緒";
-                status.style.color = "gray";
-            } catch (e) {
-                status.innerText = "⚠️ 雲端連線失敗，請檢查網路";
-                status.style.color = "red";
-            }
-        }
-
-        async function updateBudget(type) {
-            const val = Number(document.getElementById('input_starting').value);
-            const pwd = prompt("請輸入密碼以變更雲端設定：");
-            if (pwd !== "0728") { alert("密碼錯誤"); return; }
-            
-            document.getElementById('status').innerText = "⏳ 正在同步預算至雲端...";
-            await fetch(url, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify({ type: "updateBudget", newBudget: val })
-            });
-            alert("雲端預算已更新，剩餘金額已重置！");
-            loadDashboard();
+                document.getElementById('status').innerText = "☁️ 雲端同步成功";
+            } catch (e) { document.getElementById('status').innerText = "⚠️ 同步失敗"; }
         }
 
         function selectMainCat(cat, btnElement) {
@@ -120,7 +91,7 @@
             select.innerHTML = "";
             subData[cat].forEach(item => {
                 let opt = document.createElement('option');
-                opt.value = item; opt.innerHTML = item;
+                opt.value = item; opt.innerText = item;
                 select.appendChild(opt);
             });
             container.style.display = "block";
@@ -128,47 +99,45 @@
 
         async function submitData() {
             const pwd = prompt("請輸入密碼：");
-            if (pwd !== "0728") { alert("密碼錯誤！"); return; }
-            const cost = Number(document.getElementById('amount').value);
-            if (!currentMainCat || !cost) { alert("請填寫完整資訊"); return; }
+            if (pwd !== "0728") return;
+            
+            const costVal = document.getElementById('amount').value;
+            if (!currentMainCat || !costVal) { alert("請填寫完整"); return; }
 
-            const cost = Number(document.getElementById('amount').value);
             const btn = document.getElementById('submitBtn');
-            const status = document.getElementById('status');
-    
             btn.disabled = true;
-            status.innerText = "⏳ 正在同步至雲端...";
+            document.getElementById('status').innerText = "⏳ 傳送中...";
 
             try {
-        await fetch(url, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify({
-                date: document.getElementById('date').value,
-                mainCategory: currentMainCat,
-                subCategory: document.getElementById('sub-category').value,
-                amount: cost,
-                note: document.getElementById('note').value
-            })
-        });
+                await fetch(url, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({
+                        date: document.getElementById('date').value,
+                        mainCategory: currentMainCat,
+                        subCategory: document.getElementById('sub-category').value,
+                        amount: costVal,
+                        note: document.getElementById('note').value
+                    })
+                });
+                document.getElementById('amount').value = "";
+                document.getElementById('note').value = "";
+                await loadDashboard(); // 重新抓取扣款後的數值
+            } catch (e) { alert("失敗"); }
+            finally { btn.disabled = false; }
+        }
 
-        // 修正點：本地端預覽也僅扣除當月，保持邏輯一致
-        let mRem = Number(localStorage.getItem('monthlyRem')) || 0;
-        localStorage.setItem('monthlyRem', mRem - cost);
-
-        status.style.color = "green";
-        status.innerText = "✅ 記帳成功！";
-        document.getElementById('amount').value = "";
-        document.getElementById('note').value = "";
-        
-        // 重新載入雲端數據以確保正確性
-        loadDashboard(); 
-    } catch (e) {
-        status.innerText = "❌ 傳送失敗";
-    } finally {
-        btn.disabled = false;
-    }
-}
+        async function updateBudget(type) {
+            const val = document.getElementById('input_starting').value;
+            if (!val) return;
+            document.getElementById('status').innerText = "⏳ 更新預算中...";
+            await fetch(url, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify({ type: "updateBudget", newBudget: val })
+            });
+            loadDashboard();
+        }
     </script>
 </body>
 </html>
