@@ -26,7 +26,7 @@
 </head>
 <body>
     <div class="card">
-        <h2>💰 雲端記帳 V7.2</h2>
+        <h2>💰 雲端記帳</h2>
         <div class="form-group"><label>📅 日期</label><input type="date" id="date"></div>
         <div class="form-group">
             <label>🏷️ 主類別</label>
@@ -96,48 +96,47 @@
             });
             container.style.display = "block";
         }
+  
+async function submitData() {
+    const pwd = prompt("請輸入密碼：");
+    if (pwd !== "0728") return;
+    
+    const amountVal = document.getElementById('amount').value;
+    if (!currentMainCat || !amountVal) { alert("請填寫完整資訊"); return; }
 
-        async function submitData() {
-            const pwd = prompt("請輸入密碼：");
-            if (pwd !== "0728") return;
-            
-            const costVal = document.getElementById('amount').value;
-            if (!currentMainCat || !costVal) { alert("請填寫完整"); return; }
+    const btn = document.getElementById('submitBtn');
+    const status = document.getElementById('status');
+    btn.disabled = true;
+    status.innerText = "⏳ 正在同步至雲端...";
 
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            document.getElementById('status').innerText = "⏳ 傳送中...";
+    try {
+        // 發送資料
+        await fetch(url, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({
+                date: document.getElementById('date').value,
+                mainCategory: currentMainCat,
+                subCategory: document.getElementById('sub-category').value,
+                amount: amountVal,
+                note: document.getElementById('note').value
+            })
+        });
 
-            try {
-                await fetch(url, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({
-                        date: document.getElementById('date').value,
-                        mainCategory: currentMainCat,
-                        subCategory: document.getElementById('sub-category').value,
-                        amount: costVal,
-                        note: document.getElementById('note').value
-                    })
-                });
-                document.getElementById('amount').value = "";
-                document.getElementById('note').value = "";
-                await loadDashboard(); // 重新抓取扣款後的數值
-            } catch (e) { alert("失敗"); }
-            finally { btn.disabled = false; }
-        }
+        status.innerText = "✅ 傳送成功，更新餘額中...";
+        document.getElementById('amount').value = "";
+        document.getElementById('note').value = "";
 
-        async function updateBudget(type) {
-            const val = document.getElementById('input_starting').value;
-            if (!val) return;
-            document.getElementById('status').innerText = "⏳ 更新預算中...";
-            await fetch(url, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify({ type: "updateBudget", newBudget: val })
-            });
-            loadDashboard();
-        }
+        // 延遲 1.5 秒再讀取，給予 Google 伺服器寫入的時間
+        setTimeout(async () => {
+            await loadDashboard();
+        }, 1500);
+
+    } catch (e) {
+        status.innerText = "❌ 傳送失敗";
+        btn.disabled = false;
+    }
+}
     </script>
 </body>
 </html>
