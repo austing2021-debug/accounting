@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>雲端記帳本</title>
+    <title>我的雲端記帳本 V3</title>
     <style>
         :root { --primary: #4a90e2; --bg: #f5f7fa; --btn-bg: #ffffff; }
         body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; }
@@ -103,75 +103,116 @@
     </div>
 
     <script>
-        // 初始化：預設今天日期
-        document.getElementById('date').valueAsDate = new Date();
+       // 1. 強制確保在網頁載入完成後才執行初始設定
+window.onload = function() {
+    try {
+        const dateInput = document.getElementById('date');
+        if (dateInput) {
+            // 設定為台灣時區的今日日期 (解決部分手機顯示空白的問題)
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
+            console.log("日期已自動設定完成");
+        }
+    } catch (e) {
+        console.error("日期設定失敗:", e);
+    }
+};
 
-        let currentMainCat = "";
+let currentMainCat = "";
 
-        // 定義子項目資料庫
-        const subData = {
-            "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"],
-            "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"],
-            "住": ["手機費", "網路費", "電費", "水費", "瓦斯費", "租車位費", "管理費", "稅費"],
-            "行": ["油錢", "停車費", "住宿費", "租車費", "交通費", "修車費"],
-            "育": ["學費", "書費", "教育費", "AI費"],
-            "樂": ["娛樂費", "電視費", "教育費"],
-            "金": ["存款", "股票", "虛擬幣"],
-            "雜": ["保險費", "其他"]
-        };
+// 子項目資料庫
+const subData = {
+    "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"],
+    "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"],
+    "住": ["手機費", "網路費", "電費", "水費", "瓦斯費", "租車位費", "管理費", "稅費"],
+    "行": ["油錢", "停車費", "住宿費", "租車費", "交通費", "修車費"],
+    "育": ["學費", "書費", "教育費", "AI費"],
+    "樂": ["娛樂費", "電視費", "教育費"],
+    "金": ["存款", "股票", "虛擬幣"],
+    "雜": ["保險費", "其他"]
+};
 
-        // 選擇主類別邏輯
-        function selectMainCat(cat, btnElement) {
-            currentMainCat = cat;
-            
-            // 視覺效果：切換 Active 狀態
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
+// 選擇主類別邏輯
+function selectMainCat(cat, btnElement) {
+    console.log("已點擊類別:", cat); // 測試用：若沒出現代表按鈕沒點到
+    currentMainCat = cat;
+    
+    // 切換按鈕樣式
+    const allBtns = document.querySelectorAll('.cat-btn');
+    allBtns.forEach(btn => btn.classList.remove('active'));
+    btnElement.classList.add('active');
 
-            // 更新並顯示子類別下拉選單
-            const container = document.getElementById('sub-category-container');
-            const select = document.getElementById('sub-category');
-            
-            select.innerHTML = ""; 
+    // 顯示子類別
+    const container = document.getElementById('sub-category-container');
+    const select = document.getElementById('sub-category');
+    
+    if (container && select) {
+        select.innerHTML = ""; // 先清空舊的
+        
+        // 抓取資料庫內的選項
+        if (subData[cat]) {
             subData[cat].forEach(item => {
                 let opt = document.createElement('option');
                 opt.value = item;
                 opt.innerHTML = item;
                 select.appendChild(opt);
             });
-
-            container.style.display = "block";
+            container.style.display = "block"; // 強制顯示區塊
+            console.log("子類別已切換為:", cat);
         }
+    } else {
+        console.error("找不到子類別容器，請檢查 HTML ID 是否正確");
+    }
+}
 
-        async function submitData() {
-            // 1. 密碼驗證
-            const pwd = prompt("請輸入記帳密碼：");
-            if (pwd !== "0728") {
-                alert("密碼錯誤，拒絕存取！");
-                return;
-            }
+// 傳送資料函數 (其餘保持不變...)
+async function submitData() {
+    const pwd = prompt("請輸入記帳密碼：");
+    if (pwd !== "0728") {
+        alert("密碼錯誤！");
+        return;
+    }
 
-            // 欄位檢查
-            if (!currentMainCat) { alert("請先選擇主類別"); return; }
-            if (!document.getElementById('amount').value) { alert("請輸入金額"); return; }
+    if (!currentMainCat) { alert("請先點選主類別按鈕 (食/衣/住...)"); return; }
+    
+    const amount = document.getElementById('amount').value;
+    if (!amount) { alert("請輸入金額"); return; }
 
-            const btn = document.getElementById('submitBtn');
-            const status = document.getElementById('status');
-            
-            // --- ⚠️ 請務必確認下方網址是否正確 ---
-            const url = "https://script.google.com/macros/s/AKfycbw_bob4WLfVlpah8dfXbeDpPgt_OplbfzknnWXe_A3RIOBKS22qzCcxagpmMMA9JXqn/exec";
+    const btn = document.getElementById('submitBtn');
+    const status = document.getElementById('status');
+    const url = "https://script.google.com/macros/s/AKfycbw_bob4WLfVlpah8dfXbeDpPgt_OplbfzknnWXe_A3RIOBKS22qzCcxagpmMMA9JXqn/exec";
 
-            const payload = {
-                date: document.getElementById('date').value,
-                mainCategory: currentMainCat,
-                subCategory: document.getElementById('sub-category').value,
-                amount: document.getElementById('amount').value,
-                note: document.getElementById('note').value
-            };
+    const payload = {
+        date: document.getElementById('date').value,
+        mainCategory: currentMainCat,
+        subCategory: document.getElementById('sub-category').value,
+        amount: amount,
+        note: document.getElementById('note').value
+    };
 
-            btn.disabled = true;
-            status.style.color = "blue";
-            status.innerText = "⏳ 正在同步至雲端...";
+    btn.disabled = true;
+    status.innerText = "⏳ 傳送中...";
 
-            try {
-                // 使用 no-cors 模式發
+    try {
+        await fetch(url, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(payload),
+            headers: { "Content-Type": "text/plain" }
+        });
+        status.style.color = "green";
+        status.innerText = "✅ 記帳成功！";
+        document.getElementById('amount').value = "";
+        document.getElementById('note').value = "";
+    } catch (e) {
+        status.innerText = "❌ 傳送失敗，請重試";
+    } finally {
+        btn.disabled = false;
+    }
+}
+    </script>
+</body>
+</html>
