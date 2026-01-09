@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人記帳系統</title>
+    <style>
+        :root { --primary: #4a90e2; --bg: #f5f7fa; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { color: #333; margin-top: 0; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        button:disabled { background: #ccc; }
+        #status { margin-top: 15px; text-align: center; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>💰 快速記帳</h2>
+        <div class="form-group">
+            <label>日期</label>
+            <input type="date" id="date">
+        </div>
+        <div class="form-group">
+            <label>類別</label>
+            <select id="category">
+                <option value="餐飲美食">餐飲美食</option>
+                <option value="交通出行">交通出行</option>
+                <option value="居家生活">居家生活</option>
+                <option value="休閒娛樂">休閒娛樂</option>
+                <option value="自我增值">自我增值</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>金額</label>
+            <input type="number" id="amount" placeholder="0.00" inputmode="decimal">
+        </div>
+        <div class="form-group">
+            <label>備註</label>
+            <input type="text" id="note" placeholder="備註內容...">
+        </div>
+        <button id="submitBtn" onclick="submitData()">確認送出</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // 自動預設今天日期
+        document.getElementById('date').valueAsDate = new Date();
+
+        async function submitData() {
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('status');
+            const url = "https://script.google.com/macros/s/AKfycbw_bob4WLfVlpah8dfXbeDpPgt_OplbfzknnWXe_A3RIOBKS22qzCcxagpmMMA9JXqn/exec";
+
+            const payload = {
+                date: document.getElementById('date').value,
+                category: document.getElementById('category').value,
+                amount: document.getElementById('amount').value,
+                note: document.getElementById('note').value
+            };
+
+            if(!payload.amount) { alert("請輸入金額"); return; }
+
+            btn.disabled = true;
+            btn.innerText = "傳送中...";
+            status.innerText = "⏳ 正在處理...";
+
+            try {
+                // 使用 fetch 的 no-cors 模式或是標準 POST
+                await fetch(url, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify(payload),
+                    headers: { "Content-Type": "text/plain" }
+                });
+                
+                status.style.color = "green";
+                status.innerText = "✅ 記帳成功！";
+                document.getElementById('amount').value = "";
+                document.getElementById('note').value = "";
+            } catch (error) {
+                status.style.color = "red";
+                status.innerText = "❌ 發生錯誤，請稍後再試";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "確認送出";
+            }
+        }
+    </script>
+</body>
+</html>
