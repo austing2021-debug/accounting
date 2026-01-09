@@ -13,19 +13,19 @@
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
         
-        /* 1. 縮短日期格子，確保不超出畫面 */
-        input[type="date"], input[type="number"], input[type="text"], select { 
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; 
-            box-sizing: border-box; font-size: 16px; background: #fff;
-        }
+/* 確保日期格子在手機上縮短且不超出 */
+input[type="date"] {
+    max-width: 100%; /* 限制最大寬度 */
+    width: 100%;
+    box-sizing: border-box; /* 包含內距與邊框 */
+}
 
-        /* 2. 8個按鈕排版 (上4下4) */
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 四列 */
-            gap: 8px;
-            margin-bottom: 15px;
-        }
+/* 按鈕 4x2 排版 */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 5px; /* 縮小間距更省空間 */
+}
         .cat-btn {
             padding: 10px 0;
             background: var(--btn-bg);
