@@ -3,75 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我的雲端記帳本 V3</title>
+    <title>雲端同步記帳 V7</title>
     <style>
-        :root { --primary: #4a90e2; --bg: #f5f7fa; --btn-bg: #ffffff; }
-        body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; }
-        
-        /* 容器與自適應寬度 */
+        :root { --primary: #4a90e2; --bg: #f5f7fa; --success: #2ecc71; --danger: #e74c3c; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; box-sizing: border-box; }
-        
         h2 { text-align: center; margin-top: 0; color: #333; font-size: 1.2rem; }
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; font-weight: bold; }
-        
-        /* 1. 修正日期與輸入框寬度，確保不超出畫面 */
-        input[type="date"], input[type="number"], input[type="text"], select { 
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; 
-            box-sizing: border-box; font-size: 16px; background: #fff; appearance: none;
-        }
-
-        /* 2. 8個大類別按鈕 (4x2 排版) */
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        .cat-btn {
-            padding: 12px 0;
-            background: var(--btn-bg);
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .cat-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            font-weight: bold;
-            transform: scale(0.95);
-        }
-
-        /* 3. 子項目下拉區塊 - 初始隱藏 */
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .cat-btn { padding: 12px 0; background: #fff; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; cursor: pointer; text-align: center; }
+        .cat-btn.active { background: var(--primary); color: white; font-weight: bold; }
         #sub-category-container { display: none; background: #f0f7ff; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
-        
-        button#submitBtn { 
-            width: 100%; padding: 15px; background: var(--primary); color: white; 
-            border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer;
-            margin-top: 10px; transition: 0.3s;
-        }
-        button#submitBtn:disabled { background: #ccc; }
-        
-        #status { margin-top: 15px; text-align: center; font-size: 14px; font-weight: bold; }
+        button#submitBtn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .dashboard { margin-top: 25px; border-top: 2px dashed #eee; padding-top: 20px; }
+        .dashboard-item { margin-bottom: 15px; }
+        .budget-input-group { display: flex; gap: 5px; margin-top: 5px; }
+        .budget-input-group input { flex: 2; }
+        .dash-btn { flex: 1; padding: 8px; font-size: 13px; border-radius: 5px; border: none; cursor: pointer; color: white; }
+        .btn-input { background: var(--success); }
+        .btn-modify { background: #95a5a6; }
+        .info-box { background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .info-label { font-size: 14px; color: #7f8c8d; }
+        .info-value { font-size: 18px; font-weight: bold; color: #2c3e50; }
+        #status { margin-top: 10px; text-align: center; font-size: 13px; min-height: 18px; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>💰 雲端快速記帳</h2>
-        
-        <div class="form-group">
-            <label>📅 日期</label>
-            <input type="date" id="date">
-        </div>
-
+        <h2>💰 雲端同步記帳 V7</h2>
+        <div class="form-group"><label>📅 日期</label><input type="date" id="date"></div>
         <div class="form-group">
             <label>🏷️ 主類別</label>
-            <div class="category-grid" id="main-category">
+            <div class="category-grid">
                 <div class="cat-btn" onclick="selectMainCat('食', this)">食</div>
                 <div class="cat-btn" onclick="selectMainCat('衣', this)">衣</div>
                 <div class="cat-btn" onclick="selectMainCat('住', this)">住</div>
@@ -82,137 +47,119 @@
                 <div class="cat-btn" onclick="selectMainCat('雜', this)">雜</div>
             </div>
         </div>
-
-        <div class="form-group" id="sub-category-container">
-            <label>🔍 子項目</label>
-            <select id="sub-category"></select>
-        </div>
-
-        <div class="form-group">
-            <label>💵 金額</label>
-            <input type="number" id="amount" placeholder="0" inputmode="decimal">
-        </div>
-
-        <div class="form-group">
-            <label>📝 備註</label>
-            <input type="text" id="note" placeholder="選填...">
-        </div>
-
+        <div class="form-group" id="sub-category-container"><label>🔍 子項目</label><select id="sub-category"></select></div>
+        <div class="form-group"><label>💵 金額</label><input type="number" id="amount" placeholder="0" inputmode="decimal"></div>
+        <div class="form-group"><label>📝 備註</label><input type="text" id="note" placeholder="選填..."></div>
         <button id="submitBtn" onclick="submitData()">確認送出</button>
-        <div id="status"></div>
+        <div id="status">正在同步雲端數值...</div>
+
+        <div class="dashboard">
+            <div class="dashboard-item">
+                <label>🏁 每月固定預算</label>
+                <div class="budget-input-group">
+                    <input type="number" id="input_starting" placeholder="輸入預算" inputmode="decimal">
+                    <button class="dash-btn btn-input" onclick="updateBudget('input')">輸入</button>
+                    <button class="dash-btn btn-modify" onclick="updateBudget('modify')">修改</button>
+                </div>
+            </div>
+            <div class="dashboard-item">
+                <div class="info-box"><span class="info-label">📉 當月剩餘金額</span><span class="info-value" id="disp_monthly_rem">0</span></div>
+            </div>
+            <div class="dashboard-item">
+                <div class="info-box"><span class="info-label">🏦 累積剩餘金額</span><span class="info-value" id="disp_accumulated_rem">0</span></div>
+            </div>
+        </div>
     </div>
 
     <script>
-       // 1. 強制確保在網頁載入完成後才執行初始設定
-window.onload = function() {
-    try {
-        const dateInput = document.getElementById('date');
-        if (dateInput) {
-            // 設定為台灣時區的今日日期 (解決部分手機顯示空白的問題)
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            dateInput.value = `${year}-${month}-${day}`;
-            console.log("日期已自動設定完成");
+        const url = "https://script.google.com/macros/s/AKfycbw_bob4WLfVlpah8dfXbeDpPgt_OplbfzknnWXe_A3RIOBKS22qzCcxagpmMMA9JXqn/exec";
+        let currentMainCat = "";
+        const subData = { "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"], "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"], "住": ["手機費", "網路費", "電費", "水費", "瓦斯費", "租車位費", "管理費", "稅費"], "行": ["油錢", "停車費", "住宿費", "租車費", "交通費", "修車費"], "育": ["學費", "書費", "教育費", "AI費"], "樂": ["娛樂費", "電視費", "教育費"], "金": ["存款", "股票", "虛擬幣"], "雜": ["保險費", "其他"] };
+
+        document.getElementById('date').valueAsDate = new Date();
+
+        window.onload = loadDashboard;
+
+        async function loadDashboard() {
+            const status = document.getElementById('status');
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                document.getElementById('input_starting').value = data.budget;
+                document.getElementById('disp_monthly_rem').innerText = Number(data.monthlyRem).toLocaleString();
+                document.getElementById('disp_accumulated_rem').innerText = Number(data.accumulatedRem).toLocaleString();
+                status.innerText = "☁️ 雲端同步已就緒";
+                status.style.color = "gray";
+            } catch (e) {
+                status.innerText = "⚠️ 雲端連線失敗，請檢查網路";
+                status.style.color = "red";
+            }
         }
-    } catch (e) {
-        console.error("日期設定失敗:", e);
-    }
-};
 
-let currentMainCat = "";
+        async function updateBudget(type) {
+            const val = Number(document.getElementById('input_starting').value);
+            const pwd = prompt("請輸入密碼以變更雲端設定：");
+            if (pwd !== "0728") { alert("密碼錯誤"); return; }
+            
+            document.getElementById('status').innerText = "⏳ 正在同步預算至雲端...";
+            await fetch(url, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify({ type: "updateBudget", newBudget: val })
+            });
+            alert("雲端預算已更新，剩餘金額已重置！");
+            loadDashboard();
+        }
 
-// 子項目資料庫
-const subData = {
-    "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"],
-    "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"],
-    "住": ["手機費", "網路費", "電費", "水費", "瓦斯費", "租車位費", "管理費", "稅費"],
-    "行": ["油錢", "停車費", "住宿費", "租車費", "交通費", "修車費"],
-    "育": ["學費", "書費", "教育費", "AI費"],
-    "樂": ["娛樂費", "電視費", "教育費"],
-    "金": ["存款", "股票", "虛擬幣"],
-    "雜": ["保險費", "其他"]
-};
-
-// 選擇主類別邏輯
-function selectMainCat(cat, btnElement) {
-    console.log("已點擊類別:", cat); // 測試用：若沒出現代表按鈕沒點到
-    currentMainCat = cat;
-    
-    // 切換按鈕樣式
-    const allBtns = document.querySelectorAll('.cat-btn');
-    allBtns.forEach(btn => btn.classList.remove('active'));
-    btnElement.classList.add('active');
-
-    // 顯示子類別
-    const container = document.getElementById('sub-category-container');
-    const select = document.getElementById('sub-category');
-    
-    if (container && select) {
-        select.innerHTML = ""; // 先清空舊的
-        
-        // 抓取資料庫內的選項
-        if (subData[cat]) {
+        function selectMainCat(cat, btnElement) {
+            currentMainCat = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            const container = document.getElementById('sub-category-container');
+            const select = document.getElementById('sub-category');
+            select.innerHTML = "";
             subData[cat].forEach(item => {
                 let opt = document.createElement('option');
-                opt.value = item;
-                opt.innerHTML = item;
+                opt.value = item; opt.innerHTML = item;
                 select.appendChild(opt);
             });
-            container.style.display = "block"; // 強制顯示區塊
-            console.log("子類別已切換為:", cat);
+            container.style.display = "block";
         }
-    } else {
-        console.error("找不到子類別容器，請檢查 HTML ID 是否正確");
-    }
-}
 
-// 傳送資料函數 (其餘保持不變...)
-async function submitData() {
-    const pwd = prompt("請輸入記帳密碼：");
-    if (pwd !== "0728") {
-        alert("密碼錯誤！");
-        return;
-    }
+        async function submitData() {
+            const pwd = prompt("請輸入密碼：");
+            if (pwd !== "0728") { alert("密碼錯誤！"); return; }
+            const cost = Number(document.getElementById('amount').value);
+            if (!currentMainCat || !cost) { alert("請填寫完整資訊"); return; }
 
-    if (!currentMainCat) { alert("請先點選主類別按鈕 (食/衣/住...)"); return; }
-    
-    const amount = document.getElementById('amount').value;
-    if (!amount) { alert("請輸入金額"); return; }
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('status');
+            btn.disabled = true;
+            status.innerText = "⏳ 正在儲存至雲端...";
 
-    const btn = document.getElementById('submitBtn');
-    const status = document.getElementById('status');
-    const url = "https://script.google.com/macros/s/AKfycbw_bob4WLfVlpah8dfXbeDpPgt_OplbfzknnWXe_A3RIOBKS22qzCcxagpmMMA9JXqn/exec";
-
-    const payload = {
-        date: document.getElementById('date').value,
-        mainCategory: currentMainCat,
-        subCategory: document.getElementById('sub-category').value,
-        amount: amount,
-        note: document.getElementById('note').value
-    };
-
-    btn.disabled = true;
-    status.innerText = "⏳ 傳送中...";
-
-    try {
-        await fetch(url, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify(payload),
-            headers: { "Content-Type": "text/plain" }
-        });
-        status.style.color = "green";
-        status.innerText = "✅ 記帳成功！";
-        document.getElementById('amount').value = "";
-        document.getElementById('note').value = "";
-    } catch (e) {
-        status.innerText = "❌ 傳送失敗，請重試";
-    } finally {
-        btn.disabled = false;
-    }
-}
+            try {
+                await fetch(url, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({
+                        date: document.getElementById('date').value,
+                        mainCategory: currentMainCat,
+                        subCategory: document.getElementById('sub-category').value,
+                        amount: cost,
+                        note: document.getElementById('note').value
+                    })
+                });
+                status.style.color = "green";
+                status.innerText = "✅ 記帳成功並已同步餘額！";
+                document.getElementById('amount').value = "";
+                document.getElementById('note').value = "";
+                loadDashboard(); // 重新抓取雲端數值
+            } catch (e) {
+                status.innerText = "❌ 傳送失敗";
+            } finally {
+                btn.disabled = false;
+            }
+        }
     </script>
 </body>
 </html>
