@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>雲端理財</title>
     <style>
-        :root { --primary: #4a90e2; --bg: #f5f7fa; --success: #2ecc71; --gray: #95a5a6; }
+        :root { --primary: #4a90e2; --bg: #f5f7fa; --success: #2ecc71; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; box-sizing: border-box; }
-        h2 { text-align: center; margin-top: 0; color: #333; font-size: 1.2rem; }
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; font-weight: bold; }
         input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
@@ -18,11 +17,10 @@
         #sub-category-container { display: none; background: #f0f7ff; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
         button#submitBtn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
         .dashboard { margin-top: 25px; border-top: 2px dashed #eee; padding-top: 20px; }
-        .info-box { background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .info-box { background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .info-value { font-size: 18px; font-weight: bold; color: #2c3e50; }
-        .btn-group { display: flex; gap: 5px; margin-top: 5px; margin-bottom: 15px; }
-        .dash-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; color: white; cursor: pointer; font-weight: bold; }
-        #status { text-align: center; font-size: 13px; color: gray; margin-top: 10px; }
+        #status { margin-top: 10px; text-align: center; font-size: 13px; color: gray; }
+        .btn-single { width: 100%; padding: 12px; background: var(--success); border: none; color: white; border-radius: 8px; font-weight: bold; margin-top: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -47,22 +45,24 @@
         <div class="form-group"><label>📝 備註</label><input type="text" id="note" placeholder="選填..."></div>
         
         <button id="submitBtn" onclick="submitData()">確認送出</button>
-        <div id="status">正在同步雲端...</div>
+        <div id="status">正在載入雲端資料...</div>
 
         <div class="dashboard">
             <label>🏁 每月固定預算</label>
             <input type="number" id="input_starting" placeholder="輸入金額">
-            <div class="btn-group">
-                <button class="dash-btn" style="background:var(--success)" onclick="updateBudget('input')">輸入</button>
-                <button class="dash-btn" style="background:var(--gray)" onclick="updateBudget('modify')">修改</button>
-            </div>
+            <button class="btn-single" onclick="updateBudget()">輸入</button>
+            <br><br>
             <div class="info-box"><span>📉 當月剩餘</span><span class="info-value" id="disp_monthly_rem">0</span></div>
+            <div class="info-box" style="background: #fdfdfd; border-color: #e0e0e0;">
+                <span style="font-size: 14px; color: #888;">⏮️ 上月剩餘</span>
+                <span class="info-value" id="disp_last_rem" style="color: #888;">0</span>
+            </div>
             <div class="info-box"><span>🏦 累積剩餘</span><span class="info-value" id="disp_accumulated_rem">0</span></div>
         </div>
     </div>
 
     <script>
-        const url = "https://script.google.com/macros/s/AKfycbw_bob4WLfVlpah8dfXbeDpPgt_OplbfzknnWXe_A3RIOBKS22qzCcxagpmMMA9JXqn/exec"; // <--- 請換成你的 URL
+        const url = "https://script.google.com/macros/s/AKfycbw_bob4WLfVlpah8dfXbeDpPgt_OplbfzknnWXe_A3RIOBKS22qzCcxagpmMMA9JXqn/exec"; 
         let currentMainCat = "";
         const subData = { "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"], "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"], "住": ["手機費", "網路費", "電費", "水費", "瓦斯費", "租車位費", "管理費", "稅費"], "行": ["油錢", "停車費", "住宿費", "租車費", "交通費", "修車費"], "育": ["學費", "書費", "教育費", "AI費"], "樂": ["娛樂費", "電視費", "教育費"], "金": ["存款", "股票", "虛擬幣"], "雜": ["保險費", "其他"] };
 
@@ -77,8 +77,9 @@
                 const data = await response.json();
                 document.getElementById('input_starting').value = data.budget;
                 document.getElementById('disp_monthly_rem').innerText = Number(data.monthlyRem).toLocaleString();
+                document.getElementById('disp_last_rem').innerText = Number(data.lastMonthRem).toLocaleString();
                 document.getElementById('disp_accumulated_rem').innerText = Number(data.accumulatedRem).toLocaleString();
-                document.getElementById('status').innerText = "☁️ 雲端同步成功";
+                document.getElementById('status').innerText = "☁️ 雲端同步完成";
             } catch (e) { document.getElementById('status').innerText = "⚠️ 同步失敗"; }
         }
 
@@ -97,33 +98,30 @@
             container.style.display = "block";
         }
 
-        async function updateBudget(mode) {
+        async function updateBudget() {
             const val = document.getElementById('input_starting').value;
             if (!val) return;
             const pwd = prompt("請輸入密碼：");
             if (pwd !== "0728") return;
 
-            document.getElementById('status').innerText = "⏳ 正在更新預算...";
+            document.getElementById('status').innerText = "⏳ 正在重新計算剩餘金額...";
             await fetch(url, {
                 method: "POST",
                 mode: "no-cors",
-                body: JSON.stringify({ type: "updateBudget", newBudget: val, mode: mode })
+                body: JSON.stringify({ type: "updateBudget", newBudget: val })
             });
-            alert("同步成功！");
+            alert("預算已更新，系統已自動扣除本月已花費金額！");
             loadDashboard();
         }
 
         async function submitData() {
             const pwd = prompt("請輸入密碼：");
             if (pwd !== "0728") return;
-            
             const amt = document.getElementById('amount').value;
             if (!currentMainCat || !amt) { alert("請填寫類別與金額"); return; }
-
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            document.getElementById('status').innerText = "⏳ 正在傳送...";
-
+            document.getElementById('status').innerText = "⏳ 傳送中...";
             try {
                 await fetch(url, {
                     method: "POST",
@@ -138,8 +136,7 @@
                 });
                 document.getElementById('amount').value = "";
                 document.getElementById('note').value = "";
-                // 延遲一點點再讀取，確保 Google 處理完畢
-                setTimeout(loadDashboard, 1000);
+                setTimeout(loadDashboard, 1500);
             } catch (e) { alert("失敗"); }
             finally { btn.disabled = false; }
         }
