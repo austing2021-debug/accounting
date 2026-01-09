@@ -47,19 +47,12 @@
     </div>
 
     <script>
-        // 在 submitData 函數的最前面加上這個驗證
-function submitData() {
-    const pwd = prompt("請輸入記帳密碼：");
-    if (pwd !== "0728") { // 這裡設定你自己的 4 位數密碼
-        alert("密碼錯誤，無法送出資料！");
-        return;
-    }
-    // ... 原本的程式碼 ...
-}
-        // 自動預設今天日期
-        document.getElementById('date').valueAsDate = new Date();
+    // 自動預設今天日期
+       document.getElementById('date').valueAsDate = new Date();
 
-        async function submitData() {
+       async function submitData() {
+    // 1. 先驗證密碼
+            const pwd = prompt("請輸入記帳密碼：");if (pwd !== "0728") {alert("密碼錯誤，無法送出資料！");return;}
             const btn = document.getElementById('submitBtn');
             const status = document.getElementById('status');
             const url = "https://script.google.com/macros/s/AKfycbw_bob4WLfVlpah8dfXbeDpPgt_OplbfzknnWXe_A3RIOBKS22qzCcxagpmMMA9JXqn/exec";
