@@ -5,28 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>雲端理財</title>
     <style>
-        :root { --primary: #4a90e2; --bg: #f5f7fa; --success: #2ecc71; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; box-sizing: border-box; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; font-weight: bold; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        .cat-btn { padding: 12px 0; background: #fff; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; cursor: pointer; text-align: center; }
-        .cat-btn.active { background: var(--primary); color: white; font-weight: bold; }
-        #sub-category-container { display: none; background: #f0f7ff; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
-        button#submitBtn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .dashboard { margin-top: 25px; border-top: 2px dashed #eee; padding-top: 20px; }
-        .info-box { background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .info-value { font-size: 18px; font-weight: bold; color: #2c3e50; }
-        #status { margin-top: 10px; text-align: center; font-size: 13px; color: gray; }
-        .btn-single { width: 100%; padding: 12px; background: var(--success); border: none; color: white; border-radius: 8px; font-weight: bold; margin-top: 5px; cursor: pointer; }
+        /* 莫蘭迪色系定義 */
+        :root {
+            --bg-color: #f4f1ea;       /* 接近白色的暖沙色 */
+            --card-bg: #ffffff;
+            --primary-muted: #8e9aaf;  /* 煙灰藍 */
+            --secondary-muted: #cbc0ad;/* 灰泥色 */
+            --success-muted: #a3b18a;  /* 豆沙綠 */
+            --text-main: #5a5a5a;
+            --text-sub: #8d8d8d;
+            --border-color: #e0dcd3;
+        }
+
+        body { 
+            font-family: -apple-system, "Noto Sans TC", sans-serif; 
+            background: var(--bg-color); 
+            display: flex; 
+            justify-content: center; 
+            padding: 20px 15px; 
+            margin: 0; 
+            color: var(--text-main);
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            width: 100%; 
+            max-width: 400px; 
+            box-sizing: border-box; 
+        }
+
+        h2 { text-align: center; margin-top: 0; color: var(--primary-muted); font-size: 1.4rem; letter-spacing: 1px; }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; color: var(--text-sub); font-size: 13px; font-weight: bold; }
+
+        input, select { 
+            width: 100%; padding: 12px; border: 1.5px solid var(--border-color); 
+            border-radius: 10px; box-sizing: border-box; font-size: 16px; 
+            background: #fafafa; color: var(--text-main); outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: var(--primary-muted); }
+
+        .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .cat-btn { 
+            padding: 12px 0; background: #fff; border: 1.5px solid var(--border-color); 
+            border-radius: 10px; font-size: 14px; cursor: pointer; text-align: center; color: var(--text-sub); transition: 0.2s;
+        }
+        .cat-btn.active { 
+            background: var(--primary-muted); color: white; border-color: var(--primary-muted); 
+            box-shadow: 0 4px 10px rgba(142, 154, 175, 0.3);
+        }
+
+        #sub-category-container { display: none; background: #f9f9f9; padding: 12px; border-radius: 10px; border: 1px dashed var(--border-color); margin-bottom: 15px; }
+
+        button#submitBtn { 
+            width: 100%; padding: 15px; background: var(--primary-muted); color: white; 
+            border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; 
+            box-shadow: 0 4px 12px rgba(142, 154, 175, 0.2); margin-top: 5px;
+        }
+
+        .dashboard { margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px; }
+        .info-box { 
+            background: #fff; border: 1px solid var(--border-color); padding: 14px; 
+            border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; 
+        }
+        .info-value { font-size: 18px; font-weight: bold; color: var(--text-main); }
+        
+        .btn-confirm { 
+            width: 100%; padding: 12px; background: var(--success-muted); border: none; 
+            color: white; border-radius: 10px; font-weight: bold; margin-top: 8px; cursor: pointer; font-size: 14px;
+        }
+
+        #status { margin-top: 15px; text-align: center; font-size: 12px; color: var(--text-sub); min-height: 18px; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>💰 雲端理財儀表板</h2>
+        <h2>💰 雲端理財</h2>
+        
         <div class="form-group"><label>📅 日期</label><input type="date" id="date"></div>
+        
         <div class="form-group">
             <label>🏷️ 主類別</label>
             <div class="category-grid">
@@ -40,24 +101,22 @@
                 <div class="cat-btn" onclick="selectMainCat('雜', this)">雜</div>
             </div>
         </div>
+
         <div class="form-group" id="sub-category-container"><label>🔍 子項目</label><select id="sub-category"></select></div>
         <div class="form-group"><label>💵 金額</label><input type="number" id="amount" placeholder="0" inputmode="decimal"></div>
         <div class="form-group"><label>📝 備註</label><input type="text" id="note" placeholder="選填..."></div>
         
         <button id="submitBtn" onclick="submitData()">確認送出</button>
-        <div id="status">正在載入雲端資料...</div>
+        <div id="status">正在同步雲端...</div>
 
         <div class="dashboard">
             <label>🏁 每月固定預算</label>
-            <input type="number" id="input_starting" placeholder="輸入金額">
-            <button class="btn-single" onclick="updateBudget()">輸入</button>
+            <input type="number" id="input_starting" placeholder="請輸入金額">
+            <button class="btn-confirm" onclick="updateBudget()">預算金額確認</button>
             <br><br>
             <div class="info-box"><span>📉 當月剩餘</span><span class="info-value" id="disp_monthly_rem">0</span></div>
-            <div class="info-box" style="background: #fdfdfd; border-color: #e0e0e0;">
-                <span style="font-size: 14px; color: #888;">⏮️ 上月剩餘</span>
-                <span class="info-value" id="disp_last_rem" style="color: #888;">0</span>
-            </div>
-            <div class="info-box"><span>🏦 累積剩餘</span><span class="info-value" id="disp_accumulated_rem">0</span></div>
+            <div class="info-box" style="background: #fafafa;"><span style="color:#888;">⏮️ 上月剩餘</span><span class="info-value" id="disp_last_rem" style="color:#888;">0</span></div>
+            <div class="info-box"><span>🏦 累積剩餘</span><span class="info-value" id="disp_accumulated_rem" style="color: #6b705c;">0</span></div>
         </div>
     </div>
 
@@ -79,7 +138,7 @@
                 document.getElementById('disp_monthly_rem').innerText = Number(data.monthlyRem).toLocaleString();
                 document.getElementById('disp_last_rem').innerText = Number(data.lastMonthRem).toLocaleString();
                 document.getElementById('disp_accumulated_rem').innerText = Number(data.accumulatedRem).toLocaleString();
-                document.getElementById('status').innerText = "☁️ 雲端同步完成";
+                document.getElementById('status').innerText = "☁️ 雲端同步已就緒";
             } catch (e) { document.getElementById('status').innerText = "⚠️ 同步失敗"; }
         }
 
@@ -101,27 +160,27 @@
         async function updateBudget() {
             const val = document.getElementById('input_starting').value;
             if (!val) return;
-            const pwd = prompt("請輸入密碼：");
+            const pwd = prompt("請輸入密碼以變更預算：");
             if (pwd !== "0728") return;
 
-            document.getElementById('status').innerText = "⏳ 正在重新計算剩餘金額...";
+            document.getElementById('status').innerText = "⏳ 正在重新計算預算...";
             await fetch(url, {
                 method: "POST",
                 mode: "no-cors",
                 body: JSON.stringify({ type: "updateBudget", newBudget: val })
             });
-            alert("預算已更新，系統已自動扣除本月已花費金額！");
+            alert("預算金額已確認更新！");
             loadDashboard();
         }
 
         async function submitData() {
-            const pwd = prompt("請輸入密碼：");
+            const pwd = prompt("請輸入記帳密碼：");
             if (pwd !== "0728") return;
             const amt = document.getElementById('amount').value;
             if (!currentMainCat || !amt) { alert("請填寫類別與金額"); return; }
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            document.getElementById('status').innerText = "⏳ 傳送中...";
+            document.getElementById('status').innerText = "⏳ 正在儲存至雲端...";
             try {
                 await fetch(url, {
                     method: "POST",
