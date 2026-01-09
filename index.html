@@ -45,7 +45,9 @@
         <button id="submitBtn" onclick="submitData()">確認送出</button>
         <div id="status"></div>
     </div>
-// 在 submitData 函數的最前面加上這個驗證
+
+    <script>
+        // 在 submitData 函數的最前面加上這個驗證
 function submitData() {
     const pwd = prompt("請輸入記帳密碼：");
     if (pwd !== "0728") { // 這裡設定你自己的 4 位數密碼
@@ -54,7 +56,6 @@ function submitData() {
     }
     // ... 原本的程式碼 ...
 }
-    <script>
         // 自動預設今天日期
         document.getElementById('date').valueAsDate = new Date();
 
