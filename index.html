@@ -2,93 +2,180 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>個人記帳系統</title>
     <style>
-        :root { --primary: #4a90e2; --bg: #f5f7fa; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { color: #333; margin-top: 0; text-align: center; }
-        .form-group { margin-bottom: 15px; }
+        :root { --primary: #4a90e2; --bg: #f5f7fa; --btn-bg: #ffffff; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; box-sizing: border-box; }
+        
+        h2 { text-align: center; margin-top: 0; color: #333; font-size: 1.2rem; }
+        .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        button:disabled { background: #ccc; }
+        
+        /* 1. 縮短日期格子，確保不超出畫面 */
+        input[type="date"], input[type="number"], input[type="text"], select { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; 
+            box-sizing: border-box; font-size: 16px; background: #fff;
+        }
+
+        /* 2. 8個按鈕排版 (上4下4) */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 四列 */
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .cat-btn {
+            padding: 10px 0;
+            background: var(--btn-bg);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .cat-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* 3. 下拉式區塊 */
+        #sub-category-container { display: none; margin-bottom: 15px; }
+        
+        button#submitBtn { 
+            width: 100%; padding: 15px; background: var(--primary); color: white; 
+            border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;
+        }
         #status { margin-top: 15px; text-align: center; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2>💰 快速記帳</h2>
+        
         <div class="form-group">
             <label>日期</label>
             <input type="date" id="date">
         </div>
+
         <div class="form-group">
-            <label>類別</label>
-            <select id="category">
-                <option value="餐飲美食">餐飲美食</option>
-                <option value="交通出行">交通出行</option>
-                <option value="居家生活">居家生活</option>
-                <option value="休閒娛樂">休閒娛樂</option>
-                <option value="自我增值">自我增值</option>
-            </select>
+            <label>主類別</label>
+            <div class="category-grid" id="main-category">
+                <div class="cat-btn" onclick="selectMainCat('食', this)">食</div>
+                <div class="cat-btn" onclick="selectMainCat('衣', this)">衣</div>
+                <div class="cat-btn" onclick="selectMainCat('住', this)">住</div>
+                <div class="cat-btn" onclick="selectMainCat('行', this)">行</div>
+                <div class="cat-btn" onclick="selectMainCat('育', this)">育</div>
+                <div class="cat-btn" onclick="selectMainCat('樂', this)">樂</div>
+                <div class="cat-btn" onclick="selectMainCat('金', this)">金</div>
+                <div class="cat-btn" onclick="selectMainCat('雜', this)">雜</div>
+            </div>
         </div>
+
+        <div class="form-group" id="sub-category-container">
+            <label>子項目</label>
+            <select id="sub-category"></select>
+        </div>
+
         <div class="form-group">
             <label>金額</label>
-            <input type="number" id="amount" placeholder="0.00" inputmode="decimal">
+            <input type="number" id="amount" placeholder="輸入金額" inputmode="decimal">
         </div>
+
         <div class="form-group">
             <label>備註</label>
-            <input type="text" id="note" placeholder="備註內容...">
+            <input type="text" id="note" placeholder="備註...">
         </div>
+
         <button id="submitBtn" onclick="submitData()">確認送出</button>
         <div id="status"></div>
     </div>
 
     <script>
-    // 自動預設今天日期
-       document.getElementById('date').valueAsDate = new Date();
+        // 設定今天日期
+        document.getElementById('date').valueAsDate = new Date();
 
-       async function submitData() {
-    // 1. 先驗證密碼
-            const pwd = prompt("請輸入記帳密碼：");if (pwd !== "0728") {alert("密碼錯誤，無法送出資料！");return;}
+        let currentMainCat = "";
+
+        // 子類別資料庫
+        const subData = {
+            "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"],
+            "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"],
+            "住": ["手機費", "網路費", "電費", "水費", "瓦斯費", "租車位費", "管理費", "稅費"],
+            "行": ["油錢", "停車費", "住宿費", "租車費", "交通費", "修車費"],
+            "育": ["學費", "書費", "教育費", "AI費"],
+            "樂": ["娛樂費", "電視費", "教育費"],
+            "金": ["存款", "股票", "虛擬幣"],
+            "雜": ["保險費", "其他"]
+        };
+
+        // 選擇主類別的動作
+        function selectMainCat(cat, btnElement) {
+            currentMainCat = cat;
+            
+            // 變更按鈕樣式
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            // 顯示子類別下拉選單
+            const container = document.getElementById('sub-category-container');
+            const select = document.getElementById('sub-category');
+            
+            select.innerHTML = ""; // 清空舊選項
+            subData[cat].forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item;
+                opt.innerHTML = item;
+                select.appendChild(opt);
+            });
+
+            container.style.display = "block";
+        }
+
+        async function submitData() {
+            // 1. 驗證密碼
+            const pwd = prompt("請輸入記帳密碼：");
+            if (pwd !== "0728") {
+                alert("密碼錯誤！");
+                return;
+            }
+
+            if (!currentMainCat) { alert("請選擇一個類別"); return; }
+            if (!document.getElementById('amount').value) { alert("請輸入金額"); return; }
+
             const btn = document.getElementById('submitBtn');
             const status = document.getElementById('status');
-            const url = "https://script.google.com/macros/s/AKfycbw_bob4WLfVlpah8dfXbeDpPgt_OplbfzknnWXe_A3RIOBKS22qzCcxagpmMMA9JXqn/exec";
+            const url = "https://script.google.com/macros/s/AKfycbw_bob4WLfVlpah8dfXbeDpPgt_OplbfzknnWXe_A3RIOBKS22qzCcxagpmMMA9JXqn/exec"; // <--- 記得檢查這行
 
             const payload = {
                 date: document.getElementById('date').value,
-                category: document.getElementById('category').value,
+                category: `${currentMainCat} - ${document.getElementById('sub-category').value}`, // 合併大類與小類
                 amount: document.getElementById('amount').value,
                 note: document.getElementById('note').value
             };
 
-            if(!payload.amount) { alert("請輸入金額"); return; }
-
             btn.disabled = true;
-            btn.innerText = "傳送中...";
-            status.innerText = "⏳ 正在處理...";
+            status.innerText = "⏳ 傳送中...";
 
             try {
-                // 使用 fetch 的 no-cors 模式或是標準 POST
                 await fetch(url, {
                     method: "POST",
                     mode: "no-cors",
                     body: JSON.stringify(payload),
                     headers: { "Content-Type": "text/plain" }
                 });
-                
                 status.style.color = "green";
                 status.innerText = "✅ 記帳成功！";
                 document.getElementById('amount').value = "";
                 document.getElementById('note').value = "";
             } catch (error) {
-                status.style.color = "red";
-                status.innerText = "❌ 發生錯誤，請稍後再試";
+                status.innerText = "❌ 失敗，請檢查網路";
             } finally {
                 btn.disabled = false;
-                btn.innerText = "確認送出";
             }
         }
     </script>
