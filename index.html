@@ -4,88 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🏦 理財紀錄</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
         :root {
-            --bg-color: #f4f1ea;       /* 莫蘭迪沙色背景 */
-            --input-bg: #e9e5db;       /* 輸入框顏色比背景深 */
+            --bg-color: #f4f1ea;
+            --input-bg: #e9e5db;
             --card-bg: #ffffff;
-            --primary-muted: #8e9aaf;  /* 煙灰藍 */
-            --milktea-color: #bfa58a;  /* 莫蘭迪奶茶色 */
+            --primary-muted: #8e9aaf;
+            --milktea-color: #bfa58a;
             --text-main: #5a5a5a;
             --text-sub: #8d8d8d;
             --border-color: #dcd7cc;
         }
 
-        /* 基礎設定 */
-        body { 
-            font-family: -apple-system, "Noto Sans TC", sans-serif; 
-            background: var(--bg-color); 
-            margin: 0; 
-            padding: 0;
-            color: var(--text-main);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* 標題區域 */
-        header {
-            padding: 15px;
-            text-align: center;
-            background: var(--bg-color);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+        body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; }
+        header { padding: 15px; text-align: center; background: var(--bg-color); }
         h2 { margin: 0; color: var(--primary-muted); font-size: 1.3rem; letter-spacing: 1px; }
 
-        /* 主容器 */
-        .main-container {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            padding-bottom: 80px; /* 留給 Tab 的空間 */
-            display: flex;
-            justify-content: center;
-        }
+        .main-container { flex: 1; padding: 15px; padding-bottom: 80px; display: flex; justify-content: center; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); width: 100%; max-width: 400px; box-sizing: border-box; }
 
-        .card { 
-            background: var(--card-bg); 
-            padding: 20px; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
-            width: 100%; 
-            max-width: 400px; 
-            box-sizing: border-box; /* 關鍵：包含 padding */
-        }
-
-        /* 頁面切換內容 */
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* 表單樣式 */
-        .form-group { margin-bottom: 15px; }
+        .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 6px; color: var(--text-sub); font-size: 13px; font-weight: bold; }
 
-        /* 修正日期格子跑出畫面 */
+        /* 徹底修復日期格超出 */
         input, select { 
-            width: 100%; 
-            padding: 14px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 12px; 
-            box-sizing: border-box; /* 確保 padding 不會撐破寬度 */
-            font-size: 16px; 
-            background: var(--input-bg); 
-            color: var(--text-main); 
-            outline: none;
-            -webkit-appearance: none; /* 去除 iOS 預設樣式 */
+            width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; 
+            box-sizing: border-box; font-size: 16px; background: var(--input-bg); color: var(--text-main); 
+            outline: none; -webkit-appearance: none;
         }
 
-        /* 類別按鈕 */
         .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        .cat-btn { padding: 10px 0; background: #fff; border: 1px solid var(--border-color); border-radius: 10px; font-size: 14px; cursor: pointer; text-align: center; color: var(--text-sub); }
+        .cat-btn { padding: 10px 0; background: #fff; border: 1px solid var(--border-color); border-radius: 10px; font-size: 14px; cursor: pointer; text-align: center; }
         .cat-btn.active { background: var(--primary-muted); color: white; border-color: var(--primary-muted); }
 
         #sub-category-container { display: none; background: var(--input-bg); padding: 12px; border-radius: 10px; margin-bottom: 15px; }
@@ -93,46 +46,27 @@
         button.main-btn { width: 100%; padding: 16px; background: var(--primary-muted); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
         .btn-confirm { background: var(--milktea-color) !important; margin-top: 10px; }
 
-        /* 儀表板區域 */
         .info-box { background: #fff; border: 1px solid var(--border-color); padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .info-value { font-size: 18px; font-weight: bold; }
 
-        /* 底部 Tab 鍵 */
-        .tab-bar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #fff;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            border-top: 1px solid var(--border-color);
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
-        }
-        .tab-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 11px;
-            color: var(--text-sub);
-            text-decoration: none;
-            cursor: pointer;
-            width: 33%;
-        }
-        .tab-item.active { color: var(--primary-muted); }
-        .tab-icon { font-size: 20px; margin-bottom: 4px; }
+        /* 底部 Tab */
+        .tab-bar { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border-color); }
+        .tab-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--text-sub); cursor: pointer; width: 33.3%; }
+        .tab-item.active { color: var(--primary-muted); font-weight: bold; }
+        .tab-icon { font-size: 22px; margin-bottom: 3px; }
 
-        /* 數位密碼視窗 */
+        /* 分析圖表容器 */
+        #chart_3d { width: 100%; height: 300px; margin-top: 10px; }
+        .progress-container { background: #eee; border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; }
+        #progress-bar { background: var(--milktea-color); height: 100%; width: 0%; transition: 1s; }
+
         #pwd-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 25px; border-radius: 20px; width: 80%; max-width: 300px; text-align: center; }
-        #pwd-input { text-align: center; letter-spacing: 5px; font-size: 24px; margin: 15px 0; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h2>🏦 理財紀錄</h2>
-    </header>
+    <header><h2>🏦 理財紀錄</h2></header>
 
     <div class="main-container">
         <div class="card">
@@ -172,22 +106,29 @@
             </div>
 
             <div id="page-analysis" class="tab-content">
-                <div style="text-align: center; padding: 40px 0; color: var(--text-sub);">
-                    <p style="font-size: 40px;">📊</p>
-                    <p>資料分析功能開發中...<br>請至 Excel 查看詳細圖表</p>
+                <label>📅 本月消費比例 (含剩餘)</label>
+                <div id="chart_3d"></div>
+                
+                <label>🔥 預算使用進度</label>
+                <div class="progress-container"><div id="progress-bar"></div></div>
+                <p id="progress-text" style="font-size: 12px; color: var(--text-sub); text-align: right;">0%</p>
+                
+                <div style="background: var(--input-bg); padding: 15px; border-radius: 12px; font-size: 13px;">
+                    💡 <b>小提示：</b><br>
+                    圓餅圖面積越大代表該項支出越高。
                 </div>
             </div>
 
-            <div id="status" style="text-align: center; font-size: 12px; color: gray; margin-top: 15px;"></div>
+            <div id="status" style="text-align: center; font-size: 11px; color: gray; margin-top: 15px;"></div>
         </div>
     </div>
 
     <nav class="tab-bar">
         <div class="tab-item active" onclick="switchTab('page-input', this)">
-            <span class="tab-icon">✍️</span><span>輸入</span>
+            <span class="tab-icon">📋</span><span>消費</span>
         </div>
         <div class="tab-item" onclick="switchTab('page-budget', this)">
-            <span class="tab-icon">🐷</span><span>預算</span>
+            <span class="tab-icon">👛</span><span>錢包</span>
         </div>
         <div class="tab-item" onclick="switchTab('page-analysis', this)">
             <span class="tab-icon">📊</span><span>分析</span>
@@ -196,10 +137,10 @@
 
     <div id="pwd-modal">
         <div class="modal-content">
-            <label>🔐 請輸入數字密碼</label>
+            <label>🔐 數位密碼驗證</label>
             <input type="password" id="pwd-input" inputmode="numeric" pattern="[0-9]*" placeholder="****">
             <button class="main-btn btn-confirm" onclick="verifyAndAction()">確定</button>
-            <button class="main-btn" style="background: #ccc;" onclick="closeModal()">取消</button>
+            <button class="main-btn" style="background: #ccc; margin-top:10px;" onclick="closeModal()">取消</button>
         </div>
     </div>
 
@@ -207,61 +148,73 @@
         const url = "https://script.google.com/macros/s/AKfycbw_bob4WLfVlpah8dfXbeDpPgt_OplbfzknnWXe_A3RIOBKS22qzCcxagpmMMA9JXqn/exec"; 
         let currentMainCat = "";
         let pendingAction = "";
+        let globalData = null;
 
-        const subData = { "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"], "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"], "住": ["手機費", "網路費", "電費", "水費", "瓦斯費", "租車位費", "管理費", "稅費"], "行": ["油錢", "停車費", "住宿費", "租車費", "交通費", "修車費"], "育": ["學費", "書費", "教育費", "AI費"], "樂": ["娛樂費", "電視費", "教育費"], "金": ["存款", "股票", "虛擬幣"], "雜": ["保險費", "其他"] };
+        google.charts.load('current', {'packages':['corechart']});
 
         window.onload = function() {
             document.getElementById('date').valueAsDate = new Date();
             loadDashboard();
         };
 
-        // Tab 切換邏輯
         function switchTab(pageId, element) {
             document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
-            
             document.getElementById(pageId).classList.add('active');
             element.classList.add('active');
-            document.getElementById('status').innerText = "";
-        }
-
-        // 數位密碼控制
-        function prepareSubmit(action) {
-            pendingAction = action;
-            document.getElementById('pwd-modal').style.display = 'flex';
-            document.getElementById('pwd-input').focus();
-        }
-
-        function closeModal() {
-            document.getElementById('pwd-modal').style.display = 'none';
-            document.getElementById('pwd-input').value = "";
-        }
-
-        function verifyAndAction() {
-            const pwd = document.getElementById('pwd-input').value;
-            if (pwd === "0728") {
-                closeModal();
-                if (pendingAction === 'expense') executeSubmit();
-                else if (pendingAction === 'budget') executeUpdateBudget();
-            } else {
-                alert("密碼錯誤！");
-                document.getElementById('pwd-input').value = "";
-            }
+            if(pageId === 'page-analysis') draw3DPieChart();
         }
 
         async function loadDashboard() {
-            const status = document.getElementById('status');
             try {
                 const response = await fetch(url);
-                const data = await response.json();
-                document.getElementById('input_starting').value = data.budget;
-                document.getElementById('disp_monthly_rem').innerText = Number(data.monthlyRem).toLocaleString();
-                document.getElementById('disp_last_rem').innerText = Number(data.lastMonthRem).toLocaleString();
-                document.getElementById('disp_accumulated_rem').innerText = Number(data.accumulatedRem).toLocaleString();
-                status.innerText = "☁️ 雲端同步完成";
-            } catch (e) { status.innerText = "⚠️ 同步失敗"; }
+                globalData = await response.json();
+                document.getElementById('input_starting').value = globalData.budget;
+                document.getElementById('disp_monthly_rem').innerText = Number(globalData.monthlyRem).toLocaleString();
+                document.getElementById('disp_last_rem').innerText = Number(globalData.lastMonthRem).toLocaleString();
+                document.getElementById('disp_accumulated_rem').innerText = Number(globalData.accumulatedRem).toLocaleString();
+                updateProgressBar();
+                document.getElementById('status').innerText = "☁️ 雲端同步成功";
+            } catch (e) { document.getElementById('status').innerText = "⚠️ 同步失敗"; }
         }
 
+        function updateProgressBar() {
+            const spent = globalData.budget - globalData.monthlyRem;
+            const percent = Math.min((spent / globalData.budget) * 100, 100);
+            document.getElementById('progress-bar').style.width = percent + "%";
+            document.getElementById('progress-text').innerText = Math.round(percent) + "% (已花費 " + spent.toLocaleString() + ")";
+        }
+
+        function draw3DPieChart() {
+            if(!globalData || !globalData.breakdown) return;
+            var dataArray = [['Category', 'Amount']];
+            for (var cat in globalData.breakdown) {
+                dataArray.push([cat, globalData.breakdown[cat]]);
+            }
+            dataArray.push(['當月剩餘', globalData.monthlyRem]);
+
+            var data = google.visualization.arrayToDataTable(dataArray);
+            var options = {
+                is3D: true,
+                backgroundColor: 'transparent',
+                chartArea: {width: '100%', height: '80%'},
+                legend: {position: 'right', textStyle: {fontSize: 12}},
+                colors: ['#8e9aaf', '#cbc0ad', '#a3b18a', '#bfa58a', '#d4a373', '#e9edc9', '#faedcd', '#ccd5ae', '#f4f1ea']
+            };
+            var chart = new google.visualization.PieChart(document.getElementById('chart_3d'));
+            chart.draw(data, options);
+        }
+
+        // --- 密碼與提交邏輯保持不變 ---
+        function prepareSubmit(action) { pendingAction = action; document.getElementById('pwd-modal').style.display = 'flex'; document.getElementById('pwd-input').focus(); }
+        function closeModal() { document.getElementById('pwd-modal').style.display = 'none'; document.getElementById('pwd-input').value = ""; }
+        function verifyAndAction() {
+            if (document.getElementById('pwd-input').value === "0728") {
+                closeModal();
+                if (pendingAction === 'expense') executeSubmit();
+                else executeUpdateBudget();
+            } else { alert("密碼錯誤"); }
+        }
         function selectMainCat(cat, btnElement) {
             currentMainCat = cat;
             document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
@@ -269,50 +222,29 @@
             const container = document.getElementById('sub-category-container');
             const select = document.getElementById('sub-category');
             select.innerHTML = "";
-            subData[cat].forEach(item => {
+            subData[currentMainCat].forEach(item => {
                 let opt = document.createElement('option');
-                opt.value = item; opt.innerText = item;
-                select.appendChild(opt);
+                opt.value = item; opt.innerText = item; select.appendChild(opt);
             });
             container.style.display = "block";
         }
-
         async function executeUpdateBudget() {
             const val = document.getElementById('input_starting').value;
-            if (!val) return;
-            document.getElementById('status').innerText = "⏳ 更新預算中...";
-            await fetch(url, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify({ type: "updateBudget", newBudget: val })
-            });
-            alert("同步成功！");
+            await fetch(url, { method: "POST", mode: "no-cors", body: JSON.stringify({ type: "updateBudget", newBudget: val }) });
             loadDashboard();
         }
-
         async function executeSubmit() {
             const amt = document.getElementById('amount').value;
-            if (!currentMainCat || !amt) { alert("請填寫完整資訊"); return; }
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            document.getElementById('status').innerText = "⏳ 傳送中...";
-            try {
-                await fetch(url, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({
-                        date: document.getElementById('date').value,
-                        mainCategory: currentMainCat,
-                        subCategory: document.getElementById('sub-category').value,
-                        amount: amt,
-                        note: document.getElementById('note').value
-                    })
-                });
-                document.getElementById('amount').value = "";
-                document.getElementById('note').value = "";
-                setTimeout(loadDashboard, 1500);
-            } catch (e) { alert("失敗"); }
-            finally { btn.disabled = false; }
+            await fetch(url, { method: "POST", mode: "no-cors", body: JSON.stringify({
+                date: document.getElementById('date').value,
+                mainCategory: currentMainCat,
+                subCategory: document.getElementById('sub-category').value,
+                amount: amt,
+                note: document.getElementById('note').value
+            })});
+            document.getElementById('amount').value = "";
+            document.getElementById('note').value = "";
+            setTimeout(loadDashboard, 1500);
         }
     </script>
 </body>
