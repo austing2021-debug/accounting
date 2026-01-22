@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏦 理財紀錄 (Pro Max)</title>
+    <title>🏦 理財紀錄 (Final)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -30,7 +30,7 @@
             --btn-submit-active-bg: #ecf6fd;
             --btn-submit-active-text: #454545;
             
-            --delete-color: #ff4d4f;
+            --delete-color: #ff4d4f; /* 紅色 */
         }
 
         body { 
@@ -98,22 +98,28 @@
         .tab-item.active { color: var(--icon-color); font-weight: bold; }
         .tab-item i { font-size: 20px; margin-bottom: 4px; }
 
-        /* 圖表修正區塊 */
+        /* --- 3. 圓餅圖文字置中修正區塊 --- */
         #chart-container {
             position: relative;
             width: 100%;
             height: 300px;
             margin-top: 10px;
+            /* 確保圖表容器也是置中 */
+            display: flex;
+            justify-content: center;
         }
         #chart_donut { width: 100%; height: 100%; }
+        
         #center-text {
             position: absolute;
-            top: 50%; left: 50%;
+            /* 改為 45% 以配合下方圖例造成的圖表上移 */
+            top: 45%; 
+            left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            pointer-events: none; /* 讓點擊穿透 */
+            pointer-events: none;
             display: none;
-            z-index: 10; /* 確保在圖表之上 */
+            z-index: 10;
         }
         #center-label { font-size: 14px; color: #888; display: block; }
         #center-value { font-size: 22px; font-weight: bold; color: var(--text-main); display: block; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
@@ -121,7 +127,6 @@
         .progress-container { background: #eee; border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.1); }
         #progress-bar { background: var(--cat-active-bg); height: 100%; width: 0%; transition: 1s; }
 
-        /* 消費紀錄與刪除功能區塊 */
         .history-section { margin-top: 25px; padding-top: 20px; border-top: 2px dashed #eee; }
         .history-controls { display: flex; gap: 5px; margin-bottom: 15px; justify-content: space-between; }
         .history-btn {
@@ -145,12 +150,41 @@
         .amt-col { text-align: right; font-weight: bold; }
         .date-col { font-size: 12px; color: #999; width: 60px; }
 
-        /* 刪除功能樣式 */
-        .checkbox-col { width: 30px; text-align: center; display: none; } /* 預設隱藏 */
+        /* --- 2. 紅心滿版圓圈 樣式 --- */
+        .checkbox-col { width: 40px; text-align: center; display: none; }
         .delete-mode .checkbox-col { display: table-cell; }
         
         .row-checkbox {
-            width: 18px; height: 18px; accent-color: var(--delete-color);
+            appearance: none; /* 隱藏預設方形 */
+            -webkit-appearance: none;
+            width: 24px; 
+            height: 24px;
+            border: 2px solid #ddd; /* 未選取時的邊框 */
+            border-radius: 50%; /* 圓形 */
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            background: #fff;
+            vertical-align: middle;
+        }
+        
+        /* 選取時的狀態 (滿版紅色圓圈) */
+        .row-checkbox:checked {
+            background-color: var(--delete-color); /* 紅色背景 */
+            border-color: var(--delete-color);
+        }
+        
+        /* 選取時裡面的勾勾 */
+        .row-checkbox:checked::after {
+            content: '\f00c'; /* FontAwesome 的勾勾代碼，或直接用 CSS 畫 */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
         }
 
         .table-footer-actions {
@@ -160,7 +194,7 @@
             padding: 8px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; border: none; cursor: pointer;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .btn-edit { background: #fff; border: 1px solid #ddd; color: #666; }
+        /* 1. 移除 btn-edit 的樣式 */
         .btn-delete { background: #fff; border: 1px solid var(--delete-color); color: var(--delete-color); }
         .btn-confirm-del { background: var(--delete-color); color: white; display: none; }
 
@@ -248,7 +282,6 @@
                     </div>
                     
                     <div class="table-footer-actions" id="table-actions" style="display:none;">
-                        <button id="btn-edit" class="action-btn btn-edit" onclick="alert('編輯功能尚在開發中，請先刪除錯誤項目後重新新增。')">編輯</button>
                         <button id="btn-delete" class="action-btn btn-delete" onclick="toggleDeleteMode()">刪除</button>
                         <button id="btn-confirm-del" class="action-btn btn-confirm-del" onclick="executeDelete()">確認刪除</button>
                     </div>
@@ -307,7 +340,7 @@
         let currentMainCat = "";
         let dashboardData = { budget: 0, spent: 0, breakdown: {} };
         let donutChart;
-        let isDeleteMode = false; // 追蹤刪除模式狀態
+        let isDeleteMode = false;
 
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(initChartWrapper);
@@ -338,31 +371,23 @@
             element.classList.add('active');
             if(pageId === 'page-analysis') drawDonutChart();
             
-            // 切換分頁時重置刪除模式
             if(isDeleteMode) toggleDeleteMode();
         }
 
-        // --- 刪除功能邏輯 ---
         function toggleDeleteMode() {
             isDeleteMode = !isDeleteMode;
             const table = document.getElementById('history-table');
-            const btnEdit = document.getElementById('btn-edit');
             const btnDel = document.getElementById('btn-delete');
             const btnConfirm = document.getElementById('btn-confirm-del');
 
             if(isDeleteMode) {
-                // 進入刪除模式
                 table.classList.add('delete-mode');
-                btnEdit.style.display = 'none';
                 btnDel.style.display = 'none';
                 btnConfirm.style.display = 'inline-block';
             } else {
-                // 離開刪除模式
                 table.classList.remove('delete-mode');
-                btnEdit.style.display = 'inline-block';
                 btnDel.style.display = 'inline-block';
                 btnConfirm.style.display = 'none';
-                // 清空勾選
                 document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
             }
         }
@@ -378,7 +403,6 @@
 
             const idsToDelete = Array.from(checkboxes).map(cb => cb.value);
 
-            // 執行 Supabase 刪除
             const { error } = await _supabase
                 .from('expenses')
                 .delete()
@@ -389,26 +413,23 @@
                 console.error(error);
             } else {
                 alert("刪除成功！");
-                toggleDeleteMode(); // 退出刪除模式
+                toggleDeleteMode();
                 
-                // 重新載入目前顯示的歷史紀錄
                 const activeBtn = document.querySelector('.history-btn.active');
                 if(activeBtn && activeBtn.innerText === '當月') loadHistory('month', activeBtn);
                 else if(activeBtn && activeBtn.innerText === '半年') loadHistory('half', activeBtn);
                 else if(activeBtn && activeBtn.innerText === 'GO') loadHistory('custom', null);
                 
-                // 更新錢包數據
                 loadDashboard();
             }
         }
 
-        // --- 歷史紀錄與消費查詢 ---
         function toggleCustomDate(btn) {
             document.querySelectorAll('.history-btn').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
             document.getElementById('custom-date-box').style.display = 'flex';
             document.getElementById('history-table-container').style.display = 'none';
-            document.getElementById('table-actions').style.display = 'none'; // 隱藏按鈕
+            document.getElementById('table-actions').style.display = 'none';
         }
 
         async function loadHistory(mode, btn) {
@@ -424,7 +445,6 @@
             const empty = document.getElementById('hist-empty');
             const actions = document.getElementById('table-actions');
 
-            // 重置刪除狀態
             if(isDeleteMode) toggleDeleteMode();
 
             tableContainer.style.display = 'block';
@@ -472,7 +492,6 @@
                     return;
                 }
                 
-                // 顯示底部按鈕
                 actions.style.display = 'flex';
 
                 records.forEach(r => {
@@ -556,12 +575,16 @@
             if(dataArray.length === 1) dataArray.push(['無消費', 1]);
 
             var data = google.visualization.arrayToDataTable(dataArray);
+            
+            // 3. 圖表設定修正：圖例移到下方，確保水平置中
             var options = {
-                pieHole: 0.7, // 修正點：加大中間空洞
+                pieHole: 0.7, 
                 pieSliceText: 'none', 
                 backgroundColor: 'transparent',
-                chartArea: {width: '90%', height: '90%'},
-                legend: {position: 'right', textStyle: {fontSize: 12}},
+                // 設定圖表區域，留出底部給圖例
+                chartArea: {left: 'auto', top: 10, width: '100%', height: '80%'},
+                // 關鍵：將圖例移到 'bottom'，這樣圓餅圖就會自動水平置中
+                legend: {position: 'bottom', textStyle: {fontSize: 12}},
                 tooltip: { trigger: 'focus' },
                 colors: ['#66b8db', '#ecf6fd', '#bfa58a', '#d4a373', '#8e9aaf', '#e9edc9', '#faedcd', '#ccd5ae']
             };
