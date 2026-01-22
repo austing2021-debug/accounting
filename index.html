@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏦 理財紀錄 (Pro Version)</title>
+    <title>🏦 理財紀錄 (Lite)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -12,38 +12,34 @@
     
     <style>
         :root {
-            /* 1. 背景顏色改為 #fbf9f4 */
+            /* 背景顏色 */
             --bg-color: #fbf9f4;
             
-            /* 4. 填寫資料表格背景色 */
-            --input-bg: #f6f5ea;
+            /* 2. 填寫資料表格背景色 (修改) */
+            --input-bg: #ededed;
             
             --card-bg: #ffffff;
-            
-            /* 2. 圖標顏色 */
             --icon-color: #454545;
             
-            /* 3. 字體基本顏色 #000000 */
+            /* 字體顏色 */
             --text-main: #000000;
             --text-sub: #8d8d8d;
             
-            /* 5. 主類別按鈕顏色 */
-            --cat-default-bg: #f7f2f8;
+            /* 3. 主類別按鈕顏色 (修改) */
+            /* 不按的時候 (淺藍底 深灰字) */
+            --cat-default-bg: #9bd9f3;
             --cat-default-text: #454545;
-            --cat-active-bg: #d8c1ec;
+            /* 選擇的時候 (深藍底 白字) */
+            --cat-active-bg: #66b8db;
             --cat-active-text: #fbf9f4;
 
-            /* 6. 確認送出按鈕顏色 */
-            --btn-submit-bg: #d8c1ec;
+            /* 4. 確認送出按鈕顏色 (修改) */
+            /* 不按的時候 (深藍底 白字) */
+            --btn-submit-bg: #66b8db;
             --btn-submit-text: #fbf9f4;
-            --btn-submit-active-bg: #f7f2f8;
+            /* 選擇的時候 (淺藍底 深灰字) */
+            --btn-submit-active-bg: #9bd9f3;
             --btn-submit-active-text: #454545;
-
-            /* 7. 預算按鈕顏色 */
-            --btn-budget-bg: #66b8db;
-            --btn-budget-text: #fbf9f4;
-            --btn-budget-active-bg: #9bd9f3;
-            --btn-budget-active-text: #454545;
         }
 
         body { 
@@ -68,7 +64,7 @@
         label { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--icon-color); font-size: 14px; font-weight: bold; }
         label i { color: var(--icon-color); }
 
-        /* 4. 輸入框改為凹陷狀態 */
+        /* 輸入框樣式 (凹陷感 + 新顏色) */
         input, select { 
             width: 100%; padding: 14px; 
             border: none;
@@ -85,7 +81,7 @@
             box-shadow: inset 3px 3px 8px rgba(0,0,0,0.15);
         }
 
-        /* 5. 主類別按鈕 - 懸浮狀態 */
+        /* 主類別按鈕 */
         .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
         .cat-btn { 
             padding: 12px 0; 
@@ -101,17 +97,17 @@
             box-shadow: 3px 3px 6px rgba(0,0,0,0.1), -1px -1px 4px rgba(255,255,255,0.8);
             transition: all 0.2s ease;
         }
-        /* 點擊效果 */
+        /* 按下效果 */
         .cat-btn:active { transform: scale(0.96); }
         .cat-btn.active { 
             background: var(--cat-active-bg); 
             color: var(--cat-active-text); 
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2); /* 按下變成凹陷 */
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
         }
 
         #sub-category-container { display: none; background: transparent; margin-bottom: 15px; }
 
-        /* 6. 確認送出按鈕 - 懸浮狀態 */
+        /* 確認送出按鈕 */
         button.main-btn { 
             width: 100%; padding: 16px; 
             background: var(--btn-submit-bg); 
@@ -119,7 +115,7 @@
             border: none; 
             border-radius: 12px; 
             font-size: 16px; font-weight: bold; cursor: pointer; 
-            box-shadow: 0 4px 10px rgba(216, 193, 236, 0.4);
+            box-shadow: 0 4px 10px rgba(102, 184, 219, 0.4); /* 配合藍色系的陰影 */
             transition: all 0.2s;
         }
         button.main-btn:active {
@@ -129,16 +125,9 @@
             box-shadow: none;
         }
 
-        /* 7. 預算金額確認按鈕 */
+        /* 預算按鈕 (沿用送出按鈕的樣式邏輯，保持一致性) */
         .btn-budget { 
-            background: var(--btn-budget-bg) !important; 
-            color: var(--btn-budget-text) !important;
             margin-top: 10px; 
-            box-shadow: 0 4px 10px rgba(102, 184, 219, 0.4) !important;
-        }
-        .btn-budget:active {
-            background: var(--btn-budget-active-bg) !important;
-            color: var(--btn-budget-active-text) !important;
         }
 
         .info-box { background: #fff; border: 1px solid #eee; padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
@@ -155,20 +144,23 @@
         .progress-container { background: #eee; border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.1); }
         #progress-bar { background: var(--cat-active-bg); height: 100%; width: 0%; transition: 1s; }
 
-        /* 8. 錢包 - 消費紀錄區塊 */
+        /* 消費紀錄區塊 */
         .history-section {
             margin-top: 25px;
             padding-top: 20px;
             border-top: 2px dashed #eee;
         }
+        
+        /* 5A. 解決按鈕超出格子問題：調整間距與 Flex 設定 */
         .history-controls {
             display: flex;
-            gap: 10px;
+            gap: 6px; /* 縮小間距 */
             margin-bottom: 15px;
+            justify-content: space-between; /* 平均分配空間 */
         }
         .history-btn {
-            flex: 1;
-            padding: 8px 0;
+            flex: 1; /* 自動填滿 */
+            padding: 8px 2px; /* 減少左右內距 */
             font-size: 13px;
             background: #fff;
             border: 1px solid #ddd;
@@ -176,12 +168,14 @@
             color: var(--text-main);
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap; /* 強制不換行 */
         }
         .history-btn.active {
             background: var(--icon-color);
             color: #fff;
             border-color: var(--icon-color);
         }
+        
         .custom-date-range {
             display: none;
             gap: 5px;
@@ -191,13 +185,13 @@
             border-radius: 10px;
         }
         .table-container {
-            height: 250px; /* 固定高度 */
-            overflow-y: auto; /* 可捲動 */
+            height: 250px;
+            overflow-y: auto;
             background: #fff;
             border-radius: 12px;
             box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
             border: 1px solid #eee;
-            display: none; /* 預設隱藏，按鈕按下才顯示 */
+            display: none;
         }
         table {
             width: 100%;
@@ -218,12 +212,14 @@
             border-bottom: 1px solid #f5f5f5;
             color: var(--text-main);
         }
-        .amt-col { text-align: right; font-weight: bold; color: #d8c1ec; }
+        
+        /* 5B. 金額欄位樣式 */
+        .amt-col { 
+            text-align: right; 
+            font-weight: bold; 
+            /* 顏色由 JS 動態控制 */
+        }
         .date-col { font-size: 12px; color: #999; width: 80px; }
-
-        /* Modal */
-        #pwd-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 80%; max-width: 300px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         
     </style>
 </head>
@@ -262,14 +258,14 @@
                     <input type="text" id="note" placeholder="選填...">
                 </div>
                 
-                <button id="submitBtn" class="main-btn" onclick="prepareSubmit('expense')">確認送出</button>
+                <button id="submitBtn" class="main-btn" onclick="executeSubmit()">確認送出</button>
             </div>
 
             <div id="page-budget" class="tab-content">
                 <div class="form-group">
                     <label><i class="fa-solid fa-wallet"></i> 每月固定預算</label>
                     <input type="number" id="input_starting" placeholder="輸入金額" inputmode="numeric">
-                    <button class="main-btn btn-budget" onclick="prepareSubmit('budget')">預算金額確認</button>
+                    <button class="main-btn btn-budget" onclick="executeUpdateBudget()">預算金額確認</button>
                 </div>
                 
                 <div class="dashboard" style="margin-top:20px;">
@@ -341,15 +337,6 @@
         </div>
     </nav>
 
-    <div id="pwd-modal">
-        <div class="modal-content">
-            <label style="justify-content:center;"><i class="fa-solid fa-lock"></i> 數位密碼驗證</label>
-            <input type="password" id="pwd-input" inputmode="numeric" pattern="[0-9]*" placeholder="****" style="text-align:center; letter-spacing: 5px; margin-bottom: 15px;">
-            <button class="main-btn btn-budget" onclick="verifyAndAction()">確定</button>
-            <button class="main-btn" style="background: #e0e0e0; color:#666; margin-top:10px; box-shadow:none;" onclick="closeModal()">取消</button>
-        </div>
-    </div>
-
     <script>
         // --- 設定 Supabase ---
         const SUPABASE_URL = 'https://sprrurptghjkxvwstukn.supabase.co';
@@ -370,7 +357,6 @@
         };
 
         let currentMainCat = "";
-        let pendingAction = "";
         let dashboardData = { budget: 0, spent: 0, breakdown: {} };
 
         google.charts.load('current', {'packages':['corechart']});
@@ -400,20 +386,15 @@
             if(pageId === 'page-analysis') draw3DPieChart();
         }
 
-        // --- 8. 消費紀錄查詢邏輯 ---
+        // --- 消費紀錄查詢邏輯 ---
         function toggleCustomDate(btn) {
-            // 切換按鈕樣式
             document.querySelectorAll('.history-btn').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
-            
-            // 顯示自選區塊
             document.getElementById('custom-date-box').style.display = 'flex';
-            // 隱藏表格直到按下GO
             document.getElementById('history-table-container').style.display = 'none';
         }
 
         async function loadHistory(mode, btn) {
-            // UI 處理
             if(mode !== 'custom') {
                 document.getElementById('custom-date-box').style.display = 'none';
                 document.querySelectorAll('.history-btn').forEach(b => b.classList.remove('active'));
@@ -425,13 +406,11 @@
             const loading = document.getElementById('hist-loading');
             const empty = document.getElementById('hist-empty');
 
-            // 顯示表格區塊與 Loading
             tableContainer.style.display = 'block';
             tbody.innerHTML = '';
             loading.style.display = 'block';
             empty.style.display = 'none';
 
-            // 計算時間範圍
             let startDate, endDate;
             const now = new Date();
             
@@ -452,15 +431,14 @@
                     return;
                 }
                 startDate = new Date(s).toISOString();
-                endDate = new Date(e).toISOString(); // 簡單起見，這裡不補時間，Supabase date 類型比對即可
+                endDate = new Date(e).toISOString();
             }
 
-            // 查詢 Supabase
             try {
                 const { data: records, error } = await _supabase
                     .from('expenses')
                     .select('*')
-                    .gte('date', startDate.split('T')[0]) // 確保格式符合 date 欄位
+                    .gte('date', startDate.split('T')[0])
                     .lte('date', endDate.split('T')[0])
                     .order('date', { ascending: false });
 
@@ -472,20 +450,29 @@
                     return;
                 }
 
-                // 渲染表格
                 records.forEach(r => {
                     const row = document.createElement('tr');
-                    // 格式化日期 MM/DD
                     const d = new Date(r.date);
                     const dateStr = (d.getMonth() + 1) + '/' + d.getDate();
                     
+                    // 5B. 金額顏色邏輯
+                    const amt = parseFloat(r.amount);
+                    let color = '#454545'; // 預設 0~99
+                    if (amt >= 10000) {
+                        color = '#d600a8'; // 超過 10000
+                    } else if (amt >= 1000) {
+                        color = '#ff0000'; // 1000~9999
+                    } else if (amt >= 100) {
+                        color = '#f891b5'; // 100~999
+                    }
+
                     row.innerHTML = `
                         <td class="date-col">${dateStr}</td>
                         <td>
                             <div style="font-weight:bold; font-size:13px;">${r.subcategory}</div>
                             <div style="font-size:11px; color:#ccc;">${r.category}</div>
                         </td>
-                        <td class="amt-col">$${r.amount}</td>
+                        <td class="amt-col" style="color:${color};">$${r.amount}</td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -498,7 +485,7 @@
             }
         }
 
-        // --- 原有邏輯 ---
+        // --- 核心與 Dashboard 邏輯 ---
         async function loadDashboard() {
             document.getElementById('status').innerText = "🔄 同步中...";
             try {
@@ -556,29 +543,10 @@
                 backgroundColor: 'transparent',
                 chartArea: {width: '100%', height: '80%'},
                 legend: {position: 'right', textStyle: {fontSize: 12}},
-                colors: ['#8e9aaf', '#cbc0ad', '#a3b18a', '#bfa58a', '#d4a373', '#e9edc9', '#faedcd', '#ccd5ae', '#f4f1ea']
+                colors: ['#66b8db', '#9bd9f3', '#bfa58a', '#d4a373', '#8e9aaf', '#e9edc9', '#faedcd', '#ccd5ae'] // 更新圖表顏色以配合新主題
             };
             var chart = new google.visualization.PieChart(document.getElementById('chart_3d'));
             chart.draw(data, options);
-        }
-
-        function prepareSubmit(action) { 
-            pendingAction = action; 
-            document.getElementById('pwd-modal').style.display = 'flex'; 
-            document.getElementById('pwd-input').focus(); 
-        }
-
-        function closeModal() { 
-            document.getElementById('pwd-modal').style.display = 'none'; 
-            document.getElementById('pwd-input').value = ""; 
-        }
-
-        function verifyAndAction() {
-            if (document.getElementById('pwd-input').value === "0728") {
-                closeModal();
-                if (pendingAction === 'expense') executeSubmit();
-                else executeUpdateBudget();
-            } else { alert("密碼錯誤"); }
         }
 
         function selectMainCat(cat, btnElement) {
@@ -595,11 +563,15 @@
             container.style.display = "block";
         }
 
+        // --- 1. 移除密碼邏輯，直接執行更新 ---
         async function executeUpdateBudget() {
             const val = document.getElementById('input_starting').value;
             const { error } = await _supabase.from('config').upsert({ key: 'monthly_budget', value: val });
             if(error) alert("更新失敗");
-            loadDashboard();
+            else {
+                alert("預算更新成功！");
+                loadDashboard();
+            }
         }
 
         async function executeSubmit() {
