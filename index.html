@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏦 理財紀錄 (Smart CSV)</title>
+    <title>🏦 理財紀錄</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -124,14 +124,20 @@
         th { background: #f0f0f0; position: sticky; top: 0; padding: 10px; text-align: left; font-size: 12px; color: #666; z-index: 5;}
         td { padding: 8px 10px; border-bottom: 1px solid #f5f5f5; color: var(--text-main); vertical-align: middle; }
         
+        /* 修改時間欄位寬度以容納年份 */
+        .date-col { font-size: 12px; color: #999; width: 85px; } /* 加寬到 85px */
         .amt-col { text-align: right; font-weight: bold; width: 70px; }
-        .date-col { font-size: 12px; color: #999; width: 50px; }
         
-        /* 下拉選單樣式 */
+        /* 主分類欄位與下拉選單樣式 */
+        .main-cat-col { width: 90px; text-align: center; } /* 1. 加寬主分類格子並置中 */
+
         .cat-select {
             border: 1px solid #eee; background: #fbfbfb; border-radius: 6px;
             padding: 4px; font-size: 13px; color: #454545; width: 100%;
             cursor: pointer; outline: none; box-shadow: none;
+            /* 2. 下拉選單文字置中 */
+            text-align: center;
+            text-align-last: center; /* 讓 Chrome/Safari 文字也置中 */
         }
         .cat-select:focus { border-color: var(--btn-submit-bg); background: #fff; }
 
@@ -232,7 +238,7 @@
                                 <tr>
                                     <th class="checkbox-col"><i class="fa-solid fa-trash-can"></i></th>
                                     <th>時間</th>
-                                    <th>主分類</th> <th>子項目</th>
+                                    <th class="main-cat-col">主分類</th> <th>子項目</th>
                                     <th style="text-align:right;">金額</th>
                                 </tr>
                             </thead>
@@ -251,10 +257,7 @@
                 <div class="import-section">
                     <label style="justify-content: center; color:#666;"><i class="fa-solid fa-file-csv"></i> 智慧發票匯入</label>
                     <div style="font-size: 12px; color: #999; margin-bottom: 10px; line-height: 1.5;">
-                        支援格式：<br>
-                        1. 財政部 CSV (自動辨識標題)<br>
-                        2. 簡易 CSV (日期, 金額, 備註)<br>
-                        (預設歸類為「雜-其他」)
+                        支援格式：<br>1. 財政部 CSV<br>2. 簡易 CSV
                     </div>
                     <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)">
                     <button class="main-btn btn-import" onclick="document.getElementById('csvInput').click()">
@@ -345,18 +348,11 @@
             if(isDeleteMode) toggleDeleteMode();
         }
 
-        // --- 核心更新功能：修改分類 ---
         async function updateCategory(id, newCat) {
             const { error } = await _supabase.from('expenses').update({ category: newCat }).eq('id', id);
-            if(error) {
-                alert("修改失敗");
-            } else {
-                // 修改成功後，給予一點視覺回饋 (可選)
-                loadDashboard(); // 重新計算金額與圖表
-            }
+            if(error) alert("修改失敗"); else loadDashboard();
         }
 
-        // --- 刪除功能 ---
         function toggleDeleteMode() {
             isDeleteMode = !isDeleteMode;
             const table = document.getElementById('history-table');
@@ -389,7 +385,6 @@
             else if(activeBtn && activeBtn.innerText === 'GO') loadHistory('custom', null);
         }
 
-        // --- 歷史紀錄 (含下拉選單生成) ---
         function toggleCustomDate(btn) {
             document.querySelectorAll('.history-btn').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
@@ -440,13 +435,13 @@
             records.forEach(r => {
                 const row = document.createElement('tr');
                 const d = new Date(r.date);
-                const dateStr = (d.getMonth() + 1) + '/' + d.getDate();
+                // 1. 修改時間格式：YYYY/M/D
+                const dateStr = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
                 
                 const amt = parseFloat(r.amount);
                 let color = '#454545';
                 if (amt >= 10000) color = '#d600a8'; else if (amt >= 1000) color = '#ff0000'; else if (amt >= 100) color = '#f891b5';
 
-                // 生成主分類下拉選單
                 let catOptions = '';
                 Object.keys(subData).forEach(cat => {
                     const selected = cat === r.category ? 'selected' : '';
@@ -456,15 +451,8 @@
                 row.innerHTML = `
                     <td class="checkbox-col"><input type="checkbox" class="row-checkbox" value="${r.id}"></td>
                     <td class="date-col">${dateStr}</td>
-                    <td>
-                        <select class="cat-select" onchange="updateCategory('${r.id}', this.value)">
-                            ${catOptions}
-                        </select>
-                    </td>
-                    <td>
-                        <div style="font-weight:bold; font-size:13px;">${r.subcategory}</div>
-                        <div style="font-size:11px; color:#ccc;">${r.note || ''}</div>
-                    </td>
+                    <td><select class="cat-select" onchange="updateCategory('${r.id}', this.value)">${catOptions}</select></td>
+                    <td><div style="font-weight:bold; font-size:13px;">${r.subcategory}</div><div style="font-size:11px; color:#ccc;">${r.note || ''}</div></td>
                     <td class="amt-col" style="color:${color};">$${r.amount}</td>
                 `;
                 tbody.appendChild(row);
@@ -472,7 +460,6 @@
         }
 
         async function loadDashboard() {
-            // 省略載入動畫，避免修改分類時畫面閃爍
             const { data: configData } = await _supabase.from('config').select('value').eq('key', 'monthly_budget').single();
             const budget = configData ? configData.value : 0;
             const now = new Date();
@@ -500,7 +487,6 @@
             document.getElementById('progress-text').innerText = Math.round(percent) + "% (已用 " + dashboardData.spent.toLocaleString() + ")";
         }
 
-        // --- 圖表 ---
         function drawDonutChart() {
             if(!dashboardData.breakdown) return;
             var dataArray = [['Category', 'Amount']];
@@ -603,7 +589,6 @@
             } else { alert("紀錄失敗: " + error.message); }
         }
 
-        // --- 智慧 CSV 匯入邏輯 (核心修改) ---
         function handleCSVUpload(input) {
             const file = input.files[0];
             if (!file) return;
@@ -614,82 +599,37 @@
             reader.onload = async function(e) {
                 const text = e.target.result;
                 const rows = text.split('\n');
-                
-                let recordsToInsert = [];
-                let errorCount = 0;
-
-                // 1. 讀取標題列 (第一列)
+                let recordsToInsert = []; let errorCount = 0;
                 const headerLine = rows[0].trim();
-                const headers = headerLine.split(',').map(h => h.trim().replace(/"/g, '')); // 去除引號
+                const headers = headerLine.split(',').map(h => h.trim().replace(/"/g, ''));
+                let dateIdx = 0; let amtIdx = 1; let noteIdx = 2;
 
-                // 2. 智慧判斷欄位索引
-                // 預設為 0, 1, 2 (簡易模式)
-                let dateIdx = 0;
-                let amtIdx = 1;
-                let noteIdx = 2;
-                let subIdx = -1; // 用來存子項目 (例如品名)
-
-                // 搜尋關鍵字
-                const targetDate = "發票日期";
-                const targetAmt = "發票金額"; // 有些是"總金額"
-                const targetNote = "消費明細_品名"; // 或者 "品名"
-
-                // 如果標題包含關鍵字，就使用找到的索引
+                const targetDate = "發票日期"; const targetAmt = "發票金額"; const targetNote = "消費明細_品名";
                 if (headers.includes(targetDate)) {
                     dateIdx = headers.indexOf(targetDate);
-                    // 如果有找到發票日期，通常代表這是電子發票格式，嘗試找其他欄位
-                    // 金額可能叫 "發票金額" 或 "總金額"
-                    amtIdx = headers.indexOf(targetAmt);
-                    if (amtIdx === -1) amtIdx = headers.indexOf("總金額");
-                    
-                    // 備註對應到品名
-                    noteIdx = headers.indexOf(targetNote);
-                    if (noteIdx === -1) noteIdx = headers.indexOf("品名");
+                    amtIdx = headers.indexOf(targetAmt); if (amtIdx === -1) amtIdx = headers.indexOf("總金額");
+                    noteIdx = headers.indexOf(targetNote); if (noteIdx === -1) noteIdx = headers.indexOf("品名");
                 }
 
-                // 3. 讀取資料
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i].trim();
                     if (!row) continue;
-                    
-                    // 簡易分割 (未處理欄位內逗號，若需嚴謹可用 Regex)
                     const cols = row.split(',').map(c => c.trim().replace(/"/g, ''));
-                    
                     if (cols.length > Math.max(dateIdx, amtIdx)) {
-                        const dateStr = cols[dateIdx];
-                        const amountStr = cols[amtIdx];
+                        const dateStr = cols[dateIdx]; const amountStr = cols[amtIdx];
                         const noteStr = noteIdx > -1 ? cols[noteIdx] : "CSV 匯入";
-
                         const amount = parseFloat(amountStr);
-                        
                         if (!isNaN(amount) && amount > 0 && dateStr.length >= 8) {
-                            recordsToInsert.push({
-                                date: dateStr,
-                                category: '雜', // 預設
-                                subcategory: '其他',
-                                amount: amount,
-                                note: noteStr
-                            });
-                        } else {
-                            errorCount++;
-                        }
+                            recordsToInsert.push({ date: dateStr, category: '雜', subcategory: '其他', amount: amount, note: noteStr });
+                        } else { errorCount++; }
                     }
                 }
 
                 if (recordsToInsert.length > 0) {
                     const { error } = await _supabase.from('expenses').insert(recordsToInsert);
-                    if (error) {
-                        alert("匯入失敗: " + error.message);
-                        document.getElementById('import-status').innerText = "匯入失敗";
-                    } else {
-                        alert(`成功匯入 ${recordsToInsert.length} 筆資料！\n(略過 ${errorCount} 筆)`);
-                        document.getElementById('import-status').innerText = "";
-                        loadDashboard();
-                    }
-                } else {
-                    alert("無有效資料，請確認 CSV 格式。\n(需包含：發票日期, 發票金額)");
-                    document.getElementById('import-status').innerText = "格式錯誤";
-                }
+                    if (error) { alert("匯入失敗: " + error.message); document.getElementById('import-status').innerText = "匯入失敗"; }
+                    else { alert(`成功匯入 ${recordsToInsert.length} 筆資料！`); document.getElementById('import-status').innerText = ""; loadDashboard(); }
+                } else { alert("無有效資料"); document.getElementById('import-status').innerText = "格式錯誤"; }
                 input.value = ''; 
             };
             reader.readAsText(file);
