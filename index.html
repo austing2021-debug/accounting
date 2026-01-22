@@ -2,79 +2,139 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>記帳本 (Supabase + Cloudflare)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🏦 理財紀錄 (Supabase Cloud)</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --bg-color: #f4f1ea;
+            --input-bg: #e9e5db;
+            --card-bg: #ffffff;
+            --primary-muted: #8e9aaf;
+            --milktea-color: #bfa58a;
+            --text-main: #5a5a5a;
+            --text-sub: #8d8d8d;
+            --border-color: #dcd7cc;
+        }
+
+        body { font-family: -apple-system, sans-serif; background: var(--bg-color); margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; }
+        header { padding: 15px; text-align: center; background: var(--bg-color); }
+        h2 { margin: 0; color: var(--primary-muted); font-size: 1.3rem; letter-spacing: 1px; }
+
+        .main-container { flex: 1; padding: 15px; padding-bottom: 80px; display: flex; justify-content: center; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); width: 100%; max-width: 400px; box-sizing: border-box; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 6px; color: var(--text-sub); font-size: 13px; font-weight: bold; }
+
+        input, select { 
+            width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; 
+            box-sizing: border-box; font-size: 16px; background: var(--input-bg); color: var(--text-main); 
+            outline: none; -webkit-appearance: none;
+        }
+
+        .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .cat-btn { padding: 10px 0; background: #fff; border: 1px solid var(--border-color); border-radius: 10px; font-size: 14px; cursor: pointer; text-align: center; }
+        .cat-btn.active { background: var(--primary-muted); color: white; border-color: var(--primary-muted); }
+
+        #sub-category-container { display: none; background: var(--input-bg); padding: 12px; border-radius: 10px; margin-bottom: 15px; }
+
+        button.main-btn { width: 100%; padding: 16px; background: var(--primary-muted); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-confirm { background: var(--milktea-color) !important; margin-top: 10px; }
+
+        .info-box { background: #fff; border: 1px solid var(--border-color); padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .info-value { font-size: 18px; font-weight: bold; }
+
+        .tab-bar { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border-color); }
+        .tab-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--text-sub); cursor: pointer; width: 33.3%; }
+        .tab-item.active { color: var(--primary-muted); font-weight: bold; }
+        .tab-icon { font-size: 22px; margin-bottom: 3px; }
+
+        #chart_3d { width: 100%; height: 300px; margin-top: 10px; }
+        .progress-container { background: #eee; border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; }
+        #progress-bar { background: var(--milktea-color); height: 100%; width: 0%; transition: 1s; }
+
+        #pwd-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 80%; max-width: 300px; text-align: center; }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex justify-center p-4">
+<body>
 
-    <div class="w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden">
-        <div class="bg-blue-600 p-4">
-            <h1 class="text-white text-xl font-bold text-center">日常記帳 (Cloud Version)</h1>
-        </div>
+    <header><h2>🏦 理財紀錄</h2></header>
 
-        <div class="p-6 space-y-4">
-            <form id="accountForm" class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">主分類</label>
-                        <select id="mainCategory" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
-                            <option value="" disabled selected>請選擇</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">子分類</label>
-                        <select id="subCategory" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
-                            <option value="">請先選主分類</option>
-                        </select>
-                    </div>
+    <div class="main-container">
+        <div class="card">
+            <div id="page-input" class="tab-content active">
+                <div class="form-group"><label>📅 日期</label><input type="date" id="date"></div>
+                <div class="form-group">
+                    <label>🏷️ 主類別</label>
+                    <div class="category-grid" id="main-cat-grid">
+                        </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">金額 ($)</label>
-                    <input type="number" id="amount" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" placeholder="輸入金額" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">備註 (選填)</label>
-                    <input type="text" id="note" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" placeholder="例如：巷口麵攤">
-                </div>
-                <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200 font-bold">
-                    新增紀錄
-                </button>
-            </form>
-
-            <hr class="border-gray-200">
-
-            <div>
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">最近 5 筆紀錄</h3>
-                <ul id="historyList" class="divide-y divide-gray-200 bg-gray-50 rounded-md p-2 text-sm">
-                    <li class="py-2 text-center text-gray-500">載入中...</li>
-                </ul>
+                <div class="form-group" id="sub-category-container"><label>🔍 子項目</label><select id="sub-category"></select></div>
+                <div class="form-group"><label>💵 消費金額</label><input type="number" id="amount" placeholder="0" inputmode="decimal"></div>
+                <div class="form-group"><label>📝 備註</label><input type="text" id="note" placeholder="選填..."></div>
+                <button id="submitBtn" class="main-btn" onclick="prepareSubmit('expense')">確認送出</button>
             </div>
+
+            <div id="page-budget" class="tab-content">
+                <div class="form-group">
+                    <label>💰 每月固定預算</label>
+                    <input type="number" id="input_starting" placeholder="輸入金額" inputmode="numeric">
+                    <button class="main-btn btn-confirm" onclick="prepareSubmit('budget')">預算金額確認</button>
+                </div>
+                <div class="dashboard" style="margin-top:20px;">
+                    <div class="info-box"><span>🪙 當月剩餘</span><span class="info-value" id="disp_monthly_rem">0</span></div>
+                    <div class="info-box" style="background: #fafafa;"><span style="color:#888;">📊 當月已花費</span><span class="info-value" id="disp_monthly_spent" style="color:#888;">0</span></div>
+                </div>
+            </div>
+
+            <div id="page-analysis" class="tab-content">
+                <label>📅 本月消費比例</label>
+                <div id="chart_3d"></div>
+                <label>🔥 預算使用進度</label>
+                <div class="progress-container"><div id="progress-bar"></div></div>
+                <p id="progress-text" style="font-size: 12px; color: var(--text-sub); text-align: right;">0%</p>
+            </div>
+
+            <div id="status" style="text-align: center; font-size: 11px; color: gray; margin-top: 15px;">載入中...</div>
+        </div>
+    </div>
+
+    <nav class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('page-input', this)">
+            <span class="tab-icon">📋</span><span>消費</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('page-budget', this)">
+            <span class="tab-icon">👛</span><span>錢包</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('page-analysis', this)">
+            <span class="tab-icon">📊</span><span>分析</span>
+        </div>
+    </nav>
+
+    <div id="pwd-modal">
+        <div class="modal-content">
+            <label>🔐 數位密碼驗證</label>
+            <input type="password" id="pwd-input" inputmode="numeric" pattern="[0-9]*" placeholder="****">
+            <button class="main-btn btn-confirm" onclick="verifyAndAction()">確定</button>
+            <button class="main-btn" style="background: #ccc; margin-top:10px;" onclick="closeModal()">取消</button>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // 1. 設定區：請務必填入你的 Supabase URL 和 Anon Key
-        // ==========================================
+        // --- 初始化 Supabase ---
         const SUPABASE_URL = 'https://sprrurptghjkxvwstukn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwcnJ1cnB0Z2hqa3h2d3N0dWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5NjcyOTMsImV4cCI6MjA4NDU0MzI5M30.IoOY-gdM7qXPEm3DildpEOq_e3jpTfQLa19X7G6iImw';
-
-        // 檢查是否忘記填寫金鑰
-        if (SUPABASE_URL.includes('你的') || SUPABASE_KEY.includes('你的')) {
-            alert('錯誤：請在程式碼第 70 行填入正確的 Supabase URL 和 API Key，否則無法連線！');
-            document.getElementById('historyList').innerHTML = '<li class="py-2 text-center text-red-500">未設定 API Key</li>';
-            throw new Error("API Key missing");
-        }
-        
-        // 修正點：使用解構賦值，避免變數名稱衝突
         const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // ==========================================
-        // 2. 資料結構
-        // ==========================================
+        // --- 子分類資料 (最新版：教育費僅在「育」) ---
         const subData = {
             "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"],
             "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"],
@@ -86,119 +146,169 @@
             "雜": ["保險費", "其他"]
         };
 
-        const mainSelect = document.getElementById('mainCategory');
-        const subSelect = document.getElementById('subCategory');
-        const form = document.getElementById('accountForm');
-        const historyList = document.getElementById('historyList');
-        const submitBtn = document.getElementById('submitBtn');
+        let currentMainCat = "";
+        let pendingAction = "";
+        let dashboardData = { budget: 0, spent: 0, breakdown: {} };
 
-        // ==========================================
-        // 3. 程式邏輯
-        // ==========================================
+        google.charts.load('current', {'packages':['corechart']});
 
-        function initDropdowns() {
-            Object.keys(subData).forEach(key => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = key;
-                mainSelect.appendChild(option);
+        window.onload = function() {
+            document.getElementById('date').valueAsDate = new Date();
+            initMainCategoryGrid();
+            loadDashboard();
+        };
+
+        // 初始化主分類按鈕
+        function initMainCategoryGrid() {
+            const grid = document.getElementById('main-cat-grid');
+            Object.keys(subData).forEach(cat => {
+                const btn = document.createElement('div');
+                btn.className = 'cat-btn';
+                btn.innerText = cat;
+                btn.onclick = () => selectMainCat(cat, btn);
+                grid.appendChild(btn);
             });
         }
 
-        mainSelect.addEventListener('change', (e) => {
-            const selectedMain = e.target.value;
-            const subs = subData[selectedMain] || [];
-            subSelect.innerHTML = '';
-            subs.forEach(sub => {
-                const option = document.createElement('option');
-                option.value = sub;
-                option.textContent = sub;
-                subSelect.appendChild(option);
-            });
-        });
+        function switchTab(pageId, element) {
+            document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            element.classList.add('active');
+            if(pageId === 'page-analysis') draw3DPieChart();
+        }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const originalBtnText = submitBtn.textContent;
-            submitBtn.textContent = "傳送中...";
-            submitBtn.disabled = true;
-
-            const newData = {
-                category: mainSelect.value,
-                subcategory: subSelect.value,
-                amount: parseFloat(document.getElementById('amount').value),
-                note: document.getElementById('note').value
-            };
-
+        // --- 核心邏輯：從 Supabase 讀取資料 ---
+        async function loadDashboard() {
+            document.getElementById('status').innerText = "🔄 同步中...";
             try {
-                // 使用修正後的 supabaseClient
-                const { data, error } = await supabaseClient
-                    .from('expenses')
-                    .insert([newData]);
+                // 1. 讀取預算
+                const { data: configData } = await _supabase.from('config').select('value').eq('key', 'monthly_budget').single();
+                const budget = configData ? configData.value : 0;
 
-                if (error) throw error;
+                // 2. 讀取本月消費
+                const now = new Date();
+                const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+                const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
 
-                alert('記帳成功！');
-                form.reset();
-                subSelect.innerHTML = '<option value="">請先選主分類</option>';
-                fetchData();
-
-            } catch (error) {
-                console.error('Error:', error);
-                alert('上傳失敗：' + error.message);
-            } finally {
-                submitBtn.textContent = originalBtnText;
-                submitBtn.disabled = false;
-            }
-        });
-
-        async function fetchData() {
-            try {
-                // 使用修正後的 supabaseClient
-                const { data, error } = await supabaseClient
-                    .from('expenses')
+                const { data: expenses } = await _supabase.from('expenses')
                     .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(5);
+                    .gte('date', firstDay)
+                    .lte('date', lastDay);
 
-                if (error) throw error;
+                // 3. 計算統計
+                let totalSpent = 0;
+                let breakdown = {};
+                expenses.forEach(e => {
+                    totalSpent += parseFloat(e.amount);
+                    breakdown[e.category] = (breakdown[e.category] || 0) + parseFloat(e.amount);
+                });
 
-                renderList(data);
-            } catch (error) {
-                console.error('Error fetching:', error);
-                historyList.innerHTML = '<li class="py-2 text-center text-red-500">讀取失敗 (請檢查 Console)</li>';
+                dashboardData = { budget, spent: totalSpent, breakdown };
+
+                // 4. 更新 UI
+                document.getElementById('input_starting').value = budget;
+                document.getElementById('disp_monthly_rem').innerText = (budget - totalSpent).toLocaleString();
+                document.getElementById('disp_monthly_spent').innerText = totalSpent.toLocaleString();
+                updateProgressBar();
+                document.getElementById('status').innerText = "☁️ 雲端同步完成";
+            } catch (e) {
+                console.error(e);
+                document.getElementById('status').innerText = "⚠️ 同步失敗";
             }
         }
 
-        function renderList(data) {
-            historyList.innerHTML = '';
-            if (!data || data.length === 0) {
-                historyList.innerHTML = '<li class="py-2 text-center text-gray-400">目前沒有紀錄</li>';
-                return;
+        function updateProgressBar() {
+            const percent = Math.min((dashboardData.spent / dashboardData.budget) * 100, 100) || 0;
+            document.getElementById('progress-bar').style.width = percent + "%";
+            document.getElementById('progress-text').innerText = Math.round(percent) + "% (已用 " + dashboardData.spent.toLocaleString() + ")";
+        }
+
+        function draw3DPieChart() {
+            if(!dashboardData.breakdown) return;
+            var dataArray = [['Category', 'Amount']];
+            for (var cat in dashboardData.breakdown) {
+                dataArray.push([cat, dashboardData.breakdown[cat]]);
+            }
+            if(dashboardData.budget > dashboardData.spent) {
+                dataArray.push(['剩餘預算', dashboardData.budget - dashboardData.spent]);
             }
 
-            data.forEach(item => {
-                const li = document.createElement('li');
-                li.className = "py-3 flex justify-between items-center";
-                const date = new Date(item.created_at).toLocaleDateString('zh-TW');
-                
-                li.innerHTML = `
-                    <div>
-                        <div class="font-medium text-gray-800">
-                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1">${item.category}</span>
-                            ${item.subcategory}
-                        </div>
-                        <div class="text-xs text-gray-500">${date} ${item.note ? '- ' + item.note : ''}</div>
-                    </div>
-                    <div class="font-bold text-green-600">$${item.amount}</div>
-                `;
-                historyList.appendChild(li);
+            var data = google.visualization.arrayToDataTable(dataArray);
+            var options = {
+                is3D: true,
+                backgroundColor: 'transparent',
+                chartArea: {width: '100%', height: '80%'},
+                legend: {position: 'right', textStyle: {fontSize: 12}},
+                colors: ['#8e9aaf', '#cbc0ad', '#a3b18a', '#bfa58a', '#d4a373', '#e9edc9', '#faedcd', '#ccd5ae', '#f4f1ea']
+            };
+            var chart = new google.visualization.PieChart(document.getElementById('chart_3d'));
+            chart.draw(data, options);
+        }
+
+        // --- 密碼與驗證邏輯 ---
+        function prepareSubmit(action) { 
+            pendingAction = action; 
+            document.getElementById('pwd-modal').style.display = 'flex'; 
+            document.getElementById('pwd-input').focus(); 
+        }
+
+        function closeModal() { 
+            document.getElementById('pwd-modal').style.display = 'none'; 
+            document.getElementById('pwd-input').value = ""; 
+        }
+
+        function verifyAndAction() {
+            if (document.getElementById('pwd-input').value === "0728") {
+                closeModal();
+                if (pendingAction === 'expense') executeSubmit();
+                else executeUpdateBudget();
+            } else { alert("密碼錯誤"); }
+        }
+
+        function selectMainCat(cat, btnElement) {
+            currentMainCat = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            const container = document.getElementById('sub-category-container');
+            const select = document.getElementById('sub-category');
+            select.innerHTML = "";
+            subData[currentMainCat].forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item; opt.innerText = item; select.appendChild(opt);
             });
+            container.style.display = "block";
         }
 
-        initDropdowns();
-        fetchData(); // 啟動讀取
+        // --- 寫入 Supabase ---
+        async function executeUpdateBudget() {
+            const val = document.getElementById('input_starting').value;
+            const { error } = await _supabase.from('config').upsert({ key: 'monthly_budget', value: val });
+            if(error) alert("更新失敗");
+            loadDashboard();
+        }
+
+        async function executeSubmit() {
+            const amt = document.getElementById('amount').value;
+            if(!amt || !currentMainCat) return alert("請填寫完整資訊");
+
+            const { error } = await _supabase.from('expenses').insert([{
+                date: document.getElementById('date').value,
+                category: currentMainCat,
+                subcategory: document.getElementById('sub-category').value,
+                amount: parseFloat(amt),
+                note: document.getElementById('note').value
+            }]);
+
+            if(!error) {
+                alert("紀錄成功");
+                document.getElementById('amount').value = "";
+                document.getElementById('note').value = "";
+                loadDashboard();
+            } else {
+                alert("紀錄失敗: " + error.message);
+            }
+        }
     </script>
 </body>
 </html>
