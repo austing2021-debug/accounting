@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的雲端記帳本 (Supabase + Cloudflare)</title>
+    <title>記帳本 (Supabase + Cloudflare)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -16,7 +16,6 @@
 
         <div class="p-6 space-y-4">
             <form id="accountForm" class="space-y-4">
-                
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">主分類</label>
@@ -24,7 +23,6 @@
                             <option value="" disabled selected>請選擇</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700">子分類</label>
                         <select id="subCategory" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-gray-50" required>
@@ -32,17 +30,14 @@
                         </select>
                     </div>
                 </div>
-
                 <div>
                     <label class="block text-sm font-medium text-gray-700">金額 ($)</label>
                     <input type="number" id="amount" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" placeholder="輸入金額" required>
                 </div>
-
                 <div>
                     <label class="block text-sm font-medium text-gray-700">備註 (選填)</label>
                     <input type="text" id="note" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" placeholder="例如：巷口麵攤">
                 </div>
-
                 <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200 font-bold">
                     新增紀錄
                 </button>
@@ -61,17 +56,24 @@
 
     <script>
         // ==========================================
-        // 1. 設定區：請填入你的 Supabase 金鑰
+        // 1. 設定區：請務必填入你的 Supabase URL 和 Anon Key
         // ==========================================
-        // 為了安全性，請確認你使用的是 "ANON" (Public) Key，而不是 "SERVICE_ROLE" Key
         const SUPABASE_URL = 'https://sprrurptghjkxvwstukn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwcnJ1cnB0Z2hqa3h2d3N0dWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5NjcyOTMsImV4cCI6MjA4NDU0MzI5M30.IoOY-gdM7qXPEm3DildpEOq_e3jpTfQLa19X7G6iImw';
+
+        // 檢查是否忘記填寫金鑰
+        if (SUPABASE_URL.includes('你的') || SUPABASE_KEY.includes('你的')) {
+            alert('錯誤：請在程式碼第 70 行填入正確的 Supabase URL 和 API Key，否則無法連線！');
+            document.getElementById('historyList').innerHTML = '<li class="py-2 text-center text-red-500">未設定 API Key</li>';
+            throw new Error("API Key missing");
+        }
         
-        // 初始化 Supabase
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // 修正點：使用解構賦值，避免變數名稱衝突
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ==========================================
-        // 2. 資料結構 (修正版)
+        // 2. 資料結構
         // ==========================================
         const subData = {
             "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"],
@@ -84,7 +86,6 @@
             "雜": ["保險費", "其他"]
         };
 
-        // DOM 元素
         const mainSelect = document.getElementById('mainCategory');
         const subSelect = document.getElementById('subCategory');
         const form = document.getElementById('accountForm');
@@ -95,7 +96,6 @@
         // 3. 程式邏輯
         // ==========================================
 
-        // A. 初始化下拉選單
         function initDropdowns() {
             Object.keys(subData).forEach(key => {
                 const option = document.createElement('option');
@@ -105,14 +105,10 @@
             });
         }
 
-        // B. 主分類改變時，更新子分類
         mainSelect.addEventListener('change', (e) => {
             const selectedMain = e.target.value;
             const subs = subData[selectedMain] || [];
-            
-            // 清空子分類
             subSelect.innerHTML = '';
-            
             subs.forEach(sub => {
                 const option = document.createElement('option');
                 option.value = sub;
@@ -121,11 +117,9 @@
             });
         });
 
-        // C. 寫入資料到 Supabase
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // 按鈕變更狀態避免重複送出
             const originalBtnText = submitBtn.textContent;
             submitBtn.textContent = "傳送中...";
             submitBtn.disabled = true;
@@ -138,13 +132,13 @@
             };
 
             try {
-                const { data, error } = await supabase
+                // 使用修正後的 supabaseClient
+                const { data, error } = await supabaseClient
                     .from('expenses')
                     .insert([newData]);
 
                 if (error) throw error;
 
-                // 成功後重置表單並重新載入列表
                 alert('記帳成功！');
                 form.reset();
                 subSelect.innerHTML = '<option value="">請先選主分類</option>';
@@ -159,10 +153,10 @@
             }
         });
 
-        // D. 從 Supabase 讀取資料
         async function fetchData() {
             try {
-                const { data, error } = await supabase
+                // 使用修正後的 supabaseClient
+                const { data, error } = await supabaseClient
                     .from('expenses')
                     .select('*')
                     .order('created_at', { ascending: false })
@@ -173,14 +167,13 @@
                 renderList(data);
             } catch (error) {
                 console.error('Error fetching:', error);
-                historyList.innerHTML = '<li class="py-2 text-center text-red-500">無法讀取資料</li>';
+                historyList.innerHTML = '<li class="py-2 text-center text-red-500">讀取失敗 (請檢查 Console)</li>';
             }
         }
 
-        // E. 渲染列表
         function renderList(data) {
             historyList.innerHTML = '';
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 historyList.innerHTML = '<li class="py-2 text-center text-gray-400">目前沒有紀錄</li>';
                 return;
             }
@@ -188,7 +181,6 @@
             data.forEach(item => {
                 const li = document.createElement('li');
                 li.className = "py-3 flex justify-between items-center";
-                // 格式化日期
                 const date = new Date(item.created_at).toLocaleDateString('zh-TW');
                 
                 li.innerHTML = `
@@ -205,10 +197,8 @@
             });
         }
 
-        // 啟動程式
         initDropdowns();
-        fetchData();
-
+        fetchData(); // 啟動讀取
     </script>
 </body>
 </html>
