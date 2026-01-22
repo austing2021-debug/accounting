@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏦 理財紀錄 (Final 2.0)</title>
+    <title>🏦 理財紀錄 (Smart CSV)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -19,7 +18,6 @@
             --text-main: #000000;
             --text-sub: #8d8d8d;
             
-            /* 顏色設定 */
             --cat-default-bg: #ecf6fd; 
             --cat-default-text: #454545;
             --cat-active-bg: #66b8db;
@@ -31,12 +29,12 @@
             --btn-submit-active-text: #454545;
             
             --delete-color: #ff4d4f;
+            --import-color: #20c997;
         }
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg-color); 
-            color: var(--text-main);
+            background: var(--bg-color); color: var(--text-main);
             margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; 
         }
 
@@ -71,10 +69,7 @@
             box-shadow: 3px 3px 6px rgba(0,0,0,0.1), -1px -1px 4px rgba(255,255,255,0.8);
             transition: all 0.2s ease;
         }
-        .cat-btn.active { 
-            background: var(--cat-active-bg); color: var(--cat-active-text); 
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
-        }
+        .cat-btn.active { background: var(--cat-active-bg); color: var(--cat-active-text); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2); }
 
         #sub-category-container { display: none; background: transparent; margin-bottom: 15px; }
 
@@ -98,36 +93,12 @@
         .tab-item.active { color: var(--icon-color); font-weight: bold; }
         .tab-item i { font-size: 20px; margin-bottom: 4px; }
 
-        /* 圖表區塊設定 */
-        #chart-container {
-            position: relative;
-            width: 100%;
-            height: 300px;
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-        }
+        #chart-container { position: relative; width: 100%; height: 300px; margin-top: 10px; display: flex; justify-content: center; }
         #chart_donut { width: 100%; height: 100%; }
-        
-        #center-text {
-            position: absolute;
-            top: 45%; 
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            pointer-events: none;
-            display: none;
-            z-index: 10;
-        }
+        #center-text { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; display: none; z-index: 10; }
         #center-label { font-size: 14px; color: #888; display: block; }
         #center-value { font-size: 22px; font-weight: bold; color: var(--text-main); display: block; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
-
-        /* 新增：年度趨勢圖容器 */
-        #trend_chart_div {
-            width: 100%;
-            height: 250px;
-            margin-top: 15px;
-        }
+        #trend_chart_div { width: 100%; height: 250px; margin-top: 15px; }
 
         .progress-container { background: #eee; border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.1); }
         #progress-bar { background: var(--cat-active-bg); height: 100%; width: 0%; transition: 1s; }
@@ -143,30 +114,39 @@
         
         .custom-date-range { display: none; gap: 5px; margin-bottom: 10px; background: #f9f9f9; padding: 10px; border-radius: 10px; }
         
+        /* 表格樣式優化 */
         .table-container {
-            height: 250px; overflow-y: auto; background: #fff;
+            height: 300px; overflow-y: auto; background: #fff;
             border-radius: 12px; box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
             border: 1px solid #eee; display: none; position: relative;
         }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th { background: #f0f0f0; position: sticky; top: 0; padding: 10px; text-align: left; font-size: 12px; color: #666; z-index: 5;}
-        td { padding: 10px; border-bottom: 1px solid #f5f5f5; color: var(--text-main); vertical-align: middle; }
+        td { padding: 8px 10px; border-bottom: 1px solid #f5f5f5; color: var(--text-main); vertical-align: middle; }
         
-        .amt-col { text-align: right; font-weight: bold; }
-        .date-col { font-size: 12px; color: #999; width: 60px; }
+        .amt-col { text-align: right; font-weight: bold; width: 70px; }
+        .date-col { font-size: 12px; color: #999; width: 50px; }
+        
+        /* 下拉選單樣式 */
+        .cat-select {
+            border: 1px solid #eee; background: #fbfbfb; border-radius: 6px;
+            padding: 4px; font-size: 13px; color: #454545; width: 100%;
+            cursor: pointer; outline: none; box-shadow: none;
+        }
+        .cat-select:focus { border-color: var(--btn-submit-bg); background: #fff; }
 
-        .checkbox-col { width: 40px; text-align: center; display: none; }
+        .checkbox-col { width: 35px; text-align: center; display: none; }
         .delete-mode .checkbox-col { display: table-cell; }
         
         .row-checkbox {
-            appearance: none; -webkit-appearance: none; width: 24px; height: 24px;
+            appearance: none; -webkit-appearance: none; width: 22px; height: 22px;
             border: 2px solid #ddd; border-radius: 50%; cursor: pointer;
             position: relative; transition: all 0.2s; background: #fff; vertical-align: middle;
         }
         .row-checkbox:checked { background-color: var(--delete-color); border-color: var(--delete-color); }
         .row-checkbox:checked::after {
             content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
-            color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 14px;
+            color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px;
         }
 
         .table-footer-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
@@ -174,13 +154,18 @@
         .btn-delete { background: #fff; border: 1px solid var(--delete-color); color: var(--delete-color); }
         .btn-confirm-del { background: var(--delete-color); color: white; display: none; }
 
+        .import-section {
+            margin-top: 25px; padding: 20px; border: 2px dashed #ddd;
+            border-radius: 12px; text-align: center; background: #fafafa;
+        }
+        .btn-import { background: var(--import-color); color: white; width: auto; display: inline-block; margin-top: 10px; }
+        .btn-import:active { background: #17a57a; }
+
     </style>
 </head>
 <body>
 
-    <header>
-        <h2><i class="fa-solid fa-piggy-bank"></i> 理財紀錄</h2>
-    </header>
+    <header><h2><i class="fa-solid fa-piggy-bank"></i> 理財紀錄</h2></header>
 
     <div class="main-container">
         <div class="card">
@@ -247,7 +232,7 @@
                                 <tr>
                                     <th class="checkbox-col"><i class="fa-solid fa-trash-can"></i></th>
                                     <th>時間</th>
-                                    <th>子項目</th>
+                                    <th>主分類</th> <th>子項目</th>
                                     <th style="text-align:right;">金額</th>
                                 </tr>
                             </thead>
@@ -262,22 +247,31 @@
                         <button id="btn-confirm-del" class="action-btn btn-confirm-del" onclick="executeDelete()">確認刪除</button>
                     </div>
                 </div>
+
+                <div class="import-section">
+                    <label style="justify-content: center; color:#666;"><i class="fa-solid fa-file-csv"></i> 智慧發票匯入</label>
+                    <div style="font-size: 12px; color: #999; margin-bottom: 10px; line-height: 1.5;">
+                        支援格式：<br>
+                        1. 財政部 CSV (自動辨識標題)<br>
+                        2. 簡易 CSV (日期, 金額, 備註)<br>
+                        (預設歸類為「雜-其他」)
+                    </div>
+                    <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)">
+                    <button class="main-btn btn-import" onclick="document.getElementById('csvInput').click()">
+                        <i class="fa-solid fa-folder-open"></i> 選擇 CSV 檔案
+                    </button>
+                    <div id="import-status" style="font-size: 12px; color: #20c997; margin-top: 5px;"></div>
+                </div>
             </div>
 
             <div id="page-analysis" class="tab-content">
                 <label><i class="fa-solid fa-chart-pie"></i> 本月消費比例</label>
-                
                 <div id="chart-container">
                     <div id="chart_donut"></div>
-                    <div id="center-text">
-                        <span id="center-label">總計</span>
-                        <span id="center-value">$0</span>
-                    </div>
+                    <div id="center-text"><span id="center-label">總計</span><span id="center-value">$0</span></div>
                 </div>
-
-                <label style="margin-top:20px;"><i class="fa-solid fa-chart-line"></i> 年度花費趨勢 (今年 vs 去年)</label>
+                <label style="margin-top:20px;"><i class="fa-solid fa-chart-line"></i> 年度花費趨勢</label>
                 <div id="trend_chart_div"></div>
-                
                 <label style="margin-top:20px;"><i class="fa-solid fa-fire"></i> 預算使用進度</label>
                 <div class="progress-container"><div id="progress-bar"></div></div>
                 <p id="progress-text" style="font-size: 12px; color: var(--text-sub); text-align: right;">0%</p>
@@ -323,7 +317,6 @@
 
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(initChartWrapper);
-
         function initChartWrapper() { }
 
         window.onload = function() {
@@ -348,60 +341,55 @@
             document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             element.classList.add('active');
-            
-            if(pageId === 'page-analysis') {
-                drawDonutChart();
-                drawTrendChart(); // 載入趨勢圖
-            }
-            
+            if(pageId === 'page-analysis') { drawDonutChart(); drawTrendChart(); }
             if(isDeleteMode) toggleDeleteMode();
         }
 
+        // --- 核心更新功能：修改分類 ---
+        async function updateCategory(id, newCat) {
+            const { error } = await _supabase.from('expenses').update({ category: newCat }).eq('id', id);
+            if(error) {
+                alert("修改失敗");
+            } else {
+                // 修改成功後，給予一點視覺回饋 (可選)
+                loadDashboard(); // 重新計算金額與圖表
+            }
+        }
+
+        // --- 刪除功能 ---
         function toggleDeleteMode() {
             isDeleteMode = !isDeleteMode;
             const table = document.getElementById('history-table');
             const btnDel = document.getElementById('btn-delete');
             const btnConfirm = document.getElementById('btn-confirm-del');
-
             if(isDeleteMode) {
                 table.classList.add('delete-mode');
-                btnDel.style.display = 'none';
-                btnConfirm.style.display = 'inline-block';
+                btnDel.style.display = 'none'; btnConfirm.style.display = 'inline-block';
             } else {
                 table.classList.remove('delete-mode');
-                btnDel.style.display = 'inline-block';
-                btnConfirm.style.display = 'none';
+                btnDel.style.display = 'inline-block'; btnConfirm.style.display = 'none';
                 document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
             }
         }
 
         async function executeDelete() {
             const checkboxes = document.querySelectorAll('.row-checkbox:checked');
-            if(checkboxes.length === 0) {
-                alert("請勾選要刪除的項目");
-                return;
-            }
-
-            if(!confirm(`確定要刪除這 ${checkboxes.length} 筆資料嗎？`)) return;
-
+            if(checkboxes.length === 0) { alert("請勾選項目"); return; }
+            if(!confirm(`確定刪除 ${checkboxes.length} 筆？`)) return;
             const idsToDelete = Array.from(checkboxes).map(cb => cb.value);
-
             const { error } = await _supabase.from('expenses').delete().in('id', idsToDelete);
-
-            if(error) {
-                alert("刪除失敗：" + error.message);
-                console.error(error);
-            } else {
-                alert("刪除成功！");
-                toggleDeleteMode();
-                const activeBtn = document.querySelector('.history-btn.active');
-                if(activeBtn && activeBtn.innerText === '當月') loadHistory('month', activeBtn);
-                else if(activeBtn && activeBtn.innerText === '半年') loadHistory('half', activeBtn);
-                else if(activeBtn && activeBtn.innerText === 'GO') loadHistory('custom', null);
-                loadDashboard();
-            }
+            if(error) alert("刪除失敗");
+            else { alert("刪除成功"); toggleDeleteMode(); refreshCurrentHistory(); loadDashboard(); }
         }
 
+        function refreshCurrentHistory() {
+            const activeBtn = document.querySelector('.history-btn.active');
+            if(activeBtn && activeBtn.innerText === '當月') loadHistory('month', activeBtn);
+            else if(activeBtn && activeBtn.innerText === '半年') loadHistory('half', activeBtn);
+            else if(activeBtn && activeBtn.innerText === 'GO') loadHistory('custom', null);
+        }
+
+        // --- 歷史紀錄 (含下拉選單生成) ---
         function toggleCustomDate(btn) {
             document.querySelectorAll('.history-btn').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
@@ -416,7 +404,6 @@
                 document.querySelectorAll('.history-btn').forEach(b => b.classList.remove('active'));
                 if(btn) btn.classList.add('active');
             }
-
             const tableContainer = document.getElementById('history-table-container');
             const tbody = document.getElementById('history-list-body');
             const loading = document.getElementById('hist-loading');
@@ -424,118 +411,87 @@
             const actions = document.getElementById('table-actions');
 
             if(isDeleteMode) toggleDeleteMode();
-
-            tableContainer.style.display = 'block';
-            tbody.innerHTML = '';
-            loading.style.display = 'block';
-            empty.style.display = 'none';
-            actions.style.display = 'none';
+            tableContainer.style.display = 'block'; tbody.innerHTML = '';
+            loading.style.display = 'block'; empty.style.display = 'none'; actions.style.display = 'none';
 
             let startDate, endDate;
             const now = new Date();
-            
             if (mode === 'month') {
                 startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
                 endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
             } else if (mode === 'half') {
-                const halfYearAgo = new Date();
-                halfYearAgo.setMonth(now.getMonth() - 6);
-                startDate = halfYearAgo.toISOString();
-                endDate = now.toISOString();
+                startDate = new Date(now.setMonth(now.getMonth() - 6)).toISOString();
+                endDate = new Date().toISOString();
             } else if (mode === 'custom') {
                 const s = document.getElementById('hist-start').value;
                 const e = document.getElementById('hist-end').value;
-                if(!s || !e) {
-                    alert("請選擇開始與結束日期");
-                    loading.style.display = 'none';
-                    return;
-                }
-                startDate = new Date(s).toISOString();
-                endDate = new Date(e).toISOString();
+                if(!s || !e) { alert("請選擇日期"); loading.style.display = 'none'; return; }
+                startDate = new Date(s).toISOString(); endDate = new Date(e).toISOString();
             }
 
-            try {
-                const { data: records, error } = await _supabase
-                    .from('expenses')
-                    .select('*')
-                    .gte('date', startDate.split('T')[0])
-                    .lte('date', endDate.split('T')[0])
-                    .order('date', { ascending: false });
+            const { data: records, error } = await _supabase.from('expenses')
+                .select('*').gte('date', startDate.split('T')[0]).lte('date', endDate.split('T')[0])
+                .order('date', { ascending: false });
 
-                loading.style.display = 'none';
+            loading.style.display = 'none';
+            if (!records || records.length === 0) { empty.style.display = 'block'; return; }
+            actions.style.display = 'flex';
 
-                if (error) throw error;
-                if (!records || records.length === 0) {
-                    empty.style.display = 'block';
-                    return;
-                }
+            records.forEach(r => {
+                const row = document.createElement('tr');
+                const d = new Date(r.date);
+                const dateStr = (d.getMonth() + 1) + '/' + d.getDate();
                 
-                actions.style.display = 'flex';
+                const amt = parseFloat(r.amount);
+                let color = '#454545';
+                if (amt >= 10000) color = '#d600a8'; else if (amt >= 1000) color = '#ff0000'; else if (amt >= 100) color = '#f891b5';
 
-                records.forEach(r => {
-                    const row = document.createElement('tr');
-                    const d = new Date(r.date);
-                    const dateStr = (d.getMonth() + 1) + '/' + d.getDate();
-                    
-                    const amt = parseFloat(r.amount);
-                    let color = '#454545';
-                    if (amt >= 10000) color = '#d600a8';
-                    else if (amt >= 1000) color = '#ff0000';
-                    else if (amt >= 100) color = '#f891b5';
-
-                    row.innerHTML = `
-                        <td class="checkbox-col"><input type="checkbox" class="row-checkbox" value="${r.id}"></td>
-                        <td class="date-col">${dateStr}</td>
-                        <td>
-                            <div style="font-weight:bold; font-size:13px;">${r.subcategory}</div>
-                            <div style="font-size:11px; color:#ccc;">${r.category}</div>
-                        </td>
-                        <td class="amt-col" style="color:${color};">$${r.amount}</td>
-                    `;
-                    tbody.appendChild(row);
+                // 生成主分類下拉選單
+                let catOptions = '';
+                Object.keys(subData).forEach(cat => {
+                    const selected = cat === r.category ? 'selected' : '';
+                    catOptions += `<option value="${cat}" ${selected}>${cat}</option>`;
                 });
 
-            } catch (e) {
-                console.error(e);
-                loading.style.display = 'none';
-                empty.innerText = "讀取失敗";
-                empty.style.display = 'block';
-            }
+                row.innerHTML = `
+                    <td class="checkbox-col"><input type="checkbox" class="row-checkbox" value="${r.id}"></td>
+                    <td class="date-col">${dateStr}</td>
+                    <td>
+                        <select class="cat-select" onchange="updateCategory('${r.id}', this.value)">
+                            ${catOptions}
+                        </select>
+                    </td>
+                    <td>
+                        <div style="font-weight:bold; font-size:13px;">${r.subcategory}</div>
+                        <div style="font-size:11px; color:#ccc;">${r.note || ''}</div>
+                    </td>
+                    <td class="amt-col" style="color:${color};">$${r.amount}</td>
+                `;
+                tbody.appendChild(row);
+            });
         }
 
         async function loadDashboard() {
-            document.getElementById('status').innerText = "🔄 同步中...";
-            try {
-                const { data: configData } = await _supabase.from('config').select('value').eq('key', 'monthly_budget').single();
-                const budget = configData ? configData.value : 0;
+            // 省略載入動畫，避免修改分類時畫面閃爍
+            const { data: configData } = await _supabase.from('config').select('value').eq('key', 'monthly_budget').single();
+            const budget = configData ? configData.value : 0;
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
+            const { data: expenses } = await _supabase.from('expenses').select('*').gte('date', firstDay).lte('date', lastDay);
 
-                const now = new Date();
-                const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-                const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
+            let totalSpent = 0; let breakdown = {};
+            expenses.forEach(e => {
+                totalSpent += parseFloat(e.amount);
+                breakdown[e.category] = (breakdown[e.category] || 0) + parseFloat(e.amount);
+            });
+            dashboardData = { budget, spent: totalSpent, breakdown };
 
-                const { data: expenses } = await _supabase.from('expenses')
-                    .select('*')
-                    .gte('date', firstDay)
-                    .lte('date', lastDay);
-
-                let totalSpent = 0;
-                let breakdown = {};
-                expenses.forEach(e => {
-                    totalSpent += parseFloat(e.amount);
-                    breakdown[e.category] = (breakdown[e.category] || 0) + parseFloat(e.amount);
-                });
-
-                dashboardData = { budget, spent: totalSpent, breakdown };
-
-                document.getElementById('input_starting').value = budget;
-                document.getElementById('disp_monthly_rem').innerText = (budget - totalSpent).toLocaleString();
-                document.getElementById('disp_monthly_spent').innerText = totalSpent.toLocaleString();
-                updateProgressBar();
-                document.getElementById('status').innerText = "☁️ 雲端同步完成";
-            } catch (e) {
-                console.error(e);
-                document.getElementById('status').innerText = "⚠️ 同步失敗";
-            }
+            document.getElementById('input_starting').value = budget;
+            document.getElementById('disp_monthly_rem').innerText = (budget - totalSpent).toLocaleString();
+            document.getElementById('disp_monthly_spent').innerText = totalSpent.toLocaleString();
+            updateProgressBar();
+            document.getElementById('status').innerText = "☁️";
         }
 
         function updateProgressBar() {
@@ -544,111 +500,63 @@
             document.getElementById('progress-text').innerText = Math.round(percent) + "% (已用 " + dashboardData.spent.toLocaleString() + ")";
         }
 
-        // --- 圖表繪製 ---
-
+        // --- 圖表 ---
         function drawDonutChart() {
             if(!dashboardData.breakdown) return;
             var dataArray = [['Category', 'Amount']];
-            for (var cat in dashboardData.breakdown) {
-                dataArray.push([cat, dashboardData.breakdown[cat]]);
-            }
+            for (var cat in dashboardData.breakdown) dataArray.push([cat, dashboardData.breakdown[cat]]);
             if(dataArray.length === 1) dataArray.push(['無消費', 1]);
 
             var data = google.visualization.arrayToDataTable(dataArray);
-            
             var options = {
-                pieHole: 0.7, 
-                pieSliceText: 'none', 
-                backgroundColor: 'transparent',
+                pieHole: 0.7, pieSliceText: 'none', backgroundColor: 'transparent',
                 chartArea: {left: 'auto', top: 10, width: '100%', height: '80%'},
-                // 2. 修改：圖例置底，強制兩行
                 legend: {position: 'bottom', maxLines: 2, textStyle: {fontSize: 12}},
                 tooltip: { trigger: 'focus' },
-                // 2. 修改：使用 8 種高對比鮮明顏色
                 colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#E7E9ED', '#767676']
             };
-
             donutChart = new google.visualization.PieChart(document.getElementById('chart_donut'));
-            
             google.visualization.events.addListener(donutChart, 'select', function() {
                 var selection = donutChart.getSelection();
                 var centerText = document.getElementById('center-text');
-                var centerLabel = document.getElementById('center-label');
-                var centerValue = document.getElementById('center-value');
-
                 if (selection.length > 0) {
                     var row = selection[0].row;
-                    var cat = data.getValue(row, 0);
-                    var val = data.getValue(row, 1);
-                    centerLabel.innerText = cat;
-                    centerValue.innerText = "$" + val.toLocaleString();
+                    document.getElementById('center-label').innerText = data.getValue(row, 0);
+                    document.getElementById('center-value').innerText = "$" + data.getValue(row, 1).toLocaleString();
                     centerText.style.display = "block";
                 } else {
-                    centerLabel.innerText = "本月總計";
-                    centerValue.innerText = "$" + dashboardData.spent.toLocaleString();
+                    document.getElementById('center-label').innerText = "本月總計";
+                    document.getElementById('center-value').innerText = "$" + dashboardData.spent.toLocaleString();
                 }
             });
-            
-            var centerText = document.getElementById('center-text');
             document.getElementById('center-label').innerText = "本月總計";
             document.getElementById('center-value').innerText = "$" + dashboardData.spent.toLocaleString();
-            centerText.style.display = "block";
-
+            document.getElementById('center-text').style.display = "block";
             donutChart.draw(data, options);
         }
 
-        // 3. 新增：繪製年度趨勢圖 (長條 + 折線)
         async function drawTrendChart() {
-            // 抓取今年與去年的資料
-            const now = new Date();
-            const thisYear = now.getFullYear();
-            const lastYear = thisYear - 1;
-            
-            // 設定查詢範圍 (去年1月1日 ~ 今年12月31日)
-            const startDate = `${lastYear}-01-01`;
-            const endDate = `${thisYear}-12-31`;
-
-            const { data: records } = await _supabase
-                .from('expenses')
-                .select('date, amount')
-                .gte('date', startDate)
-                .lte('date', endDate);
-
+            const now = new Date(); const thisYear = now.getFullYear(); const lastYear = thisYear - 1;
+            const startDate = `${lastYear}-01-01`; const endDate = `${thisYear}-12-31`;
+            const { data: records } = await _supabase.from('expenses').select('date, amount').gte('date', startDate).lte('date', endDate);
             if(!records) return;
 
-            // 整理資料：Month (1-12) -> { thisYear: 0, lastYear: 0 }
             let monthlyData = {};
             for(let i=1; i<=12; i++) monthlyData[i] = { thisYear: 0, lastYear: 0 };
-
             records.forEach(r => {
-                const d = new Date(r.date);
-                const y = d.getFullYear();
-                const m = d.getMonth() + 1;
-                const amt = parseFloat(r.amount);
-
-                if(y === thisYear) monthlyData[m].thisYear += amt;
-                else if(y === lastYear) monthlyData[m].lastYear += amt;
+                const d = new Date(r.date); const y = d.getFullYear(); const m = d.getMonth() + 1; const amt = parseFloat(r.amount);
+                if(y === thisYear) monthlyData[m].thisYear += amt; else if(y === lastYear) monthlyData[m].lastYear += amt;
             });
 
-            // 轉換為 Google Chart 格式
             var dataArray = [['月份', '今年花費', '去年花費']];
-            for(let i=1; i<=12; i++) {
-                dataArray.push([i + '月', monthlyData[i].thisYear, monthlyData[i].lastYear]);
-            }
+            for(let i=1; i<=12; i++) dataArray.push([i + '月', monthlyData[i].thisYear, monthlyData[i].lastYear]);
 
             var data = google.visualization.arrayToDataTable(dataArray);
-
             var options = {
-                title : '年度花費對比 (長條:今年 / 折線:去年)',
-                vAxis: {title: '金額 ($)'},
-                hAxis: {title: '月份'},
-                seriesType: 'bars', // 預設為長條圖 (今年)
-                series: {1: {type: 'line'}}, // 第二個系列 (去年) 改為折線圖
-                colors: ['#36A2EB', '#FF6384'], // 藍色長條，紅色折線
-                legend: { position: 'bottom' },
-                chartArea: {width: '80%', height: '70%'}
+                title : '年度花費對比', vAxis: {title: '金額 ($)'}, hAxis: {title: '月份'},
+                seriesType: 'bars', series: {1: {type: 'line'}}, colors: ['#36A2EB', '#FF6384'],
+                legend: { position: 'bottom' }, chartArea: {width: '80%', height: '70%'}
             };
-
             var chart = new google.visualization.ComboChart(document.getElementById('trend_chart_div'));
             chart.draw(data, options);
         }
@@ -670,17 +578,12 @@
         async function executeUpdateBudget() {
             const val = document.getElementById('input_starting').value;
             const { error } = await _supabase.from('config').upsert({ key: 'monthly_budget', value: val });
-            if(error) alert("更新失敗");
-            else {
-                alert("預算更新成功！");
-                loadDashboard();
-            }
+            if(error) alert("更新失敗"); else { alert("預算更新成功！"); loadDashboard(); }
         }
 
         async function executeSubmit() {
             const amt = document.getElementById('amount').value;
             if(!amt || !currentMainCat) return alert("請填寫完整資訊");
-
             const { error } = await _supabase.from('expenses').insert([{
                 date: document.getElementById('date').value,
                 category: currentMainCat,
@@ -688,26 +591,108 @@
                 amount: parseFloat(amt),
                 note: document.getElementById('note').value
             }]);
-
             if(!error) {
                 alert("紀錄成功");
-                
-                // 1. 修改：送出後清空所有欄位與狀態
                 document.getElementById('amount').value = "";
                 document.getElementById('note').value = "";
-                
-                // 清除主類別選取
                 currentMainCat = "";
                 document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-                
-                // 隱藏子選單
                 document.getElementById('sub-category-container').style.display = "none";
                 document.getElementById('sub-category').innerHTML = "";
-
                 loadDashboard();
-            } else {
-                alert("紀錄失敗: " + error.message);
-            }
+            } else { alert("紀錄失敗: " + error.message); }
+        }
+
+        // --- 智慧 CSV 匯入邏輯 (核心修改) ---
+        function handleCSVUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            document.getElementById('import-status').innerText = "讀取中...";
+            
+            reader.onload = async function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n');
+                
+                let recordsToInsert = [];
+                let errorCount = 0;
+
+                // 1. 讀取標題列 (第一列)
+                const headerLine = rows[0].trim();
+                const headers = headerLine.split(',').map(h => h.trim().replace(/"/g, '')); // 去除引號
+
+                // 2. 智慧判斷欄位索引
+                // 預設為 0, 1, 2 (簡易模式)
+                let dateIdx = 0;
+                let amtIdx = 1;
+                let noteIdx = 2;
+                let subIdx = -1; // 用來存子項目 (例如品名)
+
+                // 搜尋關鍵字
+                const targetDate = "發票日期";
+                const targetAmt = "發票金額"; // 有些是"總金額"
+                const targetNote = "消費明細_品名"; // 或者 "品名"
+
+                // 如果標題包含關鍵字，就使用找到的索引
+                if (headers.includes(targetDate)) {
+                    dateIdx = headers.indexOf(targetDate);
+                    // 如果有找到發票日期，通常代表這是電子發票格式，嘗試找其他欄位
+                    // 金額可能叫 "發票金額" 或 "總金額"
+                    amtIdx = headers.indexOf(targetAmt);
+                    if (amtIdx === -1) amtIdx = headers.indexOf("總金額");
+                    
+                    // 備註對應到品名
+                    noteIdx = headers.indexOf(targetNote);
+                    if (noteIdx === -1) noteIdx = headers.indexOf("品名");
+                }
+
+                // 3. 讀取資料
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i].trim();
+                    if (!row) continue;
+                    
+                    // 簡易分割 (未處理欄位內逗號，若需嚴謹可用 Regex)
+                    const cols = row.split(',').map(c => c.trim().replace(/"/g, ''));
+                    
+                    if (cols.length > Math.max(dateIdx, amtIdx)) {
+                        const dateStr = cols[dateIdx];
+                        const amountStr = cols[amtIdx];
+                        const noteStr = noteIdx > -1 ? cols[noteIdx] : "CSV 匯入";
+
+                        const amount = parseFloat(amountStr);
+                        
+                        if (!isNaN(amount) && amount > 0 && dateStr.length >= 8) {
+                            recordsToInsert.push({
+                                date: dateStr,
+                                category: '雜', // 預設
+                                subcategory: '其他',
+                                amount: amount,
+                                note: noteStr
+                            });
+                        } else {
+                            errorCount++;
+                        }
+                    }
+                }
+
+                if (recordsToInsert.length > 0) {
+                    const { error } = await _supabase.from('expenses').insert(recordsToInsert);
+                    if (error) {
+                        alert("匯入失敗: " + error.message);
+                        document.getElementById('import-status').innerText = "匯入失敗";
+                    } else {
+                        alert(`成功匯入 ${recordsToInsert.length} 筆資料！\n(略過 ${errorCount} 筆)`);
+                        document.getElementById('import-status').innerText = "";
+                        loadDashboard();
+                    }
+                } else {
+                    alert("無有效資料，請確認 CSV 格式。\n(需包含：發票日期, 發票金額)");
+                    document.getElementById('import-status').innerText = "格式錯誤";
+                }
+                input.value = ''; 
+            };
+            reader.readAsText(file);
         }
     </script>
 </body>
