@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏦 理財紀錄 (Pro Donut)</title>
+    <title>🏦 理財紀錄 (Pro Max)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -12,35 +12,25 @@
     
     <style>
         :root {
-            /* 背景顏色 */
             --bg-color: #fbf9f4;
-            
-            /* 填寫資料表格背景色 */
             --input-bg: #ededed;
-            
             --card-bg: #ffffff;
             --icon-color: #454545;
-            
-            /* 字體顏色 */
             --text-main: #000000;
             --text-sub: #8d8d8d;
             
-            /* 1. 顏色調整: #9bd9f3 -> #ecf6fd */
-            /* 主類別按鈕顏色 */
-            /* 不按的時候 (極淺藍底 深灰字) */
+            /* 顏色設定 */
             --cat-default-bg: #ecf6fd; 
             --cat-default-text: #454545;
-            /* 選擇的時候 (深藍底 白字) */
             --cat-active-bg: #66b8db;
             --cat-active-text: #fbf9f4;
 
-            /* 確認送出按鈕顏色 */
-            /* 不按的時候 (深藍底 白字) */
             --btn-submit-bg: #66b8db;
             --btn-submit-text: #fbf9f4;
-            /* 選擇的時候 (極淺藍底 深灰字) */
             --btn-submit-active-bg: #ecf6fd;
             --btn-submit-active-text: #454545;
+            
+            --delete-color: #ff4d4f;
         }
 
         body { 
@@ -63,161 +53,117 @@
 
         .form-group { margin-bottom: 15px; }
         label { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--icon-color); font-size: 14px; font-weight: bold; }
-        label i { color: var(--icon-color); }
-
-        /* 輸入框樣式 */
+        
         input, select { 
-            width: 100%; padding: 14px; 
-            border: none;
-            border-radius: 12px; 
-            box-sizing: border-box; font-size: 16px; 
-            background: var(--input-bg); 
-            color: var(--text-main); 
-            outline: none; -webkit-appearance: none;
+            width: 100%; padding: 14px; border: none; border-radius: 12px; 
+            box-sizing: border-box; font-size: 16px; background: var(--input-bg); 
+            color: var(--text-main); outline: none; -webkit-appearance: none;
             box-shadow: inset 2px 2px 6px rgba(0,0,0,0.1), inset -2px -2px 6px rgba(255,255,255,0.7);
             transition: all 0.2s;
         }
-        input:focus, select:focus {
-            box-shadow: inset 3px 3px 8px rgba(0,0,0,0.15);
-        }
+        input:focus, select:focus { box-shadow: inset 3px 3px 8px rgba(0,0,0,0.15); }
 
-        /* 主類別按鈕 */
         .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
         .cat-btn { 
-            padding: 12px 0; 
-            background: var(--cat-default-bg); 
-            color: var(--cat-default-text);
-            border: none; 
-            border-radius: 15px; 
-            font-size: 14px; 
-            font-weight: bold;
-            cursor: pointer; 
-            text-align: center; 
+            padding: 12px 0; background: var(--cat-default-bg); color: var(--cat-default-text);
+            border: none; border-radius: 15px; font-size: 14px; font-weight: bold;
+            cursor: pointer; text-align: center; 
             box-shadow: 3px 3px 6px rgba(0,0,0,0.1), -1px -1px 4px rgba(255,255,255,0.8);
             transition: all 0.2s ease;
         }
-        .cat-btn:active { transform: scale(0.96); }
         .cat-btn.active { 
-            background: var(--cat-active-bg); 
-            color: var(--cat-active-text); 
+            background: var(--cat-active-bg); color: var(--cat-active-text); 
             box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
         }
 
         #sub-category-container { display: none; background: transparent; margin-bottom: 15px; }
 
-        /* 確認送出按鈕 */
         button.main-btn { 
-            width: 100%; padding: 16px; 
-            background: var(--btn-submit-bg); 
-            color: var(--btn-submit-text); 
-            border: none; 
-            border-radius: 12px; 
-            font-size: 16px; font-weight: bold; cursor: pointer; 
-            box-shadow: 0 4px 10px rgba(102, 184, 219, 0.4);
-            transition: all 0.2s;
+            width: 100%; padding: 16px; background: var(--btn-submit-bg); color: var(--btn-submit-text); 
+            border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(102, 184, 219, 0.4); transition: all 0.2s;
         }
         button.main-btn:active {
-            background: var(--btn-submit-active-bg);
-            color: var(--btn-submit-active-text);
-            transform: translateY(2px);
-            box-shadow: none;
+            background: var(--btn-submit-active-bg); color: var(--btn-submit-active-text);
+            transform: translateY(2px); box-shadow: none;
         }
 
-        /* 預算按鈕 */
         .btn-budget { margin-top: 10px; }
 
         .info-box { background: #fff; border: 1px solid #eee; padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .info-value { font-size: 18px; font-weight: bold; color: var(--text-main); }
 
-        /* 底部 Tab */
         .tab-bar { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); z-index: 100; }
         .tab-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #ccc; cursor: pointer; width: 33.3%; transition: color 0.3s; }
         .tab-item.active { color: var(--icon-color); font-weight: bold; }
         .tab-item i { font-size: 20px; margin-bottom: 4px; }
 
-        /* 3. 分析圖表 - 甜甜圈圖容器 */
+        /* 圖表修正區塊 */
         #chart-container {
-            position: relative; /* 為了讓中間文字絕對定位 */
+            position: relative;
             width: 100%;
             height: 300px;
             margin-top: 10px;
         }
         #chart_donut { width: 100%; height: 100%; }
-        
-        /* 圓餅圖中間的文字 */
         #center-text {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            pointer-events: none; /* 讓點擊穿透到圖表 */
-            display: none; /* 預設隱藏 */
+            pointer-events: none; /* 讓點擊穿透 */
+            display: none;
+            z-index: 10; /* 確保在圖表之上 */
         }
         #center-label { font-size: 14px; color: #888; display: block; }
-        #center-value { font-size: 20px; font-weight: bold; color: var(--text-main); display: block; }
+        #center-value { font-size: 22px; font-weight: bold; color: var(--text-main); display: block; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
 
         .progress-container { background: #eee; border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.1); }
         #progress-bar { background: var(--cat-active-bg); height: 100%; width: 0%; transition: 1s; }
 
-        /* 消費紀錄區塊 */
-        .history-section {
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 2px dashed #eee;
-        }
-        
-        /* 2A. 修正按鈕超出格子 - 使用 flex 調整比例與字體 */
-        .history-controls {
-            display: flex;
-            gap: 5px; /* 縮小間距 */
-            margin-bottom: 15px;
-            justify-content: space-between;
-        }
+        /* 消費紀錄與刪除功能區塊 */
+        .history-section { margin-top: 25px; padding-top: 20px; border-top: 2px dashed #eee; }
+        .history-controls { display: flex; gap: 5px; margin-bottom: 15px; justify-content: space-between; }
         .history-btn {
-            /* 讓自選時間佔據更多空間，或縮小字體以適應 */
-            flex: 1;
-            padding: 8px 0; 
-            font-size: 12px; /* 縮小字體 */
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            color: var(--text-main);
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
+            flex: 1; padding: 8px 0; font-size: 12px; background: #fff;
+            border: 1px solid #ddd; border-radius: 8px; color: var(--text-main);
+            cursor: pointer; transition: all 0.2s; white-space: nowrap;
         }
-        .history-btn.active {
-            background: var(--icon-color);
-            color: #fff;
-            border-color: var(--icon-color);
-        }
+        .history-btn.active { background: var(--icon-color); color: #fff; border-color: var(--icon-color); }
         
-        .custom-date-range {
-            display: none;
-            gap: 5px;
-            margin-bottom: 10px;
-            background: #f9f9f9;
-            padding: 10px;
-            border-radius: 10px;
-        }
+        .custom-date-range { display: none; gap: 5px; margin-bottom: 10px; background: #f9f9f9; padding: 10px; border-radius: 10px; }
+        
         .table-container {
-            height: 250px;
-            overflow-y: auto;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
-            display: none;
+            height: 250px; overflow-y: auto; background: #fff;
+            border-radius: 12px; box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+            border: 1px solid #eee; display: none; position: relative;
         }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { background: #f0f0f0; position: sticky; top: 0; padding: 10px; text-align: left; font-size: 12px; color: #666; }
-        td { padding: 10px; border-bottom: 1px solid #f5f5f5; color: var(--text-main); }
+        th { background: #f0f0f0; position: sticky; top: 0; padding: 10px; text-align: left; font-size: 12px; color: #666; z-index: 5;}
+        td { padding: 10px; border-bottom: 1px solid #f5f5f5; color: var(--text-main); vertical-align: middle; }
         
-        /* 2B. 金額欄位 - 顏色由 JS 強制控制，這裡不設預設顏色 */
         .amt-col { text-align: right; font-weight: bold; }
-        .date-col { font-size: 12px; color: #999; width: 80px; }
+        .date-col { font-size: 12px; color: #999; width: 60px; }
+
+        /* 刪除功能樣式 */
+        .checkbox-col { width: 30px; text-align: center; display: none; } /* 預設隱藏 */
+        .delete-mode .checkbox-col { display: table-cell; }
         
+        .row-checkbox {
+            width: 18px; height: 18px; accent-color: var(--delete-color);
+        }
+
+        .table-footer-actions {
+            display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;
+        }
+        .action-btn {
+            padding: 8px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; border: none; cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-edit { background: #fff; border: 1px solid #ddd; color: #666; }
+        .btn-delete { background: #fff; border: 1px solid var(--delete-color); color: var(--delete-color); }
+        .btn-confirm-del { background: var(--delete-color); color: white; display: none; }
+
     </style>
 </head>
 <body>
@@ -233,27 +179,22 @@
                     <label><i class="fa-regular fa-calendar"></i> 日期</label>
                     <input type="date" id="date">
                 </div>
-                
                 <div class="form-group">
                     <label><i class="fa-solid fa-tags"></i> 主類別</label>
                     <div class="category-grid" id="main-cat-grid"></div>
                 </div>
-                
                 <div class="form-group" id="sub-category-container">
                     <label><i class="fa-solid fa-filter"></i> 子項目</label>
                     <select id="sub-category"></select>
                 </div>
-                
                 <div class="form-group">
                     <label><i class="fa-solid fa-dollar-sign"></i> 消費金額</label>
                     <input type="number" id="amount" placeholder="0" inputmode="decimal">
                 </div>
-                
                 <div class="form-group">
                     <label><i class="fa-solid fa-pen"></i> 備註</label>
                     <input type="text" id="note" placeholder="選填...">
                 </div>
-                
                 <button id="submitBtn" class="main-btn" onclick="executeSubmit()">確認送出</button>
             </div>
 
@@ -294,6 +235,7 @@
                         <table id="history-table">
                             <thead>
                                 <tr>
+                                    <th class="checkbox-col"><i class="fa-solid fa-trash-can"></i></th>
                                     <th>時間</th>
                                     <th>子項目</th>
                                     <th style="text-align:right;">金額</th>
@@ -303,6 +245,12 @@
                         </table>
                         <div id="hist-loading" style="text-align:center; padding:20px; color:#999; display:none;">載入中...</div>
                         <div id="hist-empty" style="text-align:center; padding:20px; color:#ccc; display:none;">查無資料</div>
+                    </div>
+                    
+                    <div class="table-footer-actions" id="table-actions" style="display:none;">
+                        <button id="btn-edit" class="action-btn btn-edit" onclick="alert('編輯功能尚在開發中，請先刪除錯誤項目後重新新增。')">編輯</button>
+                        <button id="btn-delete" class="action-btn btn-delete" onclick="toggleDeleteMode()">刪除</button>
+                        <button id="btn-confirm-del" class="action-btn btn-confirm-del" onclick="executeDelete()">確認刪除</button>
                     </div>
                 </div>
             </div>
@@ -340,13 +288,11 @@
     </nav>
 
     <script>
-        // --- 設定 Supabase ---
         const SUPABASE_URL = 'https://sprrurptghjkxvwstukn.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwcnJ1cnB0Z2hqa3h2d3N0dWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5NjcyOTMsImV4cCI6MjA4NDU0MzI5M30.IoOY-gdM7qXPEm3DildpEOq_e3jpTfQLa19X7G6iImw';
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- 子分類資料 ---
         const subData = {
             "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"],
             "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"],
@@ -360,15 +306,13 @@
 
         let currentMainCat = "";
         let dashboardData = { budget: 0, spent: 0, breakdown: {} };
-        let donutChart; // 儲存圖表實例
+        let donutChart;
+        let isDeleteMode = false; // 追蹤刪除模式狀態
 
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(initChartWrapper);
 
-        // 為了確保圖表載入不會報錯，包裝一層
-        function initChartWrapper() {
-            // 圖表載入完成
-        }
+        function initChartWrapper() { }
 
         window.onload = function() {
             document.getElementById('date').valueAsDate = new Date();
@@ -393,14 +337,78 @@
             document.getElementById(pageId).classList.add('active');
             element.classList.add('active');
             if(pageId === 'page-analysis') drawDonutChart();
+            
+            // 切換分頁時重置刪除模式
+            if(isDeleteMode) toggleDeleteMode();
         }
 
-        // --- 消費紀錄查詢邏輯 ---
+        // --- 刪除功能邏輯 ---
+        function toggleDeleteMode() {
+            isDeleteMode = !isDeleteMode;
+            const table = document.getElementById('history-table');
+            const btnEdit = document.getElementById('btn-edit');
+            const btnDel = document.getElementById('btn-delete');
+            const btnConfirm = document.getElementById('btn-confirm-del');
+
+            if(isDeleteMode) {
+                // 進入刪除模式
+                table.classList.add('delete-mode');
+                btnEdit.style.display = 'none';
+                btnDel.style.display = 'none';
+                btnConfirm.style.display = 'inline-block';
+            } else {
+                // 離開刪除模式
+                table.classList.remove('delete-mode');
+                btnEdit.style.display = 'inline-block';
+                btnDel.style.display = 'inline-block';
+                btnConfirm.style.display = 'none';
+                // 清空勾選
+                document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+            }
+        }
+
+        async function executeDelete() {
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            if(checkboxes.length === 0) {
+                alert("請勾選要刪除的項目");
+                return;
+            }
+
+            if(!confirm(`確定要刪除這 ${checkboxes.length} 筆資料嗎？`)) return;
+
+            const idsToDelete = Array.from(checkboxes).map(cb => cb.value);
+
+            // 執行 Supabase 刪除
+            const { error } = await _supabase
+                .from('expenses')
+                .delete()
+                .in('id', idsToDelete);
+
+            if(error) {
+                alert("刪除失敗：" + error.message);
+                console.error(error);
+            } else {
+                alert("刪除成功！");
+                toggleDeleteMode(); // 退出刪除模式
+                
+                // 重新載入目前顯示的歷史紀錄
+                const activeBtn = document.querySelector('.history-btn.active');
+                if(activeBtn && activeBtn.innerText === '當月') loadHistory('month', activeBtn);
+                else if(activeBtn && activeBtn.innerText === '半年') loadHistory('half', activeBtn);
+                else if(activeBtn && activeBtn.innerText === 'GO') loadHistory('custom', null);
+                
+                // 更新錢包數據
+                loadDashboard();
+            }
+        }
+
+        // --- 歷史紀錄與消費查詢 ---
         function toggleCustomDate(btn) {
             document.querySelectorAll('.history-btn').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
             document.getElementById('custom-date-box').style.display = 'flex';
             document.getElementById('history-table-container').style.display = 'none';
+            document.getElementById('table-actions').style.display = 'none'; // 隱藏按鈕
         }
 
         async function loadHistory(mode, btn) {
@@ -414,11 +422,16 @@
             const tbody = document.getElementById('history-list-body');
             const loading = document.getElementById('hist-loading');
             const empty = document.getElementById('hist-empty');
+            const actions = document.getElementById('table-actions');
+
+            // 重置刪除狀態
+            if(isDeleteMode) toggleDeleteMode();
 
             tableContainer.style.display = 'block';
             tbody.innerHTML = '';
             loading.style.display = 'block';
             empty.style.display = 'none';
+            actions.style.display = 'none';
 
             let startDate, endDate;
             const now = new Date();
@@ -458,25 +471,23 @@
                     empty.style.display = 'block';
                     return;
                 }
+                
+                // 顯示底部按鈕
+                actions.style.display = 'flex';
 
                 records.forEach(r => {
                     const row = document.createElement('tr');
                     const d = new Date(r.date);
                     const dateStr = (d.getMonth() + 1) + '/' + d.getDate();
                     
-                    // 2B. 金額顏色修復邏輯 (使用 inline style 確保變色)
                     const amt = parseFloat(r.amount);
-                    let color = '#454545'; // 預設 0~99 (深灰)
-                    
-                    if (amt >= 10000) {
-                        color = '#d600a8'; // 紫色
-                    } else if (amt >= 1000) {
-                        color = '#ff0000'; // 紅色
-                    } else if (amt >= 100) {
-                        color = '#f891b5'; // 粉色
-                    }
+                    let color = '#454545';
+                    if (amt >= 10000) color = '#d600a8';
+                    else if (amt >= 1000) color = '#ff0000';
+                    else if (amt >= 100) color = '#f891b5';
 
                     row.innerHTML = `
+                        <td class="checkbox-col"><input type="checkbox" class="row-checkbox" value="${r.id}"></td>
                         <td class="date-col">${dateStr}</td>
                         <td>
                             <div style="font-weight:bold; font-size:13px;">${r.subcategory}</div>
@@ -536,34 +547,27 @@
             document.getElementById('progress-text').innerText = Math.round(percent) + "% (已用 " + dashboardData.spent.toLocaleString() + ")";
         }
 
-        // 3. 繪製甜甜圈圖並加入互動
         function drawDonutChart() {
             if(!dashboardData.breakdown) return;
             var dataArray = [['Category', 'Amount']];
             for (var cat in dashboardData.breakdown) {
                 dataArray.push([cat, dashboardData.breakdown[cat]]);
             }
-            // 不顯示剩餘預算，只顯示消費分佈，這樣圓餅圖比較好看
-            
-            // 如果沒有數據
-            if(dataArray.length === 1) {
-                dataArray.push(['無消費', 1]);
-            }
+            if(dataArray.length === 1) dataArray.push(['無消費', 1]);
 
             var data = google.visualization.arrayToDataTable(dataArray);
             var options = {
-                pieHole: 0.5, // 甜甜圈圖關鍵
-                pieSliceText: 'none', // 不在切片上顯示文字
+                pieHole: 0.7, // 修正點：加大中間空洞
+                pieSliceText: 'none', 
                 backgroundColor: 'transparent',
                 chartArea: {width: '90%', height: '90%'},
                 legend: {position: 'right', textStyle: {fontSize: 12}},
-                tooltip: { trigger: 'focus' }, // 點擊觸發
+                tooltip: { trigger: 'focus' },
                 colors: ['#66b8db', '#ecf6fd', '#bfa58a', '#d4a373', '#8e9aaf', '#e9edc9', '#faedcd', '#ccd5ae']
             };
 
             donutChart = new google.visualization.PieChart(document.getElementById('chart_donut'));
             
-            // 監聽選擇事件 (點擊切片)
             google.visualization.events.addListener(donutChart, 'select', function() {
                 var selection = donutChart.getSelection();
                 var centerText = document.getElementById('center-text');
@@ -574,18 +578,15 @@
                     var row = selection[0].row;
                     var cat = data.getValue(row, 0);
                     var val = data.getValue(row, 1);
-                    
                     centerLabel.innerText = cat;
                     centerValue.innerText = "$" + val.toLocaleString();
                     centerText.style.display = "block";
                 } else {
-                    // 取消選擇時顯示總計
                     centerLabel.innerText = "本月總計";
                     centerValue.innerText = "$" + dashboardData.spent.toLocaleString();
                 }
             });
             
-            // 初始顯示總計
             var centerText = document.getElementById('center-text');
             document.getElementById('center-label').innerText = "本月總計";
             document.getElementById('center-value').innerText = "$" + dashboardData.spent.toLocaleString();
