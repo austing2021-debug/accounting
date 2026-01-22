@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏦 理財紀錄 (Final)</title>
+    <title>🏦 理財紀錄 (Final 2.0)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -30,7 +30,7 @@
             --btn-submit-active-bg: #ecf6fd;
             --btn-submit-active-text: #454545;
             
-            --delete-color: #ff4d4f; /* 紅色 */
+            --delete-color: #ff4d4f;
         }
 
         body { 
@@ -98,13 +98,12 @@
         .tab-item.active { color: var(--icon-color); font-weight: bold; }
         .tab-item i { font-size: 20px; margin-bottom: 4px; }
 
-        /* --- 3. 圓餅圖文字置中修正區塊 --- */
+        /* 圖表區塊設定 */
         #chart-container {
             position: relative;
             width: 100%;
             height: 300px;
             margin-top: 10px;
-            /* 確保圖表容器也是置中 */
             display: flex;
             justify-content: center;
         }
@@ -112,7 +111,6 @@
         
         #center-text {
             position: absolute;
-            /* 改為 45% 以配合下方圖例造成的圖表上移 */
             top: 45%; 
             left: 50%;
             transform: translate(-50%, -50%);
@@ -123,6 +121,13 @@
         }
         #center-label { font-size: 14px; color: #888; display: block; }
         #center-value { font-size: 22px; font-weight: bold; color: var(--text-main); display: block; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
+
+        /* 新增：年度趨勢圖容器 */
+        #trend_chart_div {
+            width: 100%;
+            height: 250px;
+            margin-top: 15px;
+        }
 
         .progress-container { background: #eee; border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.1); }
         #progress-bar { background: var(--cat-active-bg); height: 100%; width: 0%; transition: 1s; }
@@ -150,51 +155,22 @@
         .amt-col { text-align: right; font-weight: bold; }
         .date-col { font-size: 12px; color: #999; width: 60px; }
 
-        /* --- 2. 紅心滿版圓圈 樣式 --- */
         .checkbox-col { width: 40px; text-align: center; display: none; }
         .delete-mode .checkbox-col { display: table-cell; }
         
         .row-checkbox {
-            appearance: none; /* 隱藏預設方形 */
-            -webkit-appearance: none;
-            width: 24px; 
-            height: 24px;
-            border: 2px solid #ddd; /* 未選取時的邊框 */
-            border-radius: 50%; /* 圓形 */
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
-            background: #fff;
-            vertical-align: middle;
+            appearance: none; -webkit-appearance: none; width: 24px; height: 24px;
+            border: 2px solid #ddd; border-radius: 50%; cursor: pointer;
+            position: relative; transition: all 0.2s; background: #fff; vertical-align: middle;
         }
-        
-        /* 選取時的狀態 (滿版紅色圓圈) */
-        .row-checkbox:checked {
-            background-color: var(--delete-color); /* 紅色背景 */
-            border-color: var(--delete-color);
-        }
-        
-        /* 選取時裡面的勾勾 */
+        .row-checkbox:checked { background-color: var(--delete-color); border-color: var(--delete-color); }
         .row-checkbox:checked::after {
-            content: '\f00c'; /* FontAwesome 的勾勾代碼，或直接用 CSS 畫 */
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            color: white;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 14px;
+            content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 14px;
         }
 
-        .table-footer-actions {
-            display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;
-        }
-        .action-btn {
-            padding: 8px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; border: none; cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        /* 1. 移除 btn-edit 的樣式 */
+        .table-footer-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+        .action-btn { padding: 8px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-delete { background: #fff; border: 1px solid var(--delete-color); color: var(--delete-color); }
         .btn-confirm-del { background: var(--delete-color); color: white; display: none; }
 
@@ -298,8 +274,11 @@
                         <span id="center-value">$0</span>
                     </div>
                 </div>
+
+                <label style="margin-top:20px;"><i class="fa-solid fa-chart-line"></i> 年度花費趨勢 (今年 vs 去年)</label>
+                <div id="trend_chart_div"></div>
                 
-                <label><i class="fa-solid fa-fire"></i> 預算使用進度</label>
+                <label style="margin-top:20px;"><i class="fa-solid fa-fire"></i> 預算使用進度</label>
                 <div class="progress-container"><div id="progress-bar"></div></div>
                 <p id="progress-text" style="font-size: 12px; color: var(--text-sub); text-align: right;">0%</p>
             </div>
@@ -369,7 +348,11 @@
             document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             element.classList.add('active');
-            if(pageId === 'page-analysis') drawDonutChart();
+            
+            if(pageId === 'page-analysis') {
+                drawDonutChart();
+                drawTrendChart(); // 載入趨勢圖
+            }
             
             if(isDeleteMode) toggleDeleteMode();
         }
@@ -403,10 +386,7 @@
 
             const idsToDelete = Array.from(checkboxes).map(cb => cb.value);
 
-            const { error } = await _supabase
-                .from('expenses')
-                .delete()
-                .in('id', idsToDelete);
+            const { error } = await _supabase.from('expenses').delete().in('id', idsToDelete);
 
             if(error) {
                 alert("刪除失敗：" + error.message);
@@ -414,12 +394,10 @@
             } else {
                 alert("刪除成功！");
                 toggleDeleteMode();
-                
                 const activeBtn = document.querySelector('.history-btn.active');
                 if(activeBtn && activeBtn.innerText === '當月') loadHistory('month', activeBtn);
                 else if(activeBtn && activeBtn.innerText === '半年') loadHistory('half', activeBtn);
                 else if(activeBtn && activeBtn.innerText === 'GO') loadHistory('custom', null);
-                
                 loadDashboard();
             }
         }
@@ -566,6 +544,8 @@
             document.getElementById('progress-text').innerText = Math.round(percent) + "% (已用 " + dashboardData.spent.toLocaleString() + ")";
         }
 
+        // --- 圖表繪製 ---
+
         function drawDonutChart() {
             if(!dashboardData.breakdown) return;
             var dataArray = [['Category', 'Amount']];
@@ -576,17 +556,16 @@
 
             var data = google.visualization.arrayToDataTable(dataArray);
             
-            // 3. 圖表設定修正：圖例移到下方，確保水平置中
             var options = {
                 pieHole: 0.7, 
                 pieSliceText: 'none', 
                 backgroundColor: 'transparent',
-                // 設定圖表區域，留出底部給圖例
                 chartArea: {left: 'auto', top: 10, width: '100%', height: '80%'},
-                // 關鍵：將圖例移到 'bottom'，這樣圓餅圖就會自動水平置中
-                legend: {position: 'bottom', textStyle: {fontSize: 12}},
+                // 2. 修改：圖例置底，強制兩行
+                legend: {position: 'bottom', maxLines: 2, textStyle: {fontSize: 12}},
                 tooltip: { trigger: 'focus' },
-                colors: ['#66b8db', '#ecf6fd', '#bfa58a', '#d4a373', '#8e9aaf', '#e9edc9', '#faedcd', '#ccd5ae']
+                // 2. 修改：使用 8 種高對比鮮明顏色
+                colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#E7E9ED', '#767676']
             };
 
             donutChart = new google.visualization.PieChart(document.getElementById('chart_donut'));
@@ -616,6 +595,62 @@
             centerText.style.display = "block";
 
             donutChart.draw(data, options);
+        }
+
+        // 3. 新增：繪製年度趨勢圖 (長條 + 折線)
+        async function drawTrendChart() {
+            // 抓取今年與去年的資料
+            const now = new Date();
+            const thisYear = now.getFullYear();
+            const lastYear = thisYear - 1;
+            
+            // 設定查詢範圍 (去年1月1日 ~ 今年12月31日)
+            const startDate = `${lastYear}-01-01`;
+            const endDate = `${thisYear}-12-31`;
+
+            const { data: records } = await _supabase
+                .from('expenses')
+                .select('date, amount')
+                .gte('date', startDate)
+                .lte('date', endDate);
+
+            if(!records) return;
+
+            // 整理資料：Month (1-12) -> { thisYear: 0, lastYear: 0 }
+            let monthlyData = {};
+            for(let i=1; i<=12; i++) monthlyData[i] = { thisYear: 0, lastYear: 0 };
+
+            records.forEach(r => {
+                const d = new Date(r.date);
+                const y = d.getFullYear();
+                const m = d.getMonth() + 1;
+                const amt = parseFloat(r.amount);
+
+                if(y === thisYear) monthlyData[m].thisYear += amt;
+                else if(y === lastYear) monthlyData[m].lastYear += amt;
+            });
+
+            // 轉換為 Google Chart 格式
+            var dataArray = [['月份', '今年花費', '去年花費']];
+            for(let i=1; i<=12; i++) {
+                dataArray.push([i + '月', monthlyData[i].thisYear, monthlyData[i].lastYear]);
+            }
+
+            var data = google.visualization.arrayToDataTable(dataArray);
+
+            var options = {
+                title : '年度花費對比 (長條:今年 / 折線:去年)',
+                vAxis: {title: '金額 ($)'},
+                hAxis: {title: '月份'},
+                seriesType: 'bars', // 預設為長條圖 (今年)
+                series: {1: {type: 'line'}}, // 第二個系列 (去年) 改為折線圖
+                colors: ['#36A2EB', '#FF6384'], // 藍色長條，紅色折線
+                legend: { position: 'bottom' },
+                chartArea: {width: '80%', height: '70%'}
+            };
+
+            var chart = new google.visualization.ComboChart(document.getElementById('trend_chart_div'));
+            chart.draw(data, options);
         }
 
         function selectMainCat(cat, btnElement) {
@@ -656,8 +691,19 @@
 
             if(!error) {
                 alert("紀錄成功");
+                
+                // 1. 修改：送出後清空所有欄位與狀態
                 document.getElementById('amount').value = "";
                 document.getElementById('note').value = "";
+                
+                // 清除主類別選取
+                currentMainCat = "";
+                document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+                
+                // 隱藏子選單
+                document.getElementById('sub-category-container').style.display = "none";
+                document.getElementById('sub-category').innerHTML = "";
+
                 loadDashboard();
             } else {
                 alert("紀錄失敗: " + error.message);
