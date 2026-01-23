@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏦 理財紀錄 </title>
+    <title>🏦 理財紀錄</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -114,7 +114,7 @@
         
         .custom-date-range { display: none; gap: 5px; margin-bottom: 10px; background: #f9f9f9; padding: 10px; border-radius: 10px; }
         
-        /* --- 表格樣式優化 (Final 6.0) --- */
+        /* 表格樣式 */
         .table-container {
             height: 300px; overflow-y: auto; background: #fff;
             border-radius: 12px; box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
@@ -124,41 +124,39 @@
         
         th { 
             background: #f0f0f0; position: sticky; top: 0; 
-            padding: 8px; text-align: center; /* 標題全部置中 */
+            padding: 8px; text-align: center; 
             font-size: 12px; color: #666; z-index: 5; 
         }
 
-        /* 儲存格樣式：使用虛線分隔，內容垂直置中 */
         td { 
             padding: 8px 5px; 
-            border-bottom: 1px dashed #dcdcdc; /* 虛線分隔符 */
+            border-bottom: 1px dashed #dcdcdc; 
             color: var(--text-main); 
             vertical-align: middle; 
         }
         
-        /* 1. 時間欄位：年分與月日分行 */
         .date-col { width: 60px; text-align: center; line-height: 1.4; }
         .year-text { font-size: 11px; color: #999; }
         .md-text { font-size: 14px; font-weight: bold; color: var(--text-main); }
 
-        /* 2. 主分類欄位：置中 */
         .main-cat-col { width: 80px; text-align: center; } 
+        /* 子項目欄位 */
+        .sub-col { text-align: center; padding-left: 5px; } /* 置中 */
+        
+        /* 通用下拉選單樣式 (主分類 + 子項目) */
         .cat-select {
             border: 1px solid #eee; background: #fbfbfb; border-radius: 6px;
             padding: 4px; font-size: 13px; color: #454545; width: 100%;
             cursor: pointer; outline: none; box-shadow: none;
             text-align: center; text-align-last: center;
+            margin-bottom: 2px;
         }
+        .cat-select:focus { border-color: var(--btn-submit-bg); background: #fff; }
 
-        /* 3. 子項目欄位：自動寬度 (最寬)，包含備註 */
-        .sub-col { text-align: left; padding-left: 10px; line-height: 1.4; }
-        .sub-text { font-size: 14px; font-weight: bold; color: var(--text-main); }
-        .note-text { font-size: 11px; color: #999; }
+        .note-text { font-size: 11px; color: #999; text-align: left; padding-left: 5px;}
 
-        /* 4. 金額欄位：靠右 */
         .amt-col { text-align: right; font-weight: bold; width: 70px; padding-right: 10px; }
 
-        /* 刪除勾選框 */
         .checkbox-col { width: 35px; text-align: center; display: none; }
         .delete-mode .checkbox-col { display: table-cell; }
         
@@ -256,7 +254,7 @@
                                 <tr>
                                     <th class="checkbox-col"><i class="fa-solid fa-trash-can"></i></th>
                                     <th>時間</th>
-                                    <th>主分類</th>
+                                    <th class="main-cat-col">主分類</th>
                                     <th>子項目</th>
                                     <th style="text-align:right;">金額</th>
                                 </tr>
@@ -280,393 +278,4 @@
                     </div>
                     <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)">
                     <button class="main-btn btn-import" onclick="document.getElementById('csvInput').click()">
-                        <i class="fa-solid fa-folder-open"></i> 選擇 CSV 檔案
-                    </button>
-                    <div id="import-status" style="font-size: 12px; color: #20c997; margin-top: 5px;"></div>
-                </div>
-            </div>
-
-            <div id="page-analysis" class="tab-content">
-                <label><i class="fa-solid fa-chart-pie"></i> 本月消費比例</label>
-                <div id="chart-container">
-                    <div id="chart_donut"></div>
-                    <div id="center-text"><span id="center-label">總計</span><span id="center-value">$0</span></div>
-                </div>
-                <label style="margin-top:20px;"><i class="fa-solid fa-chart-line"></i> 年度花費趨勢</label>
-                <div id="trend_chart_div"></div>
-                <label style="margin-top:20px;"><i class="fa-solid fa-fire"></i> 預算使用進度</label>
-                <div class="progress-container"><div id="progress-bar"></div></div>
-                <p id="progress-text" style="font-size: 12px; color: var(--text-sub); text-align: right;">0%</p>
-            </div>
-
-            <div id="status" style="text-align: center; font-size: 11px; color: gray; margin-top: 15px;">載入中...</div>
-        </div>
-    </div>
-
-    <nav class="tab-bar">
-        <div class="tab-item active" onclick="switchTab('page-input', this)">
-            <i class="fa-solid fa-pen-to-square"></i><span>消費</span>
-        </div>
-        <div class="tab-item" onclick="switchTab('page-budget', this)">
-            <i class="fa-solid fa-wallet"></i><span>錢包</span>
-        </div>
-        <div class="tab-item" onclick="switchTab('page-analysis', this)">
-            <i class="fa-solid fa-chart-simple"></i><span>分析</span>
-        </div>
-    </nav>
-
-    <script>
-        const SUPABASE_URL = 'https://sprrurptghjkxvwstukn.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwcnJ1cnB0Z2hqa3h2d3N0dWtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5NjcyOTMsImV4cCI6MjA4NDU0MzI5M30.IoOY-gdM7qXPEm3DildpEOq_e3jpTfQLa19X7G6iImw';
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        const subData = {
-            "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"],
-            "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"],
-            "住": ["手機費", "網路費", "電費", "水費", "瓦斯費", "租車位費", "管理費", "稅費"],
-            "行": ["油錢", "停車費", "住宿費", "租車費", "交通費", "修車費"],
-            "育": ["學費", "書費", "教育費", "AI費"],
-            "樂": ["娛樂費", "電視費"],
-            "金": ["存款", "股票", "虛擬幣"],
-            "雜": ["保險費", "其他"]
-        };
-
-        let currentMainCat = "";
-        let dashboardData = { budget: 0, spent: 0, breakdown: {} };
-        let donutChart;
-        let isDeleteMode = false;
-
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(initChartWrapper);
-        function initChartWrapper() { }
-
-        window.onload = function() {
-            document.getElementById('date').valueAsDate = new Date();
-            initMainCategoryGrid();
-            loadDashboard();
-        };
-
-        function initMainCategoryGrid() {
-            const grid = document.getElementById('main-cat-grid');
-            Object.keys(subData).forEach(cat => {
-                const btn = document.createElement('div');
-                btn.className = 'cat-btn';
-                btn.innerText = cat;
-                btn.onclick = () => selectMainCat(cat, btn);
-                grid.appendChild(btn);
-            });
-        }
-
-        function switchTab(pageId, element) {
-            document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            element.classList.add('active');
-            if(pageId === 'page-analysis') { drawDonutChart(); drawTrendChart(); }
-            if(isDeleteMode) toggleDeleteMode();
-        }
-
-        async function updateCategory(id, newCat) {
-            const { error } = await _supabase.from('expenses').update({ category: newCat }).eq('id', id);
-            if(error) alert("修改失敗"); else loadDashboard();
-        }
-
-        function toggleDeleteMode() {
-            isDeleteMode = !isDeleteMode;
-            const table = document.getElementById('history-table');
-            const btnDel = document.getElementById('btn-delete');
-            const btnConfirm = document.getElementById('btn-confirm-del');
-            if(isDeleteMode) {
-                table.classList.add('delete-mode');
-                btnDel.style.display = 'none'; btnConfirm.style.display = 'inline-block';
-            } else {
-                table.classList.remove('delete-mode');
-                btnDel.style.display = 'inline-block'; btnConfirm.style.display = 'none';
-                document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
-            }
-        }
-
-        async function executeDelete() {
-            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
-            if(checkboxes.length === 0) { alert("請勾選項目"); return; }
-            if(!confirm(`確定刪除 ${checkboxes.length} 筆？`)) return;
-            const idsToDelete = Array.from(checkboxes).map(cb => cb.value);
-            const { error } = await _supabase.from('expenses').delete().in('id', idsToDelete);
-            if(error) alert("刪除失敗");
-            else { alert("刪除成功"); toggleDeleteMode(); refreshCurrentHistory(); loadDashboard(); }
-        }
-
-        function refreshCurrentHistory() {
-            const activeBtn = document.querySelector('.history-btn.active');
-            if(activeBtn && activeBtn.innerText === '當月') loadHistory('month', activeBtn);
-            else if(activeBtn && activeBtn.innerText === '半年') loadHistory('half', activeBtn);
-            else if(activeBtn && activeBtn.innerText === 'GO') loadHistory('custom', null);
-        }
-
-        function toggleCustomDate(btn) {
-            document.querySelectorAll('.history-btn').forEach(b => b.classList.remove('active'));
-            if(btn) btn.classList.add('active');
-            document.getElementById('custom-date-box').style.display = 'flex';
-            document.getElementById('history-table-container').style.display = 'none';
-            document.getElementById('table-actions').style.display = 'none';
-        }
-
-        async function loadHistory(mode, btn) {
-            if(mode !== 'custom') {
-                document.getElementById('custom-date-box').style.display = 'none';
-                document.querySelectorAll('.history-btn').forEach(b => b.classList.remove('active'));
-                if(btn) btn.classList.add('active');
-            }
-            const tableContainer = document.getElementById('history-table-container');
-            const tbody = document.getElementById('history-list-body');
-            const loading = document.getElementById('hist-loading');
-            const empty = document.getElementById('hist-empty');
-            const actions = document.getElementById('table-actions');
-
-            if(isDeleteMode) toggleDeleteMode();
-            tableContainer.style.display = 'block'; tbody.innerHTML = '';
-            loading.style.display = 'block'; empty.style.display = 'none'; actions.style.display = 'none';
-
-            let startDate, endDate;
-            const now = new Date();
-            if (mode === 'month') {
-                startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
-            } else if (mode === 'half') {
-                startDate = new Date(now.setMonth(now.getMonth() - 6)).toISOString();
-                endDate = new Date().toISOString();
-            } else if (mode === 'custom') {
-                const s = document.getElementById('hist-start').value;
-                const e = document.getElementById('hist-end').value;
-                if(!s || !e) { alert("請選擇日期"); loading.style.display = 'none'; return; }
-                startDate = new Date(s).toISOString(); endDate = new Date(e).toISOString();
-            }
-
-            const { data: records, error } = await _supabase.from('expenses')
-                .select('*').gte('date', startDate.split('T')[0]).lte('date', endDate.split('T')[0])
-                .order('date', { ascending: false });
-
-            loading.style.display = 'none';
-            if (!records || records.length === 0) { empty.style.display = 'block'; return; }
-            actions.style.display = 'flex';
-
-            records.forEach(r => {
-                const row = document.createElement('tr');
-                const d = new Date(r.date);
-                
-                // === 資料處理 ===
-                const yearStr = d.getFullYear();
-                const mdStr = (d.getMonth() + 1) + '/' + d.getDate();
-                const amt = parseFloat(r.amount);
-                
-                let color = '#454545';
-                if (amt >= 10000) color = '#d600a8'; else if (amt >= 1000) color = '#ff0000'; else if (amt >= 100) color = '#f891b5';
-
-                let catOptions = '';
-                Object.keys(subData).forEach(cat => {
-                    const selected = cat === r.category ? 'selected' : '';
-                    catOptions += `<option value="${cat}" ${selected}>${cat}</option>`;
-                });
-
-                row.innerHTML = `
-                    <td class="checkbox-col"><input type="checkbox" class="row-checkbox" value="${r.id}"></td>
-                    
-                    <td class="date-col">
-                        <div class="year-text">${yearStr}</div>
-                        <div class="md-text">${mdStr}</div>
-                    </td>
-                    
-                    <td class="main-cat-col">
-                        <select class="cat-select" onchange="updateCategory('${r.id}', this.value)">${catOptions}</select>
-                    </td>
-                    
-                    <td class="sub-col">
-                        <div class="sub-text">${r.subcategory}</div>
-                        <div class="note-text">${r.note || ''}</div>
-                    </td>
-                    
-                    <td class="amt-col" style="color:${color};">$${r.amount}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        async function loadDashboard() {
-            const { data: configData } = await _supabase.from('config').select('value').eq('key', 'monthly_budget').single();
-            const budget = configData ? configData.value : 0;
-            const now = new Date();
-            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
-            const { data: expenses } = await _supabase.from('expenses').select('*').gte('date', firstDay).lte('date', lastDay);
-
-            let totalSpent = 0; let breakdown = {};
-            expenses.forEach(e => {
-                totalSpent += parseFloat(e.amount);
-                breakdown[e.category] = (breakdown[e.category] || 0) + parseFloat(e.amount);
-            });
-            dashboardData = { budget, spent: totalSpent, breakdown };
-
-            document.getElementById('input_starting').value = budget;
-            document.getElementById('disp_monthly_rem').innerText = (budget - totalSpent).toLocaleString();
-            document.getElementById('disp_monthly_spent').innerText = totalSpent.toLocaleString();
-            updateProgressBar();
-            document.getElementById('status').innerText = "☁️";
-        }
-
-        function updateProgressBar() {
-            const percent = Math.min((dashboardData.spent / dashboardData.budget) * 100, 100) || 0;
-            document.getElementById('progress-bar').style.width = percent + "%";
-            document.getElementById('progress-text').innerText = Math.round(percent) + "% (已用 " + dashboardData.spent.toLocaleString() + ")";
-        }
-
-        function drawDonutChart() {
-            if(!dashboardData.breakdown) return;
-            var dataArray = [['Category', 'Amount']];
-            for (var cat in dashboardData.breakdown) dataArray.push([cat, dashboardData.breakdown[cat]]);
-            if(dataArray.length === 1) dataArray.push(['無消費', 1]);
-
-            var data = google.visualization.arrayToDataTable(dataArray);
-            var options = {
-                pieHole: 0.7, pieSliceText: 'none', backgroundColor: 'transparent',
-                chartArea: {left: 'auto', top: 10, width: '100%', height: '80%'},
-                legend: {position: 'bottom', maxLines: 2, textStyle: {fontSize: 12}},
-                tooltip: { trigger: 'focus' },
-                colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#E7E9ED', '#767676']
-            };
-            donutChart = new google.visualization.PieChart(document.getElementById('chart_donut'));
-            google.visualization.events.addListener(donutChart, 'select', function() {
-                var selection = donutChart.getSelection();
-                var centerText = document.getElementById('center-text');
-                if (selection.length > 0) {
-                    var row = selection[0].row;
-                    document.getElementById('center-label').innerText = data.getValue(row, 0);
-                    document.getElementById('center-value').innerText = "$" + data.getValue(row, 1).toLocaleString();
-                    centerText.style.display = "block";
-                } else {
-                    document.getElementById('center-label').innerText = "本月總計";
-                    document.getElementById('center-value').innerText = "$" + dashboardData.spent.toLocaleString();
-                }
-            });
-            document.getElementById('center-label').innerText = "本月總計";
-            document.getElementById('center-value').innerText = "$" + dashboardData.spent.toLocaleString();
-            document.getElementById('center-text').style.display = "block";
-            donutChart.draw(data, options);
-        }
-
-        async function drawTrendChart() {
-            const now = new Date(); const thisYear = now.getFullYear(); const lastYear = thisYear - 1;
-            const startDate = `${lastYear}-01-01`; const endDate = `${thisYear}-12-31`;
-            const { data: records } = await _supabase.from('expenses').select('date, amount').gte('date', startDate).lte('date', endDate);
-            if(!records) return;
-
-            let monthlyData = {};
-            for(let i=1; i<=12; i++) monthlyData[i] = { thisYear: 0, lastYear: 0 };
-            records.forEach(r => {
-                const d = new Date(r.date); const y = d.getFullYear(); const m = d.getMonth() + 1; const amt = parseFloat(r.amount);
-                if(y === thisYear) monthlyData[m].thisYear += amt; else if(y === lastYear) monthlyData[m].lastYear += amt;
-            });
-
-            var dataArray = [['月份', '今年花費', '去年花費']];
-            for(let i=1; i<=12; i++) dataArray.push([i + '月', monthlyData[i].thisYear, monthlyData[i].lastYear]);
-
-            var data = google.visualization.arrayToDataTable(dataArray);
-            var options = {
-                title : '年度花費對比', vAxis: {title: '金額 ($)'}, hAxis: {title: '月份'},
-                seriesType: 'bars', series: {1: {type: 'line'}}, colors: ['#36A2EB', '#FF6384'],
-                legend: { position: 'bottom' }, chartArea: {width: '80%', height: '70%'}
-            };
-            var chart = new google.visualization.ComboChart(document.getElementById('trend_chart_div'));
-            chart.draw(data, options);
-        }
-
-        function selectMainCat(cat, btnElement) {
-            currentMainCat = cat;
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
-            const container = document.getElementById('sub-category-container');
-            const select = document.getElementById('sub-category');
-            select.innerHTML = "";
-            subData[currentMainCat].forEach(item => {
-                let opt = document.createElement('option');
-                opt.value = item; opt.innerText = item; select.appendChild(opt);
-            });
-            container.style.display = "block";
-        }
-
-        async function executeUpdateBudget() {
-            const val = document.getElementById('input_starting').value;
-            const { error } = await _supabase.from('config').upsert({ key: 'monthly_budget', value: val });
-            if(error) alert("更新失敗"); else { alert("預算更新成功！"); loadDashboard(); }
-        }
-
-        async function executeSubmit() {
-            const amt = document.getElementById('amount').value;
-            if(!amt || !currentMainCat) return alert("請填寫完整資訊");
-            const { error } = await _supabase.from('expenses').insert([{
-                date: document.getElementById('date').value,
-                category: currentMainCat,
-                subcategory: document.getElementById('sub-category').value,
-                amount: parseFloat(amt),
-                note: document.getElementById('note').value
-            }]);
-            if(!error) {
-                alert("紀錄成功");
-                document.getElementById('amount').value = "";
-                document.getElementById('note').value = "";
-                currentMainCat = "";
-                document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-                document.getElementById('sub-category-container').style.display = "none";
-                document.getElementById('sub-category').innerHTML = "";
-                loadDashboard();
-            } else { alert("紀錄失敗: " + error.message); }
-        }
-
-        function handleCSVUpload(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            document.getElementById('import-status').innerText = "讀取中...";
-            
-            reader.onload = async function(e) {
-                const text = e.target.result;
-                const rows = text.split('\n');
-                let recordsToInsert = []; let errorCount = 0;
-                const headerLine = rows[0].trim();
-                const headers = headerLine.split(',').map(h => h.trim().replace(/"/g, ''));
-                let dateIdx = 0; let amtIdx = 1; let noteIdx = 2;
-
-                const targetDate = "發票日期"; const targetAmt = "發票金額"; const targetNote = "消費明細_品名";
-                if (headers.includes(targetDate)) {
-                    dateIdx = headers.indexOf(targetDate);
-                    amtIdx = headers.indexOf(targetAmt); if (amtIdx === -1) amtIdx = headers.indexOf("總金額");
-                    noteIdx = headers.indexOf(targetNote); if (noteIdx === -1) noteIdx = headers.indexOf("品名");
-                }
-
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i].trim();
-                    if (!row) continue;
-                    const cols = row.split(',').map(c => c.trim().replace(/"/g, ''));
-                    if (cols.length > Math.max(dateIdx, amtIdx)) {
-                        const dateStr = cols[dateIdx]; const amountStr = cols[amtIdx];
-                        const noteStr = noteIdx > -1 ? cols[noteIdx] : "CSV 匯入";
-                        const amount = parseFloat(amountStr);
-                        if (!isNaN(amount) && amount > 0 && dateStr.length >= 8) {
-                            recordsToInsert.push({ date: dateStr, category: '雜', subcategory: '其他', amount: amount, note: noteStr });
-                        } else { errorCount++; }
-                    }
-                }
-
-                if (recordsToInsert.length > 0) {
-                    const { error } = await _supabase.from('expenses').insert(recordsToInsert);
-                    if (error) { alert("匯入失敗: " + error.message); document.getElementById('import-status').innerText = "匯入失敗"; }
-                    else { alert(`成功匯入 ${recordsToInsert.length} 筆資料！`); document.getElementById('import-status').innerText = ""; loadDashboard(); }
-                } else { alert("無有效資料"); document.getElementById('import-status').innerText = "格式錯誤"; }
-                input.value = ''; 
-            };
-            reader.readAsText(file);
-        }
-    </script>
-</body>
-</html>
+                        <i class="fa-solid fa-folder-open"></i>
