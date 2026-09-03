@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>理財紀錄 (資產整合增強版)</title>
+    <title>理財紀錄 (Foreglint 投資整合版)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -76,6 +76,7 @@
         .page.active { display: block; animation: fade .25s ease; }
         @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
+        /* 英雄黑卡儀表板 */
         .hero {
             background: linear-gradient(160deg, #243356 0%, #1B2744 100%);
             color: #fff;
@@ -246,6 +247,22 @@
         }
         .seg button.on { background: var(--navy); color: #fff; }
 
+        /* 投資持股卡片 */
+        .stock-item {
+            background: #fff; border-radius: 16px; padding: 12px 14px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--line);
+        }
+        .stock-item:last-child { border-bottom: none; }
+        .stock-title { font-size: 15px; font-weight: 800; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+        .stock-badge { font-size: 10px; background: #EBF0F5; color: var(--navy); padding: 2px 6px; border-radius: 6px; font-weight: 700; }
+        .stock-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+        .stock-val { text-align: right; }
+        .stock-mkt { font-size: 15px; font-weight: 800; color: var(--ink); }
+        .stock-pnl { font-size: 12px; font-weight: 700; margin-top: 2px; }
+        .pnl-up { color: #E5484D; }
+        .pnl-down { color: #1F9D7A; }
+
         .account-card {
             display: flex; justify-content: space-between; align-items: center;
             padding: 12px 0; border-bottom: 1px solid var(--line);
@@ -277,14 +294,14 @@
         }
         .import-card p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
 
-        /* 全域底部導覽列 */
+        /* 全域底部導覽列 (五大分頁固定) */
         .tabbar {
             position: fixed; left: 50%; bottom: 0; transform: translateX(-50%);
             width: 100%; max-width: 430px;
             background: rgba(255,255,255,.95);
             backdrop-filter: blur(16px);
             display: grid;
-            grid-template-columns: 1fr 1fr 60px 1fr 1fr;
+            grid-template-columns: 1fr 1fr 56px 1fr 1fr;
             align-items: center;
             padding: 6px 4px calc(10px + env(safe-area-inset-bottom));
             border-top: 1px solid var(--line);
@@ -376,7 +393,6 @@
             font-size: 13px; opacity: 0; pointer-events: none; z-index: 80; transition: .25s; font-weight: 600;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .hint { font-size: 12px; color: var(--muted); line-height: 1.6; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -442,7 +458,30 @@
         </div>
     </section>
 
-    <!-- 頁面 3: 資產庫存與金流 -->
+    <!-- 頁面 3: 投資 (Foreglint 股票/基金/虛擬幣) -->
+    <section id="page-invest" class="page">
+        <div class="hero" style="background: linear-gradient(160deg, #182C4A 0%, #0F1E33 100%);">
+            <div class="hero-kicker">投資組合總市值 (TWD)</div>
+            <div class="hero-row">
+                <div class="hero-num" id="investTotalMkt">NT$0</div>
+            </div>
+            <div class="hero-sub" id="investTotalSub">總投入成本 $0 · 損益 +$0 (+0.0%)</div>
+        </div>
+
+        <div class="seg" id="investFilter">
+            <button class="on" onclick="filterInvest('all', this)">全部標的</button>
+            <button onclick="filterInvest('tw', this)">台股</button>
+            <button onclick="filterInvest('us', this)">美股/定期定額</button>
+            <button onclick="filterInvest('crypto', this)">加密貨幣</button>
+        </div>
+
+        <div class="panel">
+            <h3>持倉組合明細</h3>
+            <div id="investList"></div>
+        </div>
+    </section>
+
+    <!-- 頁面 4: 資產 (銀行存簿與固定扣款) -->
     <section id="page-assets" class="page">
         <div class="kpi">
             <div><span>台幣活存</span><b id="kpiCash">NT$0</b></div>
@@ -467,6 +506,14 @@
             <div id="fixedExpenseList"></div>
         </div>
 
+        <div class="panel">
+            <h3>每月固定生活預算</h3>
+            <div class="field">
+                <input type="number" id="input_starting" placeholder="輸入預算金額" inputmode="numeric">
+            </div>
+            <button class="btn-solid" onclick="executeUpdateBudget()">儲存設定</button>
+        </div>
+
         <div class="import-card">
             <strong><i class="fa-solid fa-file-csv"></i> 智慧發票匯入</strong>
             <p>自動判定發票標題，支援財政部與一般 CSV</p>
@@ -478,7 +525,7 @@
         </div>
     </section>
 
-    <!-- 頁面 4: 分析圖表 -->
+    <!-- 頁面 5: 分析圖表 -->
     <section id="page-analysis" class="page">
         <div class="insight" id="insightBox">載入洞察中...</div>
         <div class="panel">
@@ -500,24 +547,16 @@
             <div class="progress"><div id="progress-bar"></div></div>
             <p id="progress-text">0%</p>
         </div>
-        
-        <div class="panel" style="margin-top:12px;">
-            <h3>每月固定預算設定</h3>
-            <div class="field">
-                <input type="number" id="input_starting" placeholder="輸入預算金額" inputmode="numeric">
-            </div>
-            <button class="btn-solid" onclick="executeUpdateBudget()">儲存設定</button>
-        </div>
     </section>
 </div>
 
-<!-- 全域底部導覽列 -->
+<!-- 全域五鍵底部導覽列 -->
 <nav class="tabbar">
     <button class="tab active" onclick="switchTab('overview', this)"><i class="fa-solid fa-house"></i>總覽</button>
     <button class="tab" onclick="switchTab('records', this)"><i class="fa-solid fa-list-ul"></i>紀錄</button>
     <button class="tab-add-btn" onclick="openSheet()"><i class="fa-solid fa-plus"></i></button>
+    <button class="tab" onclick="switchTab('invest', this)"><i class="fa-solid fa-arrow-trend-up"></i>投資</button>
     <button class="tab" onclick="switchTab('assets', this)"><i class="fa-solid fa-wallet"></i>資產</button>
-    <button class="tab" onclick="switchTab('analysis', this)"><i class="fa-solid fa-chart-pie"></i>分析</button>
 </nav>
 
 <!-- 統一記帳／轉帳／繳費彈窗 -->
@@ -566,7 +605,7 @@
             <select id="billItemSelect" onchange="onBillItemChange()"></select>
         </div>
         <div class="field">
-            <label>扣繳扣款帳戶</label>
+            <label>扣款帳戶</label>
             <select id="billAccountSelect"></select>
         </div>
     </div>
@@ -596,6 +635,20 @@
     const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const FX_RATES = { JPY: 0.2004, USD: 31.44 };
+
+    // 投資組合持股快照 (整合自 Excel「股票」、「定期定額累積」與「虛擬幣」)
+    const PORTFOLIO_DATA = [
+        { type: 'tw', name: '至上', symbol: '8112', broker: '國泰證券', shares: 1000, costPrice: 53.86, currPrice: 85.3, cost: 53860, mktVal: 85300 },
+        { type: 'tw', name: '國泰金', symbol: '2882', broker: '國泰證券', shares: 300, costPrice: 45.97, currPrice: 78.6, cost: 13791, mktVal: 23580 },
+        { type: 'tw', name: '元大高股息', symbol: '0056', broker: '國泰證券', shares: 539, costPrice: 36.87, currPrice: 45.22, cost: 19873, mktVal: 24374 },
+        { type: 'tw', name: '元大台灣50', symbol: '0050', broker: '國泰證券', shares: 171, costPrice: 66.68, currPrice: 95.5, cost: 11402, mktVal: 16331 },
+        { type: 'tw', name: '國泰永續高股息', symbol: '00878', broker: '國泰證券', shares: 535, costPrice: 27.14, currPrice: 27.6, cost: 14517, mktVal: 14766 },
+        { type: 'tw', name: '台新標普500', symbol: '009806', broker: '永豐證券', shares: 1000, costPrice: 11.83, currPrice: 13.05, cost: 11830, mktVal: 13050 },
+        { type: 'tw', name: '中鋼', symbol: '2002', broker: '國泰證券', shares: 500, costPrice: 24.38, currPrice: 18.15, cost: 12190, mktVal: 9075 },
+        { type: 'us', name: 'Invesco QQQ', symbol: 'QQQ', broker: '永豐美股', shares: 0.3292, costPrice: 607.57, currPrice: 607.01, cost: 6289, mktVal: 6283 }, // USD換算台幣
+        { type: 'us', name: 'Vanguard S&P500', symbol: 'VOO', broker: '永豐美股', shares: 0.3207, costPrice: 623.74, currPrice: 630.68, cost: 6289, mktVal: 6359 },
+        { type: 'crypto', name: 'BitoPro 加密貨幣', symbol: 'BTC/USDT', broker: '幣託BitoPro', shares: 1, costPrice: 78215, currPrice: 79236, cost: 78215, mktVal: 79236 }
+    ];
 
     const subData = {
         "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"],
@@ -628,6 +681,7 @@
     let accountsData = [];
     let billsData = [];
     let acctFilterKind = "all";
+    let investFilterKind = "all";
     let donutChart;
     let isDeleteMode = false;
     let lastHistoryMode = "month";
@@ -641,6 +695,7 @@
         buildCatGrid();
         loadDashboard();
         loadAssetsData();
+        loadInvestData();
         loadHistory("month");
     };
 
@@ -680,7 +735,7 @@
         
         if (el) el.classList.add("active");
         else {
-            const map = { overview: 0, records: 1, assets: 2, analysis: 3 };
+            const map = { overview: 0, records: 1, invest: 2, assets: 3, analysis: 4 };
             const tabs = document.querySelectorAll(".tabbar .tab");
             if (tabs[map[name]]) tabs[map[name]].classList.add("active");
         }
@@ -690,6 +745,7 @@
             drawTrendChart();
             renderInsight();
         }
+        if (name === "invest") renderInvestList();
         if (name === "assets") loadAssetsData();
         if (name === "records" && !document.getElementById("historyList").innerHTML) loadHistory(lastHistoryMode);
     }
@@ -933,15 +989,12 @@
             const bill = billsData.find(b => b.id == billId);
             const acc = accountsData.find(a => a.id == accId);
 
-            // 扣除銀行帳戶
             await _supabase.from("accounts").update({ balance: Number(acc.balance) - amt }).eq("id", accId);
 
-            // 更新固定繳費項目狀態與期數
             const updates = { is_paid: true };
             if (bill.total_periods > 0) updates.paid_periods = Number(bill.paid_periods) + 1;
             await _supabase.from("fixed_expenses").update(updates).eq("id", billId);
 
-            // 寫入日常消費紀錄
             let targetCat = "雜";
             let targetSub = "其他";
             if (bill.name.includes("幼兒園") || bill.name.includes("學費")) { targetCat = "育"; targetSub = "學費"; }
@@ -1035,6 +1088,65 @@
         renderMiniBreakdown();
         renderRecent();
         renderInsight();
+    }
+
+    // --- 投資模組 (Foreglint 股票/基金/虛擬幣展示) ---
+    function loadInvestData() {
+        renderInvestList();
+    }
+
+    function renderInvestList() {
+        const list = document.getElementById("investList");
+        list.innerHTML = "";
+
+        let totalCost = 0;
+        let totalMktVal = 0;
+
+        PORTFOLIO_DATA.forEach(item => {
+            totalCost += item.cost;
+            totalMktVal += item.mktVal;
+        });
+
+        const totalPnl = totalMktVal - totalCost;
+        const totalPnlPct = (totalPnl / (totalCost || 1)) * 100;
+
+        document.getElementById("investTotalMkt").innerText = "NT$" + money(Math.round(totalMktVal));
+        document.getElementById("investTotalSub").innerText = `總投入成本 $${money(Math.round(totalCost))} · 損益 ${totalPnl >= 0 ? '+' : ''}$${money(Math.round(totalPnl))} (${totalPnlPct >= 0 ? '+' : ''}${totalPnlPct.toFixed(1)}%)`;
+
+        const filtered = PORTFOLIO_DATA.filter(p => investFilterKind === 'all' || p.type === investFilterKind);
+
+        filtered.forEach(p => {
+            const pnl = p.mktVal - p.cost;
+            const pnlPct = (pnl / (p.cost || 1)) * 100;
+            const isUp = pnl >= 0;
+
+            list.innerHTML += `
+                <div class="stock-item">
+                    <div>
+                        <div class="stock-title">
+                            ${p.name}
+                            <span class="stock-badge">${p.symbol}</span>
+                        </div>
+                        <div class="stock-sub">
+                            ${p.broker} · 持有 ${p.shares} 股 · 均價 $${p.costPrice}
+                        </div>
+                    </div>
+                    <div class="stock-val">
+                        <div class="stock-mkt">$${money(Math.round(p.mktVal))}</div>
+                        <div class="stock-pnl ${isUp ? 'pnl-up' : 'pnl-down'}">
+                            ${isUp ? '+' : ''}$${money(Math.round(pnl))} (${isUp ? '+' : ''}${pnlPct.toFixed(1)}%)
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function filterInvest(kind, btn) {
+        investFilterKind = kind;
+        document.querySelectorAll("#investFilter button").forEach(b => b.classList.remove("on"));
+        if (btn) btn.classList.add("on");
+        renderInvestList();
     }
 
     async function loadAssetsData() {
