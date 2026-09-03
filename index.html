@@ -2,8 +2,10 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏦 理財紀錄</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>🏦 理財紀錄 (Foreglint Edition)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -11,186 +13,170 @@
     
     <style>
         :root {
-            --bg-color: #fbf9f4;
-            --input-bg: #ededed;
-            --card-bg: #ffffff;
-            --icon-color: #454545;
-            --text-main: #000000;
-            --text-sub: #8d8d8d;
-            
-            --cat-default-bg: #ecf6fd; 
-            --cat-default-text: #454545;
-            --cat-active-bg: #66b8db;
-            --cat-active-text: #fbf9f4;
-
-            --btn-submit-bg: #66b8db;
-            --btn-submit-text: #fbf9f4;
-            --btn-submit-active-bg: #ecf6fd;
-            --btn-submit-active-text: #454545;
-            
-            --delete-color: #ff4d4f;
-            --import-color: #20c997;
+            /* Foreglint 現代極簡配色 */
+            --bg-color: #F5F5F7;
+            --card-bg: #FFFFFF;
+            --primary: #1C1C1E; /* 深黑主色 */
+            --primary-light: #F2F2F7; /* 控件底色 */
+            --text-main: #1C1C1E;
+            --text-sub: #8E8E93;
+            --border: #E5E5EA;
+            --danger: #FF3B30;
+            --accent: #007AFF;
         }
 
+        /* 桌面端邊框約束，模擬 App 視覺 */
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg-color); color: var(--text-main);
-            margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; 
+            background: #E5E5EA; /* 桌面底色 */
+            color: var(--text-main);
+            margin: 0; padding: 0; height: 100vh; 
+            display: flex; justify-content: center; align-items: flex-start;
         }
 
-        header { padding: 15px; text-align: center; background: var(--bg-color); }
-        h2 { margin: 0; color: var(--icon-color); font-size: 1.3rem; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        /* App 框架 */
+        .app-frame {
+            width: 100%; max-width: 430px; height: 100vh;
+            background: var(--bg-color);
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+            box-shadow: 0 0 40px rgba(0,0,0,0.08);
+        }
 
-        .main-container { flex: 1; padding: 15px; padding-bottom: 80px; display: flex; justify-content: center; overflow-y: auto; }
-        .card { background: var(--card-bg); padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); width: 100%; max-width: 400px; box-sizing: border-box; min-height: fit-content; }
+        header { padding: 20px 24px 10px 24px; text-align: left; background: var(--bg-color); }
+        h2 { margin: 0; color: var(--text-main); font-size: 24px; font-weight: 800; letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
 
+        .main-container { flex: 1; padding: 0 24px 100px 24px; overflow-y: auto; }
+        
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .form-group { margin-bottom: 15px; }
-        label { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--icon-color); font-size: 14px; font-weight: bold; }
+        /* 扁平化表單設計 */
+        .form-group { margin-bottom: 20px; }
+        label { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--text-sub); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         
         input, select { 
-            width: 100%; padding: 14px; border: none; border-radius: 12px; 
-            box-sizing: border-box; font-size: 16px; background: var(--input-bg); 
-            color: var(--text-main); outline: none; -webkit-appearance: none;
-            box-shadow: inset 2px 2px 6px rgba(0,0,0,0.1), inset -2px -2px 6px rgba(255,255,255,0.7);
-            transition: all 0.2s;
+            width: 100%; padding: 16px; border: 2px solid transparent; border-radius: 16px; 
+            box-sizing: border-box; font-size: 16px; font-weight: 500; background: var(--primary-light); 
+            color: var(--text-main); outline: none; transition: all 0.2s;
         }
-        input:focus, select:focus { box-shadow: inset 3px 3px 8px rgba(0,0,0,0.15); }
+        input:focus, select:focus { border-color: rgba(0,0,0,0.1); background: #FFF; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
 
-        .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        /* 分類按鈕網格 */
+        .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 15px; }
         .cat-btn { 
-            padding: 12px 0; background: var(--cat-default-bg); color: var(--cat-default-text);
-            border: none; border-radius: 15px; font-size: 14px; font-weight: bold;
+            padding: 14px 0; background: #FFF; color: var(--text-main);
+            border: 1px solid var(--border); border-radius: 16px; font-size: 14px; font-weight: 600;
             cursor: pointer; text-align: center; 
-            box-shadow: 3px 3px 6px rgba(0,0,0,0.1), -1px -1px 4px rgba(255,255,255,0.8);
-            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        .cat-btn.active { background: var(--cat-active-bg); color: var(--cat-active-text); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2); }
+        .cat-btn:active { transform: scale(0.92); }
+        .cat-btn.active { background: var(--primary); color: #FFF; border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 
-        #sub-category-container { display: none; background: transparent; margin-bottom: 15px; }
+        #sub-category-container { display: none; margin-bottom: 20px; }
 
         button.main-btn { 
-            width: 100%; padding: 16px; background: var(--btn-submit-bg); color: var(--btn-submit-text); 
-            border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; 
-            box-shadow: 0 4px 10px rgba(102, 184, 219, 0.4); transition: all 0.2s;
+            width: 100%; padding: 16px; background: var(--primary); color: #FFF; 
+            border: none; border-radius: 16px; font-size: 17px; font-weight: 700; cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.2s; margin-top: 10px;
         }
-        button.main-btn:active {
-            background: var(--btn-submit-active-bg); color: var(--btn-submit-active-text);
-            transform: translateY(2px); box-shadow: none;
+        button.main-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        /* 底部導覽列 (毛玻璃效果) */
+        .tab-bar { 
+            position: absolute; bottom: 0; width: 100%; 
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; padding: 12px 0; 
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            border-top: 1px solid rgba(0,0,0,0.05); z-index: 100; 
+        }
+        .tab-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 500; color: #C7C7CC; cursor: pointer; width: 33.3%; transition: color 0.3s; }
+        .tab-item.active { color: var(--primary); font-weight: 700; }
+        .tab-item i { font-size: 22px; margin-bottom: 4px; }
+
+        /* Foreglint 風格黑卡儀表板 */
+        .budget-dashboard {
+            background: linear-gradient(135deg, #2C2C2E, #1C1C1E); color: #FFF;
+            border-radius: 24px; padding: 24px; margin-bottom: 24px; margin-top: 10px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
         }
 
-        .btn-budget { margin-top: 10px; }
-
-        .info-box { background: #fff; border: 1px solid #eee; padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .info-value { font-size: 18px; font-weight: bold; color: var(--text-main); }
-
-        .tab-bar { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); z-index: 100; }
-        .tab-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #ccc; cursor: pointer; width: 33.3%; transition: color 0.3s; }
-        .tab-item.active { color: var(--icon-color); font-weight: bold; }
-        .tab-item i { font-size: 20px; margin-bottom: 4px; }
-
-        #chart-container { position: relative; width: 100%; height: 300px; margin-top: 10px; display: flex; justify-content: center; }
+        /* 圖表卡片 */
+        .chart-card { background: #FFF; border-radius: 24px; padding: 20px 0; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        #chart-container { position: relative; width: 100%; height: 280px; display: flex; justify-content: center; }
         #chart_donut { width: 100%; height: 100%; }
-        #center-text { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; display: none; z-index: 10; }
-        #center-label { font-size: 14px; color: #888; display: block; }
-        #center-value { font-size: 22px; font-weight: bold; color: var(--text-main); display: block; text-shadow: 0 0 5px rgba(255,255,255,0.8); }
-        #trend_chart_div { width: 100%; height: 250px; margin-top: 15px; }
+        #center-text { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; display: none; z-index: 10; }
+        #center-label { font-size: 12px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        #center-value { font-size: 24px; font-weight: 800; color: var(--text-main); letter-spacing: -1px; margin-top: 2px;}
+        #trend_chart_div { width: 100%; height: 250px; }
 
-        .progress-container { background: #eee; border-radius: 10px; height: 10px; margin: 10px 0; overflow: hidden; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.1); }
-        #progress-bar { background: var(--cat-active-bg); height: 100%; width: 0%; transition: 1s; }
-
-        .history-section { margin-top: 25px; padding-top: 20px; border-top: 2px dashed #eee; }
-        .history-controls { display: flex; gap: 5px; margin-bottom: 15px; justify-content: space-between; }
+        /* iOS 風格分段控制器 */
+        .history-controls { display: flex; background: #E5E5EA; padding: 4px; border-radius: 12px; margin-bottom: 16px; gap: 2px;}
         .history-btn {
-            flex: 1; padding: 8px 0; font-size: 12px; background: #fff;
-            border: 1px solid #ddd; border-radius: 8px; color: var(--text-main);
+            flex: 1; padding: 8px 0; font-size: 13px; font-weight: 600; background: transparent;
+            border: none; border-radius: 10px; color: var(--text-sub);
             cursor: pointer; transition: all 0.2s; white-space: nowrap;
         }
-        .history-btn.active { background: var(--icon-color); color: #fff; border-color: var(--icon-color); }
+        .history-btn.active { background: #FFF; color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         
-        .custom-date-range { display: none; gap: 5px; margin-bottom: 10px; background: #f9f9f9; padding: 10px; border-radius: 10px; }
+        .custom-date-range { display: none; gap: 8px; margin-bottom: 16px; background: #FFF; padding: 12px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         
-        /* 表格樣式 */
-        .table-container {
-            height: 300px; overflow-y: auto; background: #fff;
-            border-radius: 12px; box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
-            border: 1px solid #eee; display: none; position: relative;
-        }
+        /* 表格優化 (無邊界清爽感) */
+        .table-container { height: 320px; overflow-y: auto; background: #FFF; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); display: none; position: relative; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); position: sticky; top: 0; padding: 12px 8px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text-sub); z-index: 5; border-bottom: 1px solid var(--border); }
+        td { padding: 12px 6px; border-bottom: 1px solid #F5F5F7; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
         
-        th { 
-            background: #f0f0f0; position: sticky; top: 0; 
-            padding: 8px; text-align: center; 
-            font-size: 12px; color: #666; z-index: 5; 
-        }
+        .date-col { width: 55px; text-align: left; padding-left: 12px; line-height: 1.4; }
+        .year-text { font-size: 10px; color: var(--text-sub); font-weight: 500;}
+        .md-text { font-size: 14px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; }
 
-        td { 
-            padding: 8px 5px; 
-            border-bottom: 1px dashed #dcdcdc; 
-            color: var(--text-main); 
-            vertical-align: middle; 
-        }
+        .main-cat-col { width: 75px; text-align: center; } 
+        .sub-col { text-align: center; padding-left: 5px; }
         
-        .date-col { width: 60px; text-align: center; line-height: 1.4; }
-        .year-text { font-size: 11px; color: #999; }
-        .md-text { font-size: 14px; font-weight: bold; color: var(--text-main); }
-
-        .main-cat-col { width: 80px; text-align: center; } 
-        /* 子項目欄位 */
-        .sub-col { text-align: center; padding-left: 5px; } /* 置中 */
-        
-        /* 通用下拉選單樣式 (主分類 + 子項目) */
         .cat-select {
-            border: 1px solid #eee; background: #fbfbfb; border-radius: 6px;
-            padding: 4px; font-size: 13px; color: #454545; width: 100%;
-            cursor: pointer; outline: none; box-shadow: none;
-            text-align: center; text-align-last: center;
-            margin-bottom: 2px;
+            border: none; background: var(--primary-light); border-radius: 8px;
+            padding: 6px 4px; font-size: 13px; font-weight: 600; color: var(--text-main); width: 100%;
+            cursor: pointer; outline: none; text-align: center; text-align-last: center; margin-bottom: 4px;
         }
-        .cat-select:focus { border-color: var(--btn-submit-bg); background: #fff; }
-
-        .note-text { font-size: 11px; color: #999; text-align: left; padding-left: 5px;}
-
-        .amt-col { text-align: right; font-weight: bold; width: 70px; padding-right: 10px; }
+        .cat-select:focus { background: #E5E5EA; }
+        .note-text { font-size: 11px; color: var(--text-sub); text-align: left; padding-left: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 90px; }
+        .amt-col { text-align: right; font-weight: 800; width: 75px; padding-right: 12px; letter-spacing: -0.5px;}
 
         .checkbox-col { width: 35px; text-align: center; display: none; }
         .delete-mode .checkbox-col { display: table-cell; }
-        
         .row-checkbox {
             appearance: none; -webkit-appearance: none; width: 22px; height: 22px;
-            border: 2px solid #ddd; border-radius: 50%; cursor: pointer;
-            position: relative; transition: all 0.2s; background: #fff; vertical-align: middle;
+            border: 2px solid var(--border); border-radius: 50%; cursor: pointer;
+            position: relative; transition: all 0.2s; background: #FFF; vertical-align: middle;
         }
-        .row-checkbox:checked { background-color: var(--delete-color); border-color: var(--delete-color); }
-        .row-checkbox:checked::after {
-            content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
-            color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px;
-        }
+        .row-checkbox:checked { background-color: var(--danger); border-color: var(--danger); }
+        .row-checkbox:checked::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; }
 
-        .table-footer-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
-        .action-btn { padding: 8px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .btn-delete { background: #fff; border: 1px solid var(--delete-color); color: var(--delete-color); }
-        .btn-confirm-del { background: var(--delete-color); color: white; display: none; }
+        .table-footer-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+        .action-btn { padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: 0.2s; }
+        .btn-delete { background: #FFF; border: 1px solid var(--border); color: var(--danger); }
+        .btn-confirm-del { background: var(--danger); color: white; display: none; box-shadow: 0 4px 10px rgba(255,59,48,0.2);}
 
+        /* 檔案匯入區塊 */
         .import-section {
-            margin-top: 25px; padding: 20px; border: 2px dashed #ddd;
-            border-radius: 12px; text-align: center; background: #fafafa;
+            margin-top: 24px; padding: 24px; border: none;
+            border-radius: 24px; text-align: center; background: #FFF;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
         }
-        .btn-import { background: var(--import-color); color: white; width: auto; display: inline-block; margin-top: 10px; }
-        .btn-import:active { background: #17a57a; }
+        .btn-import { background: var(--primary); color: white; border-radius: 12px; font-size: 14px; padding: 12px 20px; font-weight: 600; border: none; margin-top: 8px;}
 
     </style>
 </head>
 <body>
 
-    <header><h2><i class="fa-solid fa-piggy-bank"></i> 理財紀錄</h2></header>
+    <div class="app-frame">
+        <header><h2>理財紀錄</h2></header>
 
-    <div class="main-container">
-        <div class="card">
+        <div class="main-container">
+            <!-- 頁面 1: 消費輸入 -->
             <div id="page-input" class="tab-content active">
                 <div class="form-group">
                     <label><i class="fa-regular fa-calendar"></i> 日期</label>
@@ -212,40 +198,47 @@
                     <label><i class="fa-solid fa-pen"></i> 備註</label>
                     <input type="text" id="note" placeholder="選填...">
                 </div>
-                <button id="submitBtn" class="main-btn" onclick="executeSubmit()">確認送出</button>
+                <button id="submitBtn" class="main-btn" onclick="executeSubmit()">紀錄一筆</button>
             </div>
 
+            <!-- 頁面 2: 錢包/預算 -->
             <div id="page-budget" class="tab-content">
-                <div class="form-group">
-                    <label><i class="fa-solid fa-wallet"></i> 每月固定預算</label>
-                    <input type="number" id="input_starting" placeholder="輸入金額" inputmode="numeric">
-                    <button class="main-btn btn-budget" onclick="executeUpdateBudget()">預算金額確認</button>
-                </div>
                 
-                <div class="dashboard" style="margin-top:20px;">
-                    <div class="info-box">
-                        <span style="font-size:14px; color:#666;"><i class="fa-solid fa-coins"></i> 當月剩餘</span>
-                        <span class="info-value" id="disp_monthly_rem">0</span>
+                <!-- 新版黑卡儀表板 -->
+                <div class="budget-dashboard">
+                    <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">本月剩餘預算</div>
+                    <div style="font-size: 38px; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px;">
+                        $<span id="disp_monthly_rem">0</span>
                     </div>
-                    <div class="info-box" style="background: #fafafa;">
-                        <span style="font-size:14px; color:#888;"><i class="fa-solid fa-chart-line"></i> 當月已花費</span>
-                        <span class="info-value" id="disp_monthly_spent" style="color:#888;">0</span>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); padding: 16px; border-radius: 16px;">
+                        <div>
+                            <div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 2px;">本月已花費</div>
+                            <div style="font-size: 18px; font-weight: 700;">$<span id="disp_monthly_spent">0</span></div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">設定預算</div>
+                            <div style="display: flex; gap: 6px; align-items: center; justify-content: flex-end;">
+                                <input type="number" id="input_starting" placeholder="預算" style="width: 70px; padding: 6px 8px; font-size: 14px; background: rgba(0,0,0,0.2); color: #fff; border-radius: 8px; border: none; text-align: right; font-weight: 600;">
+                                <button onclick="executeUpdateBudget()" style="background: #FFF; color: var(--primary); border: none; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px;">更新</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="history-section">
-                    <label><i class="fa-solid fa-list-ul"></i> 消費紀錄</label>
+                    <label style="margin-bottom: 12px;"><i class="fa-solid fa-list-ul"></i> 交易明細</label>
                     
                     <div class="history-controls">
-                        <button class="history-btn" onclick="loadHistory('month', this)">當月</button>
-                        <button class="history-btn" onclick="loadHistory('half', this)">半年</button>
-                        <button class="history-btn" onclick="toggleCustomDate(this)">自選時間</button>
+                        <button class="history-btn active" onclick="loadHistory('month', this)">當月</button>
+                        <button class="history-btn" onclick="loadHistory('half', this)">近半年</button>
+                        <button class="history-btn" onclick="toggleCustomDate(this)">自訂期間</button>
                     </div>
 
                     <div id="custom-date-box" class="custom-date-range">
-                        <input type="date" id="hist-start">
-                        <input type="date" id="hist-end">
-                        <button class="history-btn active" style="flex:0 0 50px;" onclick="loadHistory('custom', null)">GO</button>
+                        <input type="date" id="hist-start" style="padding:10px;">
+                        <input type="date" id="hist-end" style="padding:10px;">
+                        <button class="history-btn active" style="flex:0 0 50px; background:var(--primary); color:#FFF;" onclick="loadHistory('custom', null)">GO</button>
                     </div>
 
                     <div id="history-table-container" class="table-container">
@@ -253,7 +246,7 @@
                             <thead>
                                 <tr>
                                     <th class="checkbox-col"><i class="fa-solid fa-trash-can"></i></th>
-                                    <th>時間</th>
+                                    <th>日期</th>
                                     <th class="main-cat-col">主分類</th>
                                     <th>子項目</th>
                                     <th style="text-align:right;">金額</th>
@@ -261,57 +254,60 @@
                             </thead>
                             <tbody id="history-list-body"></tbody>
                         </table>
-                        <div id="hist-loading" style="text-align:center; padding:20px; color:#999; display:none;">載入中...</div>
-                        <div id="hist-empty" style="text-align:center; padding:20px; color:#ccc; display:none;">查無資料</div>
+                        <div id="hist-loading" style="text-align:center; padding:30px; color:var(--text-sub); display:none; font-weight:500;">載入中...</div>
+                        <div id="hist-empty" style="text-align:center; padding:30px; color:var(--border); display:none; font-weight:500;">查無資料</div>
                     </div>
                     
                     <div class="table-footer-actions" id="table-actions" style="display:none;">
-                        <button id="btn-delete" class="action-btn btn-delete" onclick="toggleDeleteMode()">刪除</button>
+                        <button id="btn-delete" class="action-btn btn-delete" onclick="toggleDeleteMode()">刪除紀錄</button>
                         <button id="btn-confirm-del" class="action-btn btn-confirm-del" onclick="executeDelete()">確認刪除</button>
                     </div>
                 </div>
 
                 <div class="import-section">
-                    <label style="justify-content: center; color:#666;"><i class="fa-solid fa-file-csv"></i> 智慧發票匯入</label>
-                    <div style="font-size: 12px; color: #999; margin-bottom: 10px; line-height: 1.5;">
-                        支援格式：<br>1. 財政部 CSV<br>2. 簡易 CSV
+                    <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;"><i class="fa-solid fa-file-csv"></i> 智慧發票匯入</div>
+                    <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px; line-height: 1.5;">
+                        支援格式：財政部 CSV / 簡易 CSV格式
                     </div>
                     <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)">
-                    <button class="main-btn btn-import" onclick="document.getElementById('csvInput').click()">
-                        <i class="fa-solid fa-folder-open"></i> 選擇 CSV 檔案
+                    <button class="btn-import" onclick="document.getElementById('csvInput').click()">
+                        選擇 CSV 檔案
                     </button>
-                    <div id="import-status" style="font-size: 12px; color: #20c997; margin-top: 5px;"></div>
+                    <div id="import-status" style="font-size: 12px; color: var(--accent); margin-top: 8px; font-weight: 500;"></div>
                 </div>
             </div>
 
+            <!-- 頁面 3: 分析圖表 -->
             <div id="page-analysis" class="tab-content">
-                <label><i class="fa-solid fa-chart-pie"></i> 本月消費比例</label>
-                <div id="chart-container">
-                    <div id="chart_donut"></div>
-                    <div id="center-text"><span id="center-label">總計</span><span id="center-value">$0</span></div>
+                <label><i class="fa-solid fa-chart-pie"></i> 本月消費分佈</label>
+                <div class="chart-card">
+                    <div id="chart-container">
+                        <div id="chart_donut"></div>
+                        <div id="center-text"><span id="center-label">總計</span><span id="center-value">$0</span></div>
+                    </div>
                 </div>
-                <label style="margin-top:20px;"><i class="fa-solid fa-chart-line"></i> 年度花費趨勢</label>
-                <div id="trend_chart_div"></div>
-                <label style="margin-top:20px;"><i class="fa-solid fa-fire"></i> 預算使用進度</label>
-                <div class="progress-container"><div id="progress-bar"></div></div>
-                <p id="progress-text" style="font-size: 12px; color: var(--text-sub); text-align: right;">0%</p>
+
+                <label><i class="fa-solid fa-chart-line"></i> 年度花費趨勢</label>
+                <div class="chart-card" style="padding: 10px;">
+                    <div id="trend_chart_div"></div>
+                </div>
             </div>
 
-            <div id="status" style="text-align: center; font-size: 11px; color: gray; margin-top: 15px;">載入中...</div>
+            <div id="status" style="text-align: center; font-size: 11px; color: var(--text-sub); margin-top: 15px;">載入中...</div>
         </div>
-    </div>
 
-    <nav class="tab-bar">
-        <div class="tab-item active" onclick="switchTab('page-input', this)">
-            <i class="fa-solid fa-pen-to-square"></i><span>消費</span>
-        </div>
-        <div class="tab-item" onclick="switchTab('page-budget', this)">
-            <i class="fa-solid fa-wallet"></i><span>錢包</span>
-        </div>
-        <div class="tab-item" onclick="switchTab('page-analysis', this)">
-            <i class="fa-solid fa-chart-simple"></i><span>分析</span>
-        </div>
-    </nav>
+        <nav class="tab-bar">
+            <div class="tab-item active" onclick="switchTab('page-input', this)">
+                <i class="fa-solid fa-pen-to-square"></i><span>記帳</span>
+            </div>
+            <div class="tab-item" onclick="switchTab('page-budget', this)">
+                <i class="fa-solid fa-wallet"></i><span>錢包</span>
+            </div>
+            <div class="tab-item" onclick="switchTab('page-analysis', this)">
+                <i class="fa-solid fa-chart-simple"></i><span>分析</span>
+            </div>
+        </nav>
+    </div>
 
     <script>
         const SUPABASE_URL = 'https://sprrurptghjkxvwstukn.supabase.co';
@@ -365,29 +361,15 @@
             if(isDeleteMode) toggleDeleteMode();
         }
 
-        // --- 核心功能：主分類變更 (聯動更新子分類) ---
         async function updateMainCategory(id, newCat) {
-            // 1. 取得新分類的第一個子項目作為預設值
             const defaultSub = subData[newCat][0];
-            
-            // 2. 更新資料庫 (同時更新 category 和 subcategory)
-            const { error } = await _supabase.from('expenses')
-                .update({ category: newCat, subcategory: defaultSub })
-                .eq('id', id);
-
-            if(error) alert("修改失敗"); 
-            else {
-                // 3. 重新載入列表以顯示新的子項目
-                refreshCurrentHistory();
-                loadDashboard();
-            }
+            const { error } = await _supabase.from('expenses').update({ category: newCat, subcategory: defaultSub }).eq('id', id);
+            if(error) alert("修改失敗"); else { refreshCurrentHistory(); loadDashboard(); }
         }
 
-        // --- 核心功能：子項目變更 ---
         async function updateSubCategory(id, newSub) {
             const { error } = await _supabase.from('expenses').update({ subcategory: newSub }).eq('id', id);
-            if(error) alert("修改失敗"); 
-            // 子項目修改不需要重整整個列表，除非想給視覺回饋
+            if(error) alert("修改失敗");
         }
 
         function toggleDeleteMode() {
@@ -418,7 +400,7 @@
         function refreshCurrentHistory() {
             const activeBtn = document.querySelector('.history-btn.active');
             if(activeBtn && activeBtn.innerText === '當月') loadHistory('month', activeBtn);
-            else if(activeBtn && activeBtn.innerText === '半年') loadHistory('half', activeBtn);
+            else if(activeBtn && activeBtn.innerText === '近半年') loadHistory('half', activeBtn);
             else if(activeBtn && activeBtn.innerText === 'GO') loadHistory('custom', null);
         }
 
@@ -473,28 +455,24 @@
                 const row = document.createElement('tr');
                 const d = new Date(r.date);
                 const yearStr = d.getFullYear();
-                const mdStr = (d.getMonth() + 1) + '/' + d.getDate();
+                const mdStr = String(d.getMonth() + 1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
                 
                 const amt = parseFloat(r.amount);
-                let color = '#454545';
-                if (amt >= 10000) color = '#d600a8'; else if (amt >= 1000) color = '#ff0000'; else if (amt >= 100) color = '#f891b5';
+                let color = '#1C1C1E'; // 預設深色
+                if (amt >= 10000) color = '#9966FF'; else if (amt >= 1000) color = '#FF3B30'; else if (amt >= 100) color = '#FF9500';
 
-                // 生成主分類下拉選單
                 let catOptions = '';
                 Object.keys(subData).forEach(cat => {
                     const selected = cat === r.category ? 'selected' : '';
                     catOptions += `<option value="${cat}" ${selected}>${cat}</option>`;
                 });
 
-                // 生成子項目下拉選單 (根據該列的主分類)
                 const currentSubList = subData[r.category] || [];
                 let subOptions = '';
                 currentSubList.forEach(sub => {
                     const selected = sub === r.subcategory ? 'selected' : '';
                     subOptions += `<option value="${sub}" ${selected}>${sub}</option>`;
                 });
-                
-                // 如果目前的子項目不在列表中 (例如從 CSV 匯入的 "其他")，手動加上去
                 if (!currentSubList.includes(r.subcategory)) {
                      subOptions += `<option value="${r.subcategory}" selected>${r.subcategory}</option>`;
                 }
@@ -510,9 +488,9 @@
                     </td>
                     <td class="sub-col">
                         <select class="cat-select" onchange="updateSubCategory('${r.id}', this.value)">${subOptions}</select>
-                        <div class="note-text">${r.note || ''}</div>
+                        <div class="note-text">${r.note || ' '}</div>
                     </td>
-                    <td class="amt-col" style="color:${color};">$${r.amount}</td>
+                    <td class="amt-col" style="color:${color};">$${r.amount.toLocaleString()}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -536,14 +514,7 @@
             document.getElementById('input_starting').value = budget;
             document.getElementById('disp_monthly_rem').innerText = (budget - totalSpent).toLocaleString();
             document.getElementById('disp_monthly_spent').innerText = totalSpent.toLocaleString();
-            updateProgressBar();
-            document.getElementById('status').innerText = "☁️";
-        }
-
-        function updateProgressBar() {
-            const percent = Math.min((dashboardData.spent / dashboardData.budget) * 100, 100) || 0;
-            document.getElementById('progress-bar').style.width = percent + "%";
-            document.getElementById('progress-text').innerText = Math.round(percent) + "% (已用 " + dashboardData.spent.toLocaleString() + ")";
+            document.getElementById('status').innerText = ""; // 同步完成隱藏文字保持乾淨
         }
 
         function drawDonutChart() {
@@ -555,10 +526,10 @@
             var data = google.visualization.arrayToDataTable(dataArray);
             var options = {
                 pieHole: 0.7, pieSliceText: 'none', backgroundColor: 'transparent',
-                chartArea: {left: 'auto', top: 10, width: '100%', height: '80%'},
+                chartArea: {left: 'auto', top: 10, width: '100%', height: '75%'},
                 legend: {position: 'bottom', maxLines: 2, textStyle: {fontSize: 12}},
                 tooltip: { trigger: 'focus' },
-                colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#E7E9ED', '#767676']
+                colors: ['#FF3B30', '#007AFF', '#FFCC00', '#34C759', '#AF52DE', '#FF9500', '#E5E5EA', '#8E8E93']
             };
             donutChart = new google.visualization.PieChart(document.getElementById('chart_donut'));
             google.visualization.events.addListener(donutChart, 'select', function() {
@@ -593,14 +564,16 @@
                 if(y === thisYear) monthlyData[m].thisYear += amt; else if(y === lastYear) monthlyData[m].lastYear += amt;
             });
 
-            var dataArray = [['月份', '今年花費', '去年花費']];
+            var dataArray = [['月份', '今年', '去年']];
             for(let i=1; i<=12; i++) dataArray.push([i + '月', monthlyData[i].thisYear, monthlyData[i].lastYear]);
 
             var data = google.visualization.arrayToDataTable(dataArray);
             var options = {
-                title : '年度花費對比', vAxis: {title: '金額 ($)'}, hAxis: {title: '月份'},
-                seriesType: 'bars', series: {1: {type: 'line'}}, colors: ['#36A2EB', '#FF6384'],
-                legend: { position: 'bottom' }, chartArea: {width: '80%', height: '70%'}
+                vAxis: {title: ''}, hAxis: {title: ''},
+                seriesType: 'bars', series: {1: {type: 'line', curveType: 'function'}}, 
+                colors: ['#007AFF', '#FF3B30'],
+                legend: { position: 'bottom' }, chartArea: {width: '85%', height: '70%'},
+                backgroundColor: 'transparent'
             };
             var chart = new google.visualization.ComboChart(document.getElementById('trend_chart_div'));
             chart.draw(data, options);
@@ -637,7 +610,6 @@
                 note: document.getElementById('note').value
             }]);
             if(!error) {
-                alert("紀錄成功");
                 document.getElementById('amount').value = "";
                 document.getElementById('note').value = "";
                 currentMainCat = "";
@@ -645,6 +617,7 @@
                 document.getElementById('sub-category-container').style.display = "none";
                 document.getElementById('sub-category').innerHTML = "";
                 loadDashboard();
+                alert("紀錄成功");
             } else { alert("紀錄失敗: " + error.message); }
         }
 
@@ -687,7 +660,7 @@
                 if (recordsToInsert.length > 0) {
                     const { error } = await _supabase.from('expenses').insert(recordsToInsert);
                     if (error) { alert("匯入失敗: " + error.message); document.getElementById('import-status').innerText = "匯入失敗"; }
-                    else { alert(`成功匯入 ${recordsToInsert.length} 筆資料！`); document.getElementById('import-status').innerText = ""; loadDashboard(); }
+                    else { alert(`成功匯入 ${recordsToInsert.length} 筆資料！`); document.getElementById('import-status').innerText = ""; loadDashboard(); refreshCurrentHistory(); }
                 } else { alert("無有效資料"); document.getElementById('import-status').innerText = "格式錯誤"; }
                 input.value = ''; 
             };
