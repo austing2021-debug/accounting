@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>理財紀錄 (Foreglint 投資整合版)</title>
+    <title>理財紀錄</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -39,18 +39,22 @@
         .app {
             width: 100%;
             max-width: 430px;
-            min-height: 100%;
+            height: 100vh;
             background: var(--canvas);
-            padding: 16px 16px 100px;
+            display: flex;
+            flex-direction: column;
             position: relative;
             box-shadow: 0 0 35px rgba(0,0,0,0.1);
         }
 
         .topbar {
+            flex: 0 0 auto;
+            padding: 16px 16px 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            background: var(--canvas);
+            z-index: 10;
         }
         .brand {
             display: flex;
@@ -72,16 +76,25 @@
         }
         .cloud.ok { color: var(--teal); }
 
+        /* 可平滑滾動的內容視窗 */
+        .content-body {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding: 4px 16px 120px; /* 留出底部導覽列距離，防止最下方被遮擋 */
+        }
+
         .page { display: none; }
         .page.active { display: block; animation: fade .25s ease; }
         @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-        /* 英雄黑卡儀表板 */
+        /* 英雄黑卡 */
         .hero {
             background: linear-gradient(160deg, #243356 0%, #1B2744 100%);
             color: #fff;
             border-radius: 24px;
-            padding: 20px 20px 18px;
+            padding: 20px;
             box-shadow: var(--shadow);
             position: relative;
             overflow: hidden;
@@ -95,13 +108,11 @@
             border-radius: 50%;
             background: rgba(240,180,41,.12);
         }
-        .hero-kicker { font-size: 12px; color: rgba(255,255,255,.7); margin-bottom: 4px; font-weight: 600; }
+        .hero-kicker { font-size: 12px; color: rgba(255,255,255,.7); margin-bottom: 6px; font-weight: 600; }
         .hero-row { display: flex; align-items: flex-end; justify-content: space-between; }
         .hero-num { font-size: 34px; font-weight: 800; color: var(--teal); letter-spacing: -1px; line-height: 1.1; }
         .hero-num.neg { color: #ff8fab; }
-        .hero-sub { margin-top: 8px; font-size: 12px; color: rgba(255,255,255,.75); font-weight: 500; }
 
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
         .panel {
             background: var(--card);
             border-radius: var(--radius);
@@ -119,23 +130,52 @@
         }
         .linkish { color: var(--muted); font-size: 12px; cursor: pointer; font-weight: 700; }
 
-        .ring-wrap { display: grid; place-items: center; padding: 4px 0; }
+        /* 預算與結構整合大卡片 */
+        .budget-combo-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px;
+        }
+        .ring-wrap { flex: 0 0 100px; display: grid; place-items: center; }
         .ring {
-            width: 104px; height: 104px; border-radius: 50%;
+            width: 100px; height: 100px; border-radius: 50%;
             display: grid; place-items: center;
             background: conic-gradient(var(--teal) var(--p, 0%), #E8EDF4 0);
         }
         .ring-inner {
-            width: 76px; height: 76px; border-radius: 50%;
+            width: 74px; height: 74px; border-radius: 50%;
             background: #fff; display: grid; place-items: center; text-align: center;
         }
-        .ring-inner b { font-size: 18px; color: var(--ink); }
-        .ring-inner span { font-size: 10px; color: var(--muted); font-weight: 600; }
+        .ring-inner b { font-size: 17px; color: var(--ink); }
+        .ring-inner span { font-size: 9px; color: var(--muted); font-weight: 600; }
 
-        .mini-cats { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+        .combo-cats { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+        .mini-cats { display: flex; flex-wrap: wrap; gap: 6px; }
         .dot-cat { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 4px; font-weight: 600; }
         .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
 
+        /* 總資產大方框 */
+        .wealth-hero {
+            background: linear-gradient(160deg, #1C3144 0%, #0D1B2A 100%);
+            color: #fff;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 12px;
+        }
+        .wealth-hero .sub-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.12);
+        }
+        .wealth-hero .sub-item span { display: block; font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 600; }
+        .wealth-hero .sub-item b { font-size: 16px; font-weight: 700; color: #fff; }
+
+        /* 明細清單 */
         .list { display: flex; flex-direction: column; gap: 8px; }
         .row {
             background: #fff;
@@ -166,11 +206,11 @@
         .amt.income { color: var(--ok); }
         .amt.transfer { color: var(--teal); }
 
-        .filters { display: flex; gap: 8px; margin-bottom: 12px; }
+        .filters { display: flex; gap: 6px; margin-bottom: 12px; }
         .pill {
             flex: 1; border: 0; background: #fff; color: var(--ink);
-            border-radius: 999px; padding: 8px 0; font-size: 13px; font-weight: 700;
-            cursor: pointer; box-shadow: var(--shadow);
+            border-radius: 999px; padding: 8px 0; font-size: 12px; font-weight: 700;
+            cursor: pointer; box-shadow: var(--shadow); white-space: nowrap;
         }
         .pill.active { background: var(--navy); color: #fff; }
 
@@ -247,7 +287,6 @@
         }
         .seg button.on { background: var(--navy); color: #fff; }
 
-        /* 投資持股卡片 */
         .stock-item {
             background: #fff; border-radius: 16px; padding: 12px 14px;
             display: flex; justify-content: space-between; align-items: center;
@@ -294,10 +333,10 @@
         }
         .import-card p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
 
-        /* 全域底部導覽列 (五大分頁固定) */
+        /* 全域底部導覽列 */
         .tabbar {
-            position: fixed; left: 50%; bottom: 0; transform: translateX(-50%);
-            width: 100%; max-width: 430px;
+            position: absolute; left: 0; bottom: 0;
+            width: 100%;
             background: rgba(255,255,255,.95);
             backdrop-filter: blur(16px);
             display: grid;
@@ -402,162 +441,175 @@
         <div class="cloud" id="cloudStatus" title="連線狀態"><i class="fa-solid fa-cloud"></i></div>
     </div>
 
-    <!-- 頁面 1: 總覽 -->
-    <section id="page-overview" class="page active">
-        <div class="hero">
-            <div class="hero-kicker" id="heroKicker">本月剩餘預算</div>
-            <div class="hero-row">
-                <div>
+    <div class="content-body">
+        <!-- 頁面 1: 總覽 -->
+        <section id="page-overview" class="page active">
+            <!-- 1a. 本月剩餘預算方框 (純粹大金額) -->
+            <div class="hero">
+                <div class="hero-kicker">本月剩餘預算</div>
+                <div class="hero-row">
                     <div class="hero-num" id="heroNum">NT$0</div>
-                    <div class="hero-sub" id="heroSub">收入 0 · 支出 0</div>
                 </div>
             </div>
-        </div>
 
-        <div class="grid-2">
+            <!-- 1b. 預算使用率與支出結構結合成大方框 -->
             <div class="panel">
-                <h3>預算使用率</h3>
-                <div class="ring-wrap">
-                    <div class="ring" id="budgetRing" style="--p:0%">
-                        <div class="ring-inner">
-                            <div><b id="budgetPct">0%</b><br><span id="budgetLeft">剩餘 0</span></div>
+                <h3>預算使用率與本月支出結構</h3>
+                <div class="budget-combo-card">
+                    <div class="ring-wrap">
+                        <div class="ring" id="budgetRing" style="--p:0%">
+                            <div class="ring-inner">
+                                <div><b id="budgetPct">0%</b><br><span id="budgetLeft">剩餘 0</span></div>
+                            </div>
                         </div>
+                    </div>
+                    <div class="combo-cats">
+                        <div id="miniBreakdown" class="mini-cats"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1d. 總資產淨額大方框 -->
+            <div class="wealth-hero">
+                <div class="hero-kicker">總資產淨額 (現金淨額 + 股票市值)</div>
+                <div class="hero-num" id="overviewNetWorth">NT$0</div>
+                <div class="sub-row">
+                    <div class="sub-item">
+                        <span>流動現金淨額</span>
+                        <b id="overviewCashNet">NT$0</b>
+                    </div>
+                    <div class="sub-item">
+                        <span>股票投資市值</span>
+                        <b id="overviewStockNet">NT$0</b>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 頁面 2: 明細紀錄 -->
+        <section id="page-records" class="page">
+            <!-- 2. 最左側新增近期明細 (預設選項) -->
+            <div class="filters">
+                <button class="pill active" onclick="loadHistory('recent7', this)">近期明細</button>
+                <button class="pill" onclick="loadHistory('month', this)">當月</button>
+                <button class="pill" onclick="loadHistory('half', this)">近半年</button>
+                <button class="pill" onclick="toggleCustom(this)">自訂時間</button>
+            </div>
+            <div id="customBox" class="custom-box">
+                <input type="date" id="hist-start">
+                <input type="date" id="hist-end">
+                <button class="pill active" onclick="loadHistory('custom', null)">GO</button>
+            </div>
+            <div id="historyList" class="list"></div>
+            <div id="histLoading" class="loading" style="display:none;">載入中...</div>
+            <div id="histEmpty" class="empty" style="display:none;">這段期間查無紀錄</div>
+            <div class="actions" id="tableActions">
+                <button class="btn-ghost" id="btnDelete" onclick="toggleDeleteMode()">刪除明細</button>
+                <button class="btn-danger" id="btnConfirmDel" onclick="executeDelete()">確認刪除</button>
+            </div>
+        </section>
+
+        <!-- 頁面 3: 投資 (Foreglint 股票/基金/虛擬幣) -->
+        <section id="page-invest" class="page">
+            <div class="hero" style="background: linear-gradient(160deg, #182C4A 0%, #0F1E33 100%);">
+                <div class="hero-kicker">投資組合總市值 (TWD)</div>
+                <div class="hero-row">
+                    <div class="hero-num" id="investTotalMkt">NT$0</div>
+                </div>
+                <div class="hero-sub" id="investTotalSub">總投入成本 $0 · 損益 +$0 (+0.0%)</div>
+            </div>
+
+            <div class="seg" id="investFilter">
+                <button class="on" onclick="filterInvest('all', this)">全部標的</button>
+                <button onclick="filterInvest('tw', this)">台股</button>
+                <button onclick="filterInvest('us', this)">美股/定期定額</button>
+                <button onclick="filterInvest('crypto', this)">加密貨幣</button>
+            </div>
+
+            <div class="panel">
+                <h3>持倉組合明細</h3>
+                <div id="investList"></div>
+            </div>
+        </section>
+
+        <!-- 頁面 4: 資產 (銀行存簿與固定扣款) -->
+        <section id="page-assets" class="page">
+            <div class="kpi">
+                <div><span>台幣活存</span><b id="kpiCash">NT$0</b></div>
+                <div><span>外幣市值</span><b id="kpiFx">NT$0</b></div>
+                <div><span>信用卡欠款</span><b id="kpiDebts" style="color:var(--danger)">NT$0</b></div>
+                <div><span>固定應繳/月</span><b id="kpiBills">NT$0</b></div>
+            </div>
+
+            <div class="panel">
+                <h3>帳戶資產 <span class="linkish" onclick="openSheetForType('transfer')">＋ 互轉</span></h3>
+                <div class="seg" id="acctFilter">
+                    <button class="on" onclick="filterAccts('all', this)">全部</button>
+                    <button onclick="filterAccts('bank', this)">銀行活存</button>
+                    <button onclick="filterAccts('foreign', this)">外幣</button>
+                    <button onclick="filterAccts('debt', this)">信用卡</button>
+                </div>
+                <div id="accountList"></div>
+            </div>
+
+            <div class="panel">
+                <h3>固定應繳費用 <span class="linkish" onclick="openSheetForType('bill')">繳費</span></h3>
+                <div id="fixedExpenseList"></div>
+            </div>
+
+            <div class="panel">
+                <h3>每月固定生活預算設定</h3>
+                <div class="field">
+                    <input type="number" id="input_starting" placeholder="輸入預算金額" inputmode="numeric">
+                </div>
+                <button class="btn-solid" onclick="executeUpdateBudget()">儲存設定</button>
+            </div>
+
+            <div class="import-card">
+                <strong><i class="fa-solid fa-file-csv"></i> 智慧發票匯入</strong>
+                <p>自動判定發票標題，支援財政部與一般 CSV</p>
+                <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)">
+                <button class="btn-gold" onclick="document.getElementById('csvInput').click()">
+                    <i class="fa-solid fa-folder-open"></i> 選擇 CSV 檔案
+                </button>
+                <div id="import-status" style="font-size: 11px; color: var(--muted); margin-top: 6px;"></div>
+            </div>
+        </section>
+
+        <!-- 頁面 5: 分析圖表 -->
+        <section id="page-analysis" class="page">
+            <div class="insight" id="insightBox">載入洞察中...</div>
+            <div class="panel">
+                <h3>本月消費比例</h3>
+                <div id="chart-container">
+                    <div id="chart_donut"></div>
+                    <div id="center-text">
+                        <span id="center-label">本月總計</span>
+                        <span id="center-value">$0</span>
                     </div>
                 </div>
             </div>
             <div class="panel">
-                <h3>本月支出結構</h3>
-                <div id="miniBreakdown" class="mini-cats"></div>
+                <h3>年度花費對比 (長條:今年 / 折線:去年)</h3>
+                <div id="trend_chart_div"></div>
             </div>
-        </div>
-
-        <div class="panel">
-            <h3>近期明細 <span class="linkish" onclick="switchTab('records')">查看全部 ›</span></h3>
-            <div id="recentList" class="list"></div>
-        </div>
-    </section>
-
-    <!-- 頁面 2: 明細紀錄 -->
-    <section id="page-records" class="page">
-        <div class="filters">
-            <button class="pill active" onclick="loadHistory('month', this)">當月</button>
-            <button class="pill" onclick="loadHistory('half', this)">近半年</button>
-            <button class="pill" onclick="toggleCustom(this)">自訂時間</button>
-        </div>
-        <div id="customBox" class="custom-box">
-            <input type="date" id="hist-start">
-            <input type="date" id="hist-end">
-            <button class="pill active" onclick="loadHistory('custom', null)">GO</button>
-        </div>
-        <div id="historyList" class="list"></div>
-        <div id="histLoading" class="loading" style="display:none;">載入中...</div>
-        <div id="histEmpty" class="empty" style="display:none;">這段期間查無紀錄</div>
-        <div class="actions" id="tableActions">
-            <button class="btn-ghost" id="btnDelete" onclick="toggleDeleteMode()">刪除明細</button>
-            <button class="btn-danger" id="btnConfirmDel" onclick="executeDelete()">確認刪除</button>
-        </div>
-    </section>
-
-    <!-- 頁面 3: 投資 (Foreglint 股票/基金/虛擬幣) -->
-    <section id="page-invest" class="page">
-        <div class="hero" style="background: linear-gradient(160deg, #182C4A 0%, #0F1E33 100%);">
-            <div class="hero-kicker">投資組合總市值 (TWD)</div>
-            <div class="hero-row">
-                <div class="hero-num" id="investTotalMkt">NT$0</div>
+            <div class="panel">
+                <h3>預算使用進度</h3>
+                <div class="progress"><div id="progress-bar"></div></div>
+                <p id="progress-text">0%</p>
             </div>
-            <div class="hero-sub" id="investTotalSub">總投入成本 $0 · 損益 +$0 (+0.0%)</div>
-        </div>
+        </section>
+    </div>
 
-        <div class="seg" id="investFilter">
-            <button class="on" onclick="filterInvest('all', this)">全部標的</button>
-            <button onclick="filterInvest('tw', this)">台股</button>
-            <button onclick="filterInvest('us', this)">美股/定期定額</button>
-            <button onclick="filterInvest('crypto', this)">加密貨幣</button>
-        </div>
-
-        <div class="panel">
-            <h3>持倉組合明細</h3>
-            <div id="investList"></div>
-        </div>
-    </section>
-
-    <!-- 頁面 4: 資產 (銀行存簿與固定扣款) -->
-    <section id="page-assets" class="page">
-        <div class="kpi">
-            <div><span>台幣活存</span><b id="kpiCash">NT$0</b></div>
-            <div><span>外幣市值</span><b id="kpiFx">NT$0</b></div>
-            <div><span>預估總淨資產</span><b id="kpiNet">NT$0</b></div>
-            <div><span>每月固定應繳</span><b id="kpiBills">NT$0</b></div>
-        </div>
-
-        <div class="panel">
-            <h3>帳戶資產 <span class="linkish" onclick="openSheetForType('transfer')">＋ 互轉</span></h3>
-            <div class="seg" id="acctFilter">
-                <button class="on" onclick="filterAccts('all', this)">全部</button>
-                <button onclick="filterAccts('bank', this)">銀行活存</button>
-                <button onclick="filterAccts('foreign', this)">外幣</button>
-                <button onclick="filterAccts('debt', this)">信用卡</button>
-            </div>
-            <div id="accountList"></div>
-        </div>
-
-        <div class="panel">
-            <h3>固定應繳費用 <span class="linkish" onclick="openSheetForType('bill')">繳費</span></h3>
-            <div id="fixedExpenseList"></div>
-        </div>
-
-        <div class="panel">
-            <h3>每月固定生活預算</h3>
-            <div class="field">
-                <input type="number" id="input_starting" placeholder="輸入預算金額" inputmode="numeric">
-            </div>
-            <button class="btn-solid" onclick="executeUpdateBudget()">儲存設定</button>
-        </div>
-
-        <div class="import-card">
-            <strong><i class="fa-solid fa-file-csv"></i> 智慧發票匯入</strong>
-            <p>自動判定發票標題，支援財政部與一般 CSV</p>
-            <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)">
-            <button class="btn-gold" onclick="document.getElementById('csvInput').click()">
-                <i class="fa-solid fa-folder-open"></i> 選擇 CSV 檔案
-            </button>
-            <div id="import-status" style="font-size: 11px; color: var(--muted); margin-top: 6px;"></div>
-        </div>
-    </section>
-
-    <!-- 頁面 5: 分析圖表 -->
-    <section id="page-analysis" class="page">
-        <div class="insight" id="insightBox">載入洞察中...</div>
-        <div class="panel">
-            <h3>本月消費比例</h3>
-            <div id="chart-container">
-                <div id="chart_donut"></div>
-                <div id="center-text">
-                    <span id="center-label">本月總計</span>
-                    <span id="center-value">$0</span>
-                </div>
-            </div>
-        </div>
-        <div class="panel">
-            <h3>年度花費對比 (長條:今年 / 折線:去年)</h3>
-            <div id="trend_chart_div"></div>
-        </div>
-        <div class="panel">
-            <h3>預算使用進度</h3>
-            <div class="progress"><div id="progress-bar"></div></div>
-            <p id="progress-text">0%</p>
-        </div>
-    </section>
+    <!-- 全域底部導覽列 -->
+    <nav class="tabbar">
+        <button class="tab active" onclick="switchTab('overview', this)"><i class="fa-solid fa-house"></i>總覽</button>
+        <button class="tab" onclick="switchTab('records', this)"><i class="fa-solid fa-list-ul"></i>紀錄</button>
+        <button class="tab-add-btn" onclick="openSheet()"><i class="fa-solid fa-plus"></i></button>
+        <button class="tab" onclick="switchTab('invest', this)"><i class="fa-solid fa-arrow-trend-up"></i>投資</button>
+        <button class="tab" onclick="switchTab('assets', this)"><i class="fa-solid fa-wallet"></i>資產</button>
+    </nav>
 </div>
-
-<!-- 全域五鍵底部導覽列 -->
-<nav class="tabbar">
-    <button class="tab active" onclick="switchTab('overview', this)"><i class="fa-solid fa-house"></i>總覽</button>
-    <button class="tab" onclick="switchTab('records', this)"><i class="fa-solid fa-list-ul"></i>紀錄</button>
-    <button class="tab-add-btn" onclick="openSheet()"><i class="fa-solid fa-plus"></i></button>
-    <button class="tab" onclick="switchTab('invest', this)"><i class="fa-solid fa-arrow-trend-up"></i>投資</button>
-    <button class="tab" onclick="switchTab('assets', this)"><i class="fa-solid fa-wallet"></i>資產</button>
-</nav>
 
 <!-- 統一記帳／轉帳／繳費彈窗 -->
 <div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
@@ -645,7 +697,7 @@
         { type: 'tw', name: '國泰永續高股息', symbol: '00878', broker: '國泰證券', shares: 535, costPrice: 27.14, currPrice: 27.6, cost: 14517, mktVal: 14766 },
         { type: 'tw', name: '台新標普500', symbol: '009806', broker: '永豐證券', shares: 1000, costPrice: 11.83, currPrice: 13.05, cost: 11830, mktVal: 13050 },
         { type: 'tw', name: '中鋼', symbol: '2002', broker: '國泰證券', shares: 500, costPrice: 24.38, currPrice: 18.15, cost: 12190, mktVal: 9075 },
-        { type: 'us', name: 'Invesco QQQ', symbol: 'QQQ', broker: '永豐美股', shares: 0.3292, costPrice: 607.57, currPrice: 607.01, cost: 6289, mktVal: 6283 }, // USD換算台幣
+        { type: 'us', name: 'Invesco QQQ', symbol: 'QQQ', broker: '永豐美股', shares: 0.3292, costPrice: 607.57, currPrice: 607.01, cost: 6289, mktVal: 6283 },
         { type: 'us', name: 'Vanguard S&P500', symbol: 'VOO', broker: '永豐美股', shares: 0.3207, costPrice: 623.74, currPrice: 630.68, cost: 6289, mktVal: 6359 },
         { type: 'crypto', name: 'BitoPro 加密貨幣', symbol: 'BTC/USDT', broker: '幣託BitoPro', shares: 1, costPrice: 78215, currPrice: 79236, cost: 78215, mktVal: 79236 }
     ];
@@ -684,7 +736,7 @@
     let investFilterKind = "all";
     let donutChart;
     let isDeleteMode = false;
-    let lastHistoryMode = "month";
+    let lastHistoryMode = "recent7"; // 2. 預設近7天明細
     let chartsReady = false;
 
     google.charts.load("current", { packages: ["corechart"] });
@@ -696,7 +748,7 @@
         loadDashboard();
         loadAssetsData();
         loadInvestData();
-        loadHistory("month");
+        loadHistory("recent7"); // 2. 預設載入近7天紀錄
     };
 
     function todayStr() {
@@ -747,7 +799,7 @@
         }
         if (name === "invest") renderInvestList();
         if (name === "assets") loadAssetsData();
-        if (name === "records" && !document.getElementById("historyList").innerHTML) loadHistory(lastHistoryMode);
+        if (name === "records") loadHistory(lastHistoryMode);
     }
 
     function openSheet(editRecord = null) {
@@ -954,7 +1006,7 @@
 
         if (!amt || amt <= 0) return toast("請輸入有效金額");
 
-        // 1. 戶頭互轉邏輯
+        // 戶頭互轉邏輯
         if (currentType === "transfer") {
             const fromId = document.getElementById("transferFrom").value;
             const toId = document.getElementById("transferTo").value;
@@ -982,7 +1034,7 @@
             return;
         }
 
-        // 2. 繳納固定扣款邏輯
+        // 繳納固定扣款邏輯
         if (currentType === "bill") {
             const billId = document.getElementById("billItemSelect").value;
             const accId = document.getElementById("billAccountSelect").value;
@@ -1016,7 +1068,7 @@
             return;
         }
 
-        // 3. 一般支出/收入
+        // 一般支出/收入
         if (!currentMainCat) return toast("請選擇主分類");
         const payload = {
             date: dateVal,
@@ -1072,13 +1124,12 @@
         const leftover = budget - spent;
         dashboardData = { budget, spent, income, leftover, breakdown, recent: rows.slice(0, 5) };
 
-        document.getElementById("heroKicker").textContent = income > 0 ? "本月淨餘額" : "本月剩餘預算";
-        const heroVal = income > 0 ? (income - spent) : leftover;
+        // 1a. 本月剩餘預算方框：純粹顯示剩餘金額
         const hero = document.getElementById("heroNum");
-        hero.textContent = "NT$" + money(heroVal);
-        hero.classList.toggle("neg", heroVal < 0);
-        document.getElementById("heroSub").textContent = `收入 ${money(income)} · 生活支出 ${money(spent)}`;
+        hero.textContent = "NT$" + money(leftover);
+        hero.classList.toggle("neg", leftover < 0);
 
+        // 1b. 預算使用率與支出結構結合
         const pct = Math.min((spent / (budget || 1)) * 100, 100) || 0;
         document.getElementById("budgetRing").style.setProperty("--p", pct + "%");
         document.getElementById("budgetPct").textContent = Math.round(pct) + "%";
@@ -1086,11 +1137,50 @@
         document.getElementById("input_starting").value = budget || "";
         updateProgressBar();
         renderMiniBreakdown();
-        renderRecent();
         renderInsight();
+
+        // 刷新首頁總資產淨額卡片
+        calcAndRenderOverviewNetWorth();
     }
 
-    // --- 投資模組 (Foreglint 股票/基金/虛擬幣展示) ---
+    // 1d. 計算總資產淨額 (台幣活存 + 外幣活存市值 + 台美股市值 - 信用卡卡費 - 固定應繳費用 - 即時支出)
+    function calcAndRenderOverviewNetWorth() {
+        let twdCash = 0;
+        let foreignCash = 0;
+        let creditDebt = 0;
+
+        accountsData.forEach(acc => {
+            const bal = parseFloat(acc.balance) || 0;
+            if (acc.type === 'bank') twdCash += bal;
+            else if (acc.type === 'debt') creditDebt += Math.abs(bal);
+            else if (acc.type === 'foreign') {
+                const rate = FX_RATES[acc.currency] || 1;
+                foreignCash += (bal * rate);
+            }
+        });
+
+        // 固定應繳費用總額
+        let unpaidBillsSum = billsData.reduce((s, b) => s + (b.is_paid ? 0 : Number(b.amount || 0)), 0);
+        // 本月即時生活支出
+        let currentSpent = dashboardData.spent || 0;
+
+        // 股票總市值 (台股 + 美股)
+        let stockMktVal = 0;
+        PORTFOLIO_DATA.forEach(p => {
+            if (p.type === 'tw' || p.type === 'us') stockMktVal += p.mktVal;
+        });
+
+        // 現金淨額 = 台幣活存 + 外幣市值 - 信用卡卡費 - 固定應繳費用 - 即時支出
+        const cashNet = (twdCash + foreignCash) - creditDebt - unpaidBillsSum - currentSpent;
+        // 總資產淨額 = 現金淨額 + 股票市值
+        const totalNet = cashNet + stockMktVal;
+
+        document.getElementById("overviewNetWorth").innerText = "NT$" + money(Math.round(totalNet));
+        document.getElementById("overviewCashNet").innerText = "NT$" + money(Math.round(cashNet));
+        document.getElementById("overviewStockNet").innerText = "NT$" + money(Math.round(stockMktVal));
+    }
+
+    // 投資持股清單與統計
     function loadInvestData() {
         renderInvestList();
     }
@@ -1173,6 +1263,7 @@
         const netWorth = totalTwdBanks + totalForeignTwd + totalDebts;
         document.getElementById("kpiCash").innerText = "NT$" + money(Math.round(totalTwdBanks));
         document.getElementById("kpiFx").innerText = "NT$" + money(Math.round(totalForeignTwd));
+        document.getElementById("kpiDebts").innerText = "NT$" + money(Math.round(Math.abs(totalDebts)));
         document.getElementById("kpiNet").innerText = "NT$" + money(Math.round(netWorth));
 
         let monthlyBillsSum = billsData.reduce((s, b) => s + Number(b.amount || 0), 0);
@@ -1180,6 +1271,7 @@
 
         renderAccountsList();
         renderBillsList();
+        calcAndRenderOverviewNetWorth();
     }
 
     function renderAccountsList() {
@@ -1266,15 +1358,6 @@
         ).join("");
     }
 
-    function renderRecent() {
-        const box = document.getElementById("recentList");
-        if (!dashboardData.recent.length) {
-            box.innerHTML = '<div class="empty">本月尚未有任何紀錄</div>';
-            return;
-        }
-        box.innerHTML = dashboardData.recent.map(r => rowHTML(r, false)).join("");
-    }
-
     function amountColorClass(r) {
         if (isIncome(r)) return "income";
         if (r.category === "轉") return "transfer";
@@ -1317,6 +1400,7 @@
         document.getElementById("customBox").classList.add("show");
     }
 
+    // 2. 紀錄分頁載入邏輯：支援近7天明細 (預設)
     async function loadHistory(mode, btn) {
         lastHistoryMode = mode;
         if (mode !== "custom") document.getElementById("customBox").classList.remove("show");
@@ -1337,12 +1421,18 @@
 
         let startDate, endDate;
         const now = new Date();
-        if (mode === "month") {
+        const z = n => String(n).padStart(2, "0");
+
+        if (mode === "recent7") {
+            // 近 7 天明細
+            const s = new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000);
+            startDate = `${s.getFullYear()}-${z(s.getMonth()+1)}-${z(s.getDate())}`;
+            endDate = todayStr();
+        } else if (mode === "month") {
             startDate = monthStart(now);
             endDate = monthEnd(now);
         } else if (mode === "half") {
             const s = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
-            const z = n => String(n).padStart(2, "0");
             startDate = `${s.getFullYear()}-${z(s.getMonth()+1)}-${z(s.getDate())}`;
             endDate = todayStr();
         } else {
