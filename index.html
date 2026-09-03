@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>理財紀錄 (資產整合版)</title>
+    <title>理財紀錄 (資產整合增強版)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -201,7 +201,7 @@
         }
         .btn-ghost { background: #fff; color: var(--danger); border: 1px solid #ffd0d0; }
         .btn-danger { background: var(--danger); color: #fff; display: none; }
-        .btn-solid { background: var(--navy); color: #fff; width: 100%; padding: 14px; border-radius: 14px; }
+        .btn-solid { background: var(--navy); color: #fff; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; border: 0; cursor: pointer; }
 
         .check {
             display: none; width: 22px; height: 22px; border: 2px solid #d5dbe6; border-radius: 50%;
@@ -234,17 +234,18 @@
         #progress-bar { height: 100%; width: 0; background: var(--gold); transition: width .8s ease; }
         #progress-text { font-size: 12px; color: var(--muted); text-align: right; margin: 0; }
 
-        .import-card {
-            border: 1.5px dashed #cfd6e2;
-            border-radius: 18px;
-            padding: 16px;
-            text-align: center;
-            background: #fbfcfe;
-            margin-bottom: 12px;
-        }
-        .import-card p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+        .kpi { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .kpi > div { background: #fff; border-radius: 16px; padding: 12px; box-shadow: var(--shadow); }
+        .kpi span { display: block; font-size: 11px; color: var(--muted); font-weight: 700; }
+        .kpi b { font-size: 16px; }
 
-        /* 資產列表樣式 */
+        .seg { display: flex; gap: 6px; margin: 10px 0 12px; flex-wrap: wrap; }
+        .seg button {
+            border: 0; background: #F3F5F9; border-radius: 999px; padding: 6px 12px;
+            font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer;
+        }
+        .seg button.on { background: var(--navy); color: #fff; }
+
         .account-card {
             display: flex; justify-content: space-between; align-items: center;
             padding: 12px 0; border-bottom: 1px solid var(--line);
@@ -255,14 +256,28 @@
         .acc-amt { font-size: 15px; font-weight: 800; text-align: right; }
         .acc-amt small { display: block; font-size: 10px; color: var(--teal); font-weight: 600; }
 
+        .goalbar { height: 5px; background: #E8EDF4; border-radius: 99px; margin-top: 5px; overflow: hidden; width: 120px; }
+        .goalbar > i { display: block; height: 100%; background: var(--gold); width: 0; }
+
         .bill-item {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 13px;
+            padding: 12px 0; border-bottom: 1px dashed var(--line); font-size: 13px;
         }
         .bill-item:last-child { border-bottom: none; }
-        .bill-status { cursor: pointer; color: var(--muted); font-size: 18px; }
+        .bill-status { cursor: pointer; color: var(--muted); font-size: 20px; }
         .bill-status.paid { color: var(--ok); }
 
+        .import-card {
+            border: 1.5px dashed #cfd6e2;
+            border-radius: 18px;
+            padding: 16px;
+            text-align: center;
+            background: #fbfcfe;
+            margin-top: 14px;
+        }
+        .import-card p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+        /* 全域底部導覽列 */
         .tabbar {
             position: fixed; left: 50%; bottom: 0; transform: translateX(-50%);
             width: 100%; max-width: 430px;
@@ -324,10 +339,10 @@
 
         .quick { position: relative; margin-bottom: 12px; }
         .quick i { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
-        .types { display: flex; background: #F3F5F9; border-radius: 999px; padding: 4px; margin-bottom: 12px; }
+        .types { display: flex; background: #F3F5F9; border-radius: 999px; padding: 4px; margin-bottom: 12px; gap: 2px; }
         .types button {
             flex: 1; border: 0; background: transparent; border-radius: 999px;
-            padding: 8px 0; font-weight: 800; color: var(--muted); cursor: pointer; font-size: 13px;
+            padding: 8px 0; font-weight: 800; color: var(--muted); cursor: pointer; font-size: 12px;
         }
         .types button.on { background: var(--gold-soft); color: var(--gold-ink); }
         .amount-preview { text-align: center; font-size: 34px; font-weight: 800; margin: 4px 0 12px; letter-spacing: -1px; }
@@ -361,6 +376,7 @@
             font-size: 13px; opacity: 0; pointer-events: none; z-index: 80; transition: .25s; font-weight: 600;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .hint { font-size: 12px; color: var(--muted); line-height: 1.6; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -426,29 +442,34 @@
         </div>
     </section>
 
-    <!-- 頁面 3: 資產庫存與固定扣款 (整合自 Excel) -->
+    <!-- 頁面 3: 資產庫存與金流 -->
     <section id="page-assets" class="page">
-        <div class="hero" style="background: linear-gradient(160deg, #1C3144 0%, #0D1B2A 100%);">
-            <div class="hero-kicker">預估淨資產 (活存+外幣-欠款)</div>
-            <div class="hero-row">
-                <div class="hero-num" id="totalNetAssets">NT$0</div>
-            </div>
-            <div class="hero-sub" id="netAssetsSub">總活存 0 · 外幣市值 0 · 總欠款 0</div>
+        <div class="kpi">
+            <div><span>台幣活存</span><b id="kpiCash">NT$0</b></div>
+            <div><span>外幣市值</span><b id="kpiFx">NT$0</b></div>
+            <div><span>預估總淨資產</span><b id="kpiNet">NT$0</b></div>
+            <div><span>每月固定應繳</span><b id="kpiBills">NT$0</b></div>
         </div>
 
         <div class="panel">
-            <h3><i class="fa-solid fa-building-columns"></i> 存簿資金與外幣</h3>
+            <h3>帳戶資產 <span class="linkish" onclick="openSheetForType('transfer')">＋ 互轉</span></h3>
+            <div class="seg" id="acctFilter">
+                <button class="on" onclick="filterAccts('all', this)">全部</button>
+                <button onclick="filterAccts('bank', this)">銀行活存</button>
+                <button onclick="filterAccts('foreign', this)">外幣</button>
+                <button onclick="filterAccts('debt', this)">信用卡</button>
+            </div>
             <div id="accountList"></div>
         </div>
 
         <div class="panel">
-            <h3><i class="fa-solid fa-clock-rotate-left"></i> 每月固定應繳費用</h3>
+            <h3>固定應繳費用 <span class="linkish" onclick="openSheetForType('bill')">繳費</span></h3>
             <div id="fixedExpenseList"></div>
         </div>
 
         <div class="import-card">
             <strong><i class="fa-solid fa-file-csv"></i> 智慧發票匯入</strong>
-            <p>自動判斷發票標題，支援財政部與三欄格式 CSV</p>
+            <p>自動判定發票標題，支援財政部與一般 CSV</p>
             <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)">
             <button class="btn-gold" onclick="document.getElementById('csvInput').click()">
                 <i class="fa-solid fa-folder-open"></i> 選擇 CSV 檔案
@@ -479,27 +500,18 @@
             <div class="progress"><div id="progress-bar"></div></div>
             <p id="progress-text">0%</p>
         </div>
-    </section>
-
-    <!-- 頁面 5: 設定預算 -->
-    <section id="page-me" class="page">
-        <div class="panel">
-            <h3>每月生活固定預算</h3>
+        
+        <div class="panel" style="margin-top:12px;">
+            <h3>每月固定預算設定</h3>
             <div class="field">
-                <input type="number" id="input_starting" placeholder="輸入金額" inputmode="numeric">
+                <input type="number" id="input_starting" placeholder="輸入預算金額" inputmode="numeric">
             </div>
             <button class="btn-solid" onclick="executeUpdateBudget()">儲存設定</button>
-            <div class="account-card" style="margin-top:10px;">
-                <span class="muted">當月剩餘</span><b id="disp_monthly_rem">0</b>
-            </div>
-            <div class="account-card">
-                <span class="muted">當月已花費</span><b id="disp_monthly_spent">0</b>
-            </div>
         </div>
     </section>
 </div>
 
-<!-- 底部導覽列 -->
+<!-- 全域底部導覽列 -->
 <nav class="tabbar">
     <button class="tab active" onclick="switchTab('overview', this)"><i class="fa-solid fa-house"></i>總覽</button>
     <button class="tab" onclick="switchTab('records', this)"><i class="fa-solid fa-list-ul"></i>紀錄</button>
@@ -508,7 +520,7 @@
     <button class="tab" onclick="switchTab('analysis', this)"><i class="fa-solid fa-chart-pie"></i>分析</button>
 </nav>
 
-<!-- 記帳 / 轉帳彈窗 -->
+<!-- 統一記帳／轉帳／繳費彈窗 -->
 <div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
     <div class="grab"></div>
@@ -516,10 +528,12 @@
         <h2 id="sheetTitle">記一筆</h2>
         <button class="icon-btn" onclick="closeSheet()"><i class="fa-solid fa-xmark"></i></button>
     </div>
+    
     <div class="types">
         <button class="on" id="typeExpense" onclick="setType('expense')">支出</button>
         <button id="typeIncome" onclick="setType('income')">收入</button>
         <button id="typeTransfer" onclick="setType('transfer')">戶頭互轉</button>
+        <button id="typeBill" onclick="setType('bill')">繳固定費</button>
     </div>
 
     <!-- 支出/收入區塊 -->
@@ -542,6 +556,18 @@
         <div class="field">
             <label>轉入帳戶</label>
             <select id="transferTo"></select>
+        </div>
+    </div>
+
+    <!-- 繳固定費區塊 -->
+    <div id="billForm" style="display:none;">
+        <div class="field">
+            <label>應繳項目</label>
+            <select id="billItemSelect" onchange="onBillItemChange()"></select>
+        </div>
+        <div class="field">
+            <label>扣繳扣款帳戶</label>
+            <select id="billAccountSelect"></select>
         </div>
     </div>
 
@@ -569,6 +595,8 @@
     const { createClient } = supabase;
     const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    const FX_RATES = { JPY: 0.2004, USD: 31.44 };
+
     const subData = {
         "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"],
         "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"],
@@ -583,12 +611,13 @@
 
     const CAT_ICON = {
         "食": "fa-utensils", "衣": "fa-shirt", "住": "fa-house", "行": "fa-car",
-        "育": "fa-book", "樂": "fa-face-smile", "金": "fa-coins", "雜": "fa-bag-shopping", "收": "fa-sack-dollar",
-        "轉": "fa-money-bill-transfer"
+        "育": "fa-book", "樂": "fa-face-smile", "金": "fa-coins", "雜": "fa-bag-shopping", 
+        "收": "fa-sack-dollar", "轉": "fa-money-bill-transfer"
     };
     const CAT_COLOR = {
         "食": "#2BB3A0", "衣": "#F0B429", "住": "#5B8DEF", "行": "#7A6FF0",
-        "育": "#3BA3D9", "樂": "#E28AD2", "金": "#C9A227", "雜": "#8B93A7", "收": "#1F9D7A", "轉": "#2BB3A0"
+        "育": "#3BA3D9", "樂": "#E28AD2", "金": "#C9A227", "雜": "#8B93A7", 
+        "收": "#1F9D7A", "轉": "#2BB3A0"
     };
     const DONUT_COLORS = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#E7E9ED', '#767676'];
 
@@ -597,6 +626,8 @@
     let currentType = "expense";
     let dashboardData = { budget: 0, spent: 0, income: 0, leftover: 0, breakdown: {}, recent: [] };
     let accountsData = [];
+    let billsData = [];
+    let acctFilterKind = "all";
     let donutChart;
     let isDeleteMode = false;
     let lastHistoryMode = "month";
@@ -609,7 +640,7 @@
         document.getElementById("date").value = todayStr();
         buildCatGrid();
         loadDashboard();
-        loadAssetsAndBills();
+        loadAssetsData();
         loadHistory("month");
     };
 
@@ -645,13 +676,13 @@
     function switchTab(name, el) {
         document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
         document.getElementById("page-" + name).classList.add("active");
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".tabbar .tab").forEach(t => t.classList.remove("active"));
+        
         if (el) el.classList.add("active");
         else {
-            const map = { overview: 0, records: 1, assets: 3, analysis: 4, me: 4 };
-            if (document.querySelectorAll(".tabbar .tab")[map[name]]) {
-                document.querySelectorAll(".tabbar .tab")[map[name]].classList.add("active");
-            }
+            const map = { overview: 0, records: 1, assets: 2, analysis: 3 };
+            const tabs = document.querySelectorAll(".tabbar .tab");
+            if (tabs[map[name]]) tabs[map[name]].classList.add("active");
         }
         if (isDeleteMode) toggleDeleteMode();
         if (name === "analysis") {
@@ -659,7 +690,7 @@
             drawTrendChart();
             renderInsight();
         }
-        if (name === "assets") loadAssetsAndBills();
+        if (name === "assets") loadAssetsData();
         if (name === "records" && !document.getElementById("historyList").innerHTML) loadHistory(lastHistoryMode);
     }
 
@@ -673,7 +704,8 @@
             document.getElementById("date").value = editRecord.date;
             document.getElementById("amount").value = editRecord.amount;
             document.getElementById("note").value = editRecord.note || "";
-            setType(editRecord.category === "收" ? "income" : (editRecord.category === "轉" ? "transfer" : "expense"));
+            const t = editRecord.category === "收" ? "income" : (editRecord.category === "轉" ? "transfer" : "expense");
+            setType(t);
             if (editRecord.category !== "轉") {
                 selectMainCat(editRecord.category);
                 currentSub = editRecord.subcategory;
@@ -692,7 +724,12 @@
 
         document.getElementById("sheetBg").classList.add("show");
         document.getElementById("sheet").classList.add("show");
-        if (!isEdit && currentType !== "transfer") setTimeout(() => document.getElementById("quickInput").focus(), 250);
+        if (!isEdit && currentType === "expense") setTimeout(() => document.getElementById("quickInput").focus(), 250);
+    }
+
+    function openSheetForType(type) {
+        openSheet();
+        setType(type);
     }
 
     function closeSheet() {
@@ -705,17 +742,21 @@
         document.getElementById("typeExpense").classList.toggle("on", type === "expense");
         document.getElementById("typeIncome").classList.toggle("on", type === "income");
         document.getElementById("typeTransfer").classList.toggle("on", type === "transfer");
+        document.getElementById("typeBill").classList.toggle("on", type === "bill");
 
         const normal = document.getElementById("normalForm");
         const transfer = document.getElementById("transferForm");
+        const bill = document.getElementById("billForm");
+
+        normal.style.display = (type === "expense" || type === "income") ? "block" : "none";
+        transfer.style.display = (type === "transfer") ? "block" : "none";
+        bill.style.display = (type === "bill") ? "block" : "none";
 
         if (type === "transfer") {
-            normal.style.display = "none";
-            transfer.style.display = "block";
             populateTransferSelects();
+        } else if (type === "bill") {
+            populateBillSelects();
         } else {
-            normal.style.display = "block";
-            transfer.style.display = "none";
             if (type === "income") selectMainCat("收");
             else if (currentMainCat === "收") {
                 currentMainCat = "";
@@ -817,12 +858,36 @@
         fromSel.innerHTML = "";
         toSel.innerHTML = "";
         accountsData.filter(a => a.type !== 'debt').forEach(acc => {
-            const opt1 = `<option value="${acc.id}">${acc.name} ($${money(acc.balance)})</option>`;
-            const opt2 = `<option value="${acc.id}">${acc.name} ($${money(acc.balance)})</option>`;
-            fromSel.innerHTML += opt1;
-            toSel.innerHTML += opt2;
+            const opt = `<option value="${acc.id}">${acc.name} (${acc.currency} ${money(acc.balance)})</option>`;
+            fromSel.innerHTML += opt;
+            toSel.innerHTML += opt;
         });
         if (toSel.options.length > 1) toSel.selectedIndex = 1;
+    }
+
+    function populateBillSelects() {
+        const bSel = document.getElementById("billItemSelect");
+        const aSel = document.getElementById("billAccountSelect");
+        bSel.innerHTML = "";
+        aSel.innerHTML = "";
+        
+        billsData.forEach(b => {
+            bSel.innerHTML += `<option value="${b.id}">${b.name} ($${money(b.amount)})</option>`;
+        });
+        accountsData.filter(a => a.type === 'bank').forEach(acc => {
+            aSel.innerHTML += `<option value="${acc.id}">${acc.name} ($${money(acc.balance)})</option>`;
+        });
+        onBillItemChange();
+    }
+
+    function onBillItemChange() {
+        const bId = document.getElementById("billItemSelect").value;
+        const bill = billsData.find(b => b.id == bId);
+        if (bill) {
+            document.getElementById("amount").value = bill.amount;
+            document.getElementById("note").value = `繳納: ${bill.name}`;
+            syncAmountPreview();
+        }
     }
 
     async function executeSubmit() {
@@ -833,7 +898,7 @@
 
         if (!amt || amt <= 0) return toast("請輸入有效金額");
 
-        // 戶頭互轉處理
+        // 1. 戶頭互轉邏輯
         if (currentType === "transfer") {
             const fromId = document.getElementById("transferFrom").value;
             const toId = document.getElementById("transferTo").value;
@@ -842,11 +907,9 @@
             const fromAcc = accountsData.find(a => a.id == fromId);
             const toAcc = accountsData.find(a => a.id == toId);
 
-            // 更新轉出與轉入餘額
             await _supabase.from("accounts").update({ balance: Number(fromAcc.balance) - amt }).eq("id", fromId);
             await _supabase.from("accounts").update({ balance: Number(toAcc.balance) + amt }).eq("id", toId);
 
-            // 存入互轉紀錄表與流水表記錄
             await _supabase.from("fund_transfers").insert([{
                 date: dateVal, from_account_id: fromId, to_account_id: toId, amount: amt, note: noteVal
             }]);
@@ -857,13 +920,50 @@
 
             toast("互轉完成，帳戶餘額已更新");
             closeSheet();
-            loadAssetsAndBills();
+            loadAssetsData();
             loadDashboard();
             loadHistory(lastHistoryMode);
             return;
         }
 
-        // 一般支出/收入處理
+        // 2. 繳納固定扣款邏輯
+        if (currentType === "bill") {
+            const billId = document.getElementById("billItemSelect").value;
+            const accId = document.getElementById("billAccountSelect").value;
+            const bill = billsData.find(b => b.id == billId);
+            const acc = accountsData.find(a => a.id == accId);
+
+            // 扣除銀行帳戶
+            await _supabase.from("accounts").update({ balance: Number(acc.balance) - amt }).eq("id", accId);
+
+            // 更新固定繳費項目狀態與期數
+            const updates = { is_paid: true };
+            if (bill.total_periods > 0) updates.paid_periods = Number(bill.paid_periods) + 1;
+            await _supabase.from("fixed_expenses").update(updates).eq("id", billId);
+
+            // 寫入日常消費紀錄
+            let targetCat = "雜";
+            let targetSub = "其他";
+            if (bill.name.includes("幼兒園") || bill.name.includes("學費")) { targetCat = "育"; targetSub = "學費"; }
+            else if (bill.name.includes("電信") || bill.name.includes("電話")) { targetCat = "住"; targetSub = "手機費"; }
+            else if (bill.name.includes("電視") || bill.name.includes("網路")) { targetCat = "樂"; targetSub = "電視費"; }
+            else if (bill.name.includes("保險")) { targetCat = "雜"; targetSub = "保險費"; }
+            else if (bill.name.includes("停車")) { targetCat = "行"; targetSub = "停車費"; }
+
+            await _supabase.from("expenses").insert([{
+                date: dateVal, category: targetCat, subcategory: targetSub,
+                amount: amt, note: `[固定扣款] ${bill.name} (${acc.name})${noteVal ? ' · ' + noteVal : ''}`
+            }]);
+
+            toast("已成功繳納並扣款");
+            closeSheet();
+            loadAssetsData();
+            loadDashboard();
+            loadHistory(lastHistoryMode);
+            return;
+        }
+
+        // 3. 一般支出/收入
         if (!currentMainCat) return toast("請選擇主分類");
         const payload = {
             date: dateVal,
@@ -931,74 +1031,109 @@
         document.getElementById("budgetPct").textContent = Math.round(pct) + "%";
         document.getElementById("budgetLeft").textContent = "剩餘 " + money(leftover);
         document.getElementById("input_starting").value = budget || "";
-        document.getElementById("disp_monthly_rem").innerText = money(leftover);
-        document.getElementById("disp_monthly_spent").innerText = money(spent);
         updateProgressBar();
         renderMiniBreakdown();
         renderRecent();
         renderInsight();
     }
 
-    // 讀取並計算資產與固定需繳費用 (Excel 結構)
-    async function loadAssetsAndBills() {
+    async function loadAssetsData() {
         const { data: accs } = await _supabase.from("accounts").select("*").order("id");
         const { data: bills } = await _supabase.from("fixed_expenses").select("*").order("id");
         
         accountsData = accs || [];
+        billsData = bills || [];
+        
         let totalTwdBanks = 0;
         let totalForeignTwd = 0;
         let totalDebts = 0;
 
-        const accList = document.getElementById("accountList");
-        accList.innerHTML = "";
-
         accountsData.forEach(acc => {
             const bal = parseFloat(acc.balance) || 0;
-            let subText = acc.account_no || "";
-            if (acc.target_amount > 0) {
-                subText += ` (目標: $${money(acc.target_amount)})`;
-            }
-
             if (acc.type === 'bank') totalTwdBanks += bal;
             else if (acc.type === 'debt') totalDebts += bal;
             else if (acc.type === 'foreign') {
-                // 外幣換算估算：日圓約 0.20，美金約 31.4
-                const rate = acc.currency === 'JPY' ? 0.2004 : 31.44;
+                const rate = FX_RATES[acc.currency] || 1;
                 totalForeignTwd += (bal * rate);
             }
+        });
 
-            accList.innerHTML += `
+        const netWorth = totalTwdBanks + totalForeignTwd + totalDebts;
+        document.getElementById("kpiCash").innerText = "NT$" + money(Math.round(totalTwdBanks));
+        document.getElementById("kpiFx").innerText = "NT$" + money(Math.round(totalForeignTwd));
+        document.getElementById("kpiNet").innerText = "NT$" + money(Math.round(netWorth));
+
+        let monthlyBillsSum = billsData.reduce((s, b) => s + Number(b.amount || 0), 0);
+        document.getElementById("kpiBills").innerText = "NT$" + money(Math.round(monthlyBillsSum));
+
+        renderAccountsList();
+        renderBillsList();
+    }
+
+    function renderAccountsList() {
+        const list = document.getElementById("accountList");
+        list.innerHTML = "";
+        const filtered = accountsData.filter(a => acctFilterKind === "all" || a.type === acctFilterKind);
+
+        if (!filtered.length) {
+            list.innerHTML = '<div class="empty">無此類別帳戶資料</div>';
+            return;
+        }
+
+        filtered.forEach(acc => {
+            const bal = parseFloat(acc.balance) || 0;
+            const goal = parseFloat(acc.target_amount) || 0;
+            const pct = goal > 0 ? Math.min(100, Math.round(bal / goal * 100)) : 0;
+            
+            let fxConverted = "";
+            if (acc.type === 'foreign') {
+                const rate = FX_RATES[acc.currency] || 1;
+                fxConverted = `<small>≈ NT$ ${money(Math.round(bal * rate))}</small>`;
+            }
+
+            list.innerHTML += `
                 <div class="account-card">
                     <div class="acc-info">
                         <b>${acc.name}</b>
-                        <span>${subText}</span>
+                        <span>${acc.account_no || ''}${goal > 0 ? ' · 目標: $' + money(goal) : ''}</span>
+                        ${goal > 0 ? `<div class="goalbar"><i style="width:${pct}%;"></i></div>` : ''}
                     </div>
-                    <div class="acc-amt" style="color:${acc.type==='debt'?'var(--danger)':'var(--ink)'}">
+                    <div class="acc-amt" style="color:${acc.type === 'debt' ? 'var(--danger)' : 'var(--ink)'};">
                         ${acc.currency} ${money(bal)}
+                        ${fxConverted}
                     </div>
                 </div>
             `;
         });
+    }
 
-        // 計算預估淨資產 (活存 + 外幣市值 + 欠款負值)
-        const netWorth = totalTwdBanks + totalForeignTwd + totalDebts;
-        document.getElementById("totalNetAssets").innerText = "NT$" + money(Math.round(netWorth));
-        document.getElementById("netAssetsSub").innerText = `活存 $${money(totalTwdBanks)} · 外幣市值 ~$${money(Math.round(totalForeignTwd))} · 負債 $${money(Math.abs(totalDebts))}`;
+    function filterAccts(kind, btn) {
+        acctFilterKind = kind;
+        document.querySelectorAll("#acctFilter button").forEach(b => b.classList.remove("on"));
+        if (btn) btn.classList.add("on");
+        renderAccountsList();
+    }
 
-        // 渲染固定扣款
-        const billList = document.getElementById("fixedExpenseList");
-        billList.innerHTML = "";
-        (bills || []).forEach(b => {
-            let periodText = b.total_periods > 0 ? `(${b.paid_periods}/${b.total_periods}期)` : '';
-            billList.innerHTML += `
+    function renderBillsList() {
+        const list = document.getElementById("fixedExpenseList");
+        list.innerHTML = "";
+        if (!billsData.length) {
+            list.innerHTML = '<div class="empty">尚無固定扣款設定</div>';
+            return;
+        }
+
+        billsData.forEach(b => {
+            const periodInfo = b.total_periods > 0 ? ` (${b.paid_periods}/${b.total_periods}期)` : '';
+            list.innerHTML += `
                 <div class="bill-item">
                     <div>
-                        <b>${b.name}</b> ${periodText}
-                        <div style="font-size:11px; color:var(--muted);">${b.bank_name} · ${b.pay_day} · ${b.note||''}</div>
+                        <b>${b.name}</b>${periodInfo}
+                        <div style="font-size:11px; color:var(--muted);">${b.bank_name} · 扣款日: ${b.pay_day}</div>
                     </div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-weight:700;">$${money(b.amount)}</span>
-                        <i class="fa-solid fa-circle-check bill-status ${b.is_paid?'paid':''}" onclick="toggleBillPaid(${b.id}, ${!b.is_paid})"></i>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span style="font-weight:700; font-size:14px;">$${money(b.amount)}</span>
+                        <i class="fa-solid fa-circle-check bill-status ${b.is_paid ? 'paid' : ''}" 
+                           onclick="toggleBillPaid(${b.id}, ${!b.is_paid})" title="切換繳納狀態"></i>
                     </div>
                 </div>
             `;
@@ -1007,7 +1142,7 @@
 
     async function toggleBillPaid(id, paid) {
         await _supabase.from("fixed_expenses").update({ is_paid: paid }).eq("id", id);
-        loadAssetsAndBills();
+        loadAssetsData();
     }
 
     function renderMiniBreakdown() {
