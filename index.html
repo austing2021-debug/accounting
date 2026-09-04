@@ -17,7 +17,7 @@
             --gold: #F0B429;
             --gold-ink: #3A2A00;
             --gold-soft: #FFF3D1;
-            --morandi-yellow: #E8D8A6; /* 莫蘭迪淡黃色 */
+            --morandi-yellow: #E8D8A6;
             --muted: #8B93A7;
             --line: #E6EAF1;
             --danger: #E5484D;
@@ -41,7 +41,6 @@
             justify-content: center;
         }
 
-        /* 1. 手機端適配高度，改用 dvh 避免被手機瀏覽器網址列裁切 */
         .app {
             width: 100%;
             max-width: 430px;
@@ -83,20 +82,18 @@
         }
         .cloud.ok { color: var(--teal); }
 
-        /* 4. 滾動式容器規範，底部保留充足內距 */
         .content-body {
             flex: 1 1 auto;
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            padding: 4px 16px 130px; /* 預留底部安全距離防止遮擋 */
+            padding: 4px 16px 130px;
         }
 
         .page { display: none; }
         .page.active { display: block; animation: fade .25s ease; }
         @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-        /* 英雄黑卡通用 */
         .hero {
             color: #fff;
             border-radius: 24px;
@@ -110,13 +107,10 @@
         .hero-row { display: flex; align-items: flex-end; justify-content: space-between; }
         .hero-num { font-size: 34px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
 
-        /* 2A. 總資產淨額 (最上層，莫蘭迪淡黃色) */
         .wealth-hero {
             background: linear-gradient(160deg, #1C3144 0%, #0D1B2A 100%);
         }
-        .wealth-hero .hero-num {
-            color: var(--morandi-yellow);
-        }
+        .wealth-hero .hero-num { color: var(--morandi-yellow); }
         .wealth-hero .sub-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -128,7 +122,6 @@
         .wealth-hero .sub-item span { display: block; font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 600; }
         .wealth-hero .sub-item b { font-size: 15px; font-weight: 700; color: #fff; }
 
-        /* 2B. 本月剩餘預算 (第二層，右上角初始預算) */
         .budget-hero {
             background: linear-gradient(160deg, #243356 0%, #1B2744 100%);
         }
@@ -160,49 +153,49 @@
         }
         .linkish { color: var(--muted); font-size: 12px; cursor: pointer; font-weight: 700; }
 
-        /* 2C. 預算使用率與支出結構 (第三層：左文字、右3D立體感圓餅圖) */
+        /* A3 & A4: 放大圓餅圖、縮減文字間距 */
         .budget-combo-card {
             display: grid;
-            grid-template-columns: 1.1fr 1fr;
+            grid-template-columns: 1fr 125px; /* 縮小文字欄，放大右側圓餅圖 */
             align-items: center;
-            gap: 12px;
-            padding: 6px 0;
+            gap: 8px;
+            padding: 4px 0;
         }
-        .combo-cats { display: flex; flex-direction: column; gap: 8px; }
+        .combo-cats { display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
         .combo-cat-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
         }
         .combo-cat-left { display: flex; align-items: center; gap: 6px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
 
-        /* 3D立體質感圓環 */
+        /* A3: 3D多色圓環 */
         .ring-wrap { display: grid; place-items: center; }
         .ring {
-            width: 110px; height: 110px; border-radius: 50%;
+            width: 122px; height: 122px; border-radius: 50%;
             display: grid; place-items: center;
-            /* 外層光影與內凹陰影打造微立體質感 */
-            background: conic-gradient(var(--teal) var(--p, 0%), #E3E9F2 0);
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.18), 0 4px 10px rgba(43, 179, 160, 0.28);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.14), inset 0 2px 4px rgba(255,255,255,0.4);
             position: relative;
+            transition: background 0.3s ease;
         }
         .ring-inner {
-            width: 78px; height: 78px; border-radius: 50%;
+            width: 82px; height: 82px; border-radius: 50%;
             background: #fff; display: grid; place-items: center; text-align: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
         }
-        .ring-inner b { font-size: 17px; color: var(--ink); }
+        .ring-inner b { font-size: 18px; color: var(--ink); line-height: 1.1; }
         .ring-inner span { font-size: 9px; color: var(--muted); font-weight: 600; }
 
-        /* 3B. 第二頁紀錄：明細滾動容器 (約6條高度，其餘捲動) */
+        /* B1 & B2: 限制滾動獨立容器，容納完整6項並防頁面拖動 */
         .records-scroll-wrap {
-            max-height: 400px;
+            height: 460px; /* 剛好容納完整 6 條記錄 */
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding-right: 4px;
+            overscroll-behavior: contain; /* 防止滑動此區域時帶動主頁面滑動 */
+            padding-right: 2px;
         }
 
         .list { display: flex; flex-direction: column; gap: 8px; }
@@ -235,7 +228,6 @@
         .amt.income { color: var(--ok); }
         .amt.transfer { color: var(--teal); }
 
-        /* 3A. 篩選標籤 */
         .filters { display: flex; gap: 6px; margin-bottom: 12px; }
         .pill {
             flex: 1; border: 0; background: #fff; color: var(--ink);
@@ -244,18 +236,27 @@
         }
         .pill.active { background: var(--navy); color: #fff; }
 
+        /* B4: 手機自訂時間排版，避免擁擠 */
         .custom-box {
             display: none; 
-            grid-template-columns: 1fr auto 1fr auto; 
-            align-items: center;
-            gap: 6px; 
             margin-bottom: 12px;
             background: #fff; 
-            padding: 10px; 
+            padding: 12px; 
             border-radius: 16px;
+            gap: 8px;
         }
-        .custom-box.show { display: grid; }
-        .custom-box input { width: 100%; }
+        .custom-box.show { display: flex; flex-direction: column; }
+        .custom-date-inputs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+        }
+        .custom-date-inputs input {
+            flex: 1;
+            padding: 8px 6px;
+            font-size: 13px;
+        }
 
         input, select {
             width: 100%;
@@ -271,21 +272,46 @@
 
         .empty, .loading { text-align: center; color: var(--muted); padding: 30px 10px; font-size: 13px; }
 
-        .actions { display: none; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+        .actions { display: none; justify-content: flex-end; gap: 8px; margin-top: 10px; }
         .actions.show { display: flex; }
         .btn-ghost, .btn-danger, .btn-solid {
             border: 0; border-radius: 12px; padding: 9px 15px; font-weight: 700; cursor: pointer; font-size: 13px;
         }
-        .btn-ghost { background: #fff; color: var(--danger); border: 1px solid #ffd0d0; }
-        .btn-danger { background: var(--danger); color: #fff; display: none; }
+        .btn-ghost { background: #fff; color: var(--muted); border: 1px solid var(--line); }
+        .btn-danger { background: var(--danger); color: #fff; display: none; box-shadow: 0 4px 10px rgba(229,72,77,0.25); }
         .btn-solid { background: var(--navy); color: #fff; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; border: 0; cursor: pointer; }
 
+        /* B3: 圓形精緻紅勾按鈕 */
         .check {
-            display: none; width: 22px; height: 22px; border: 2px solid #d5dbe6; border-radius: 50%;
-            appearance: none; flex: 0 0 auto; background: #fff; cursor: pointer;
+            display: none; 
+            width: 24px; 
+            height: 24px; 
+            border: 2px solid #CBD5E1; 
+            border-radius: 50%;
+            appearance: none; 
+            flex: 0 0 auto; 
+            background: #fff; 
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .delete-on .check { display: inline-block; }
-        .check:checked { background: var(--danger); border-color: var(--danger); }
+        .check:checked { 
+            background: var(--danger); 
+            border-color: var(--danger); 
+            box-shadow: 0 2px 8px rgba(229, 72, 77, 0.4);
+        }
+        .check:checked::after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: #fff;
+            font-size: 12px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
 
         .insight {
             background: var(--gold-soft);
@@ -338,7 +364,6 @@
         .pnl-up { color: #E5484D; }
         .pnl-down { color: #1F9D7A; }
 
-        /* 4C. 帳戶卡片不顯示帳號 */
         .account-card {
             display: flex; justify-content: space-between; align-items: center;
             padding: 12px 0; border-bottom: 1px solid var(--line);
@@ -370,7 +395,6 @@
         }
         .import-card p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
 
-        /* 1. 全域底部導覽列：固定吸附於最下方，杜絕手機遮擋 */
         .tabbar {
             position: fixed; 
             left: 50%; 
@@ -502,24 +526,22 @@
                 </div>
             </div>
 
-            <!-- 2B. 第二層：本月剩餘預算 (右上角顯示初始預算) -->
+            <!-- 2B. 第二層：本月剩餘預算 (右上角標示本月預算) -->
             <div class="hero budget-hero">
                 <div class="hero-row" style="align-items: center; margin-bottom: 6px;">
                     <div class="hero-kicker" style="margin-bottom:0;">本月剩餘預算</div>
-                    <div class="init-tag" id="heroInitBudget">初始預算: NT$0</div>
+                    <div class="init-tag" id="heroInitBudget">本月預算: NT$0</div>
                 </div>
                 <div class="hero-row">
                     <div class="hero-num" id="heroNum">NT$0</div>
                 </div>
             </div>
 
-            <!-- 2C. 第三層：預算使用率與本月支出結構 (左文字、右3D立體圓餅圖) -->
+            <!-- 2C & A3, A4: 第三層：左側分類使用金額緊湊排版、右側多色3D立體圓環 -->
             <div class="panel">
                 <h3>本月支出結構與使用率</h3>
                 <div class="budget-combo-card">
-                    <div class="combo-cats" id="comboCatList">
-                        <!-- 類別使用金額文字 -->
-                    </div>
+                    <div class="combo-cats" id="comboCatList"></div>
                     <div class="ring-wrap">
                         <div class="ring" id="budgetRing" style="--p:0%">
                             <div class="ring-inner">
@@ -533,34 +555,38 @@
 
         <!-- 頁面 2: 明細紀錄 -->
         <section id="page-records" class="page">
-            <!-- 3A. 篩選標籤：近期明細 (近7天)、近3個月、自訂時間 -->
+            <!-- 3A. 篩選切換標籤 -->
             <div class="filters">
                 <button class="pill active" onclick="loadHistory('recent7', this)">近期明細</button>
                 <button class="pill" onclick="loadHistory('m3', this)">近3個月</button>
                 <button class="pill" onclick="toggleCustom(this)">自訂時間</button>
             </div>
-            <!-- 3A. 自訂時間：中間加 ~，選定後才觸發 -->
+            <!-- B4. 自訂時間：中間加 ~，手機排版不擁擠 -->
             <div id="customBox" class="custom-box">
-                <input type="date" id="hist-start" onchange="onCustomDateChange()">
-                <span style="font-weight:700; color:var(--muted);">~</span>
-                <input type="date" id="hist-end" onchange="onCustomDateChange()">
-                <button class="pill active" style="padding:8px 12px;" onclick="loadHistory('custom', null)">查詢</button>
+                <div class="custom-date-inputs">
+                    <input type="date" id="hist-start" onchange="onCustomDateChange()">
+                    <span style="font-weight:700; color:var(--muted); font-size:16px;">~</span>
+                    <input type="date" id="hist-end" onchange="onCustomDateChange()">
+                </div>
+                <button class="btn-solid" style="padding:10px; font-size:13px;" onclick="loadHistory('custom', null)">查詢期間明細</button>
             </div>
 
-            <!-- 3B. 滾動容器：最多顯示約6條，其餘下拉捲動 -->
+            <!-- B1 & B2: 限制 6 條高度，獨立內部捲動 -->
             <div class="records-scroll-wrap">
                 <div id="historyList" class="list"></div>
                 <div id="histLoading" class="loading" style="display:none;">載入中...</div>
                 <div id="histEmpty" class="empty" style="display:none;">這段期間查無紀錄</div>
             </div>
 
+            <!-- B3. 刪除列：包含正圓紅圈與取消按鈕 -->
             <div class="actions" id="tableActions">
-                <button class="btn-ghost" id="btnDelete" onclick="toggleDeleteMode()">刪除明細</button>
+                <button class="btn-ghost" onclick="cancelDeleteMode()">取消</button>
+                <button class="btn-ghost" id="btnDelete" onclick="toggleDeleteMode()">選擇刪除</button>
                 <button class="btn-danger" id="btnConfirmDel" onclick="executeDelete()">確認刪除</button>
             </div>
         </section>
 
-        <!-- 頁面 3: 資產 (整合「帳戶資產」與「投資組合」，原投資頁) -->
+        <!-- 頁面 3: 資產 (整合「帳戶資產」與「投資組合」) -->
         <section id="page-invest" class="page">
             <div class="kpi">
                 <div><span>台幣活存</span><b id="kpiCash">NT$0</b></div>
@@ -577,7 +603,7 @@
             </div>
 
             <div class="panel" id="bankAccountsBox">
-                <h3>銀行帳戶資產 <span class="linkish" onclick="openSheetForType('transfer')">＋ 互轉</span></h3>
+                <h3>銀行存簿資產 <span class="linkish" onclick="openSheetForType('transfer')">＋ 互轉</span></h3>
                 <div id="accountList"></div>
             </div>
 
@@ -587,7 +613,7 @@
             </div>
         </section>
 
-        <!-- 頁面 4: 設定 (整合固定費、預算設定、發票匯入) -->
+        <!-- 頁面 4: 設定 -->
         <section id="page-assets" class="page">
             <div class="panel">
                 <h3>固定應繳費用管理 <span class="linkish" onclick="openSheetForType('bill')">繳費</span></h3>
@@ -638,7 +664,7 @@
         </section>
     </div>
 
-    <!-- 1. 全域五鍵底部導覽列 (名稱依需求改為：總覽、紀錄、＋、資產、設定) -->
+    <!-- 全域五鍵底部導覽列 -->
     <nav class="tabbar">
         <button class="tab active" onclick="switchTab('overview', this)"><i class="fa-solid fa-house"></i>總覽</button>
         <button class="tab" onclick="switchTab('records', this)"><i class="fa-solid fa-list-ul"></i>紀錄</button>
@@ -648,7 +674,7 @@
     </nav>
 </div>
 
-<!-- 統一記帳／轉帳／繳費彈窗 -->
+<!-- 記帳／轉帳／繳費彈窗 -->
 <div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
     <div class="grab"></div>
@@ -725,7 +751,6 @@
 
     const FX_RATES = { JPY: 0.2004, USD: 31.44 };
 
-    // 投資組合持股快照 (Excel 數據)
     const PORTFOLIO_DATA = [
         { type: 'tw', name: '至上', symbol: '8112', broker: '國泰證券', shares: 1000, costPrice: 53.86, currPrice: 85.3, cost: 53860, mktVal: 85300 },
         { type: 'tw', name: '國泰金', symbol: '2882', broker: '國泰證券', shares: 300, costPrice: 45.97, currPrice: 78.6, cost: 13791, mktVal: 23580 },
@@ -772,7 +797,7 @@
     let assetsFilterKind = "all";
     let donutChart;
     let isDeleteMode = false;
-    let lastHistoryMode = "recent7"; // 預設近7天
+    let lastHistoryMode = "recent7";
     let chartsReady = false;
 
     google.charts.load("current", { packages: ["corechart"] });
@@ -1041,7 +1066,6 @@
 
         if (!amt || amt <= 0) return toast("請輸入有效金額");
 
-        // 戶頭互轉邏輯
         if (currentType === "transfer") {
             const fromId = document.getElementById("transferFrom").value;
             const toId = document.getElementById("transferTo").value;
@@ -1069,11 +1093,10 @@
             return;
         }
 
-        // 繳納固定扣款邏輯
         if (currentType === "bill") {
             const billId = document.getElementById("billItemSelect").value;
             const accId = document.getElementById("billAccountSelect").value;
-            const bill = billsData.find(b => b.id == bId);
+            const bill = billsData.find(b => b.id == billId);
             const acc = accountsData.find(a => a.id == accId);
 
             await _supabase.from("accounts").update({ balance: Number(acc.balance) - amt }).eq("id", accId);
@@ -1103,7 +1126,6 @@
             return;
         }
 
-        // 一般支出/收入
         if (!currentMainCat) return toast("請選擇主分類");
         const payload = {
             date: dateVal,
@@ -1159,46 +1181,65 @@
         const leftover = budget - spent;
         dashboardData = { budget, spent, income, leftover, breakdown, recent: rows.slice(0, 5) };
 
-        // 2B. 第二層：剩餘預算與右上角初始預算小字
+        // 2B. 第二層：顯示剩餘預算，右上角顯示本月預算
         const hero = document.getElementById("heroNum");
         hero.textContent = "NT$" + money(leftover);
         hero.classList.toggle("neg", leftover < 0);
-        document.getElementById("heroInitBudget").innerText = `初始預算: NT$${money(budget)}`;
+        document.getElementById("heroInitBudget").innerText = `本月預算: NT$${money(budget)}`;
 
-        // 2C. 第三層：圓環與左半部支出結構文字
-        const pct = Math.min((spent / (budget || 1)) * 100, 100) || 0;
-        document.getElementById("budgetRing").style.setProperty("--p", pct + "%");
-        document.getElementById("budgetPct").textContent = Math.round(pct) + "%";
-        document.getElementById("budgetLeft").textContent = "剩餘 " + money(leftover);
-        document.getElementById("input_starting").value = budget || "";
-        
-        renderComboBreakdown();
+        // A3 & A4: 渲染左側緊湊文字與多色3D立體圓環
+        renderComboBreakdownAnd3DRing();
         updateProgressBar();
         renderInsight();
         calcAndRenderOverviewNetWorth();
     }
 
-    // 2C. 渲染第三層左側支出結構
-    function renderComboBreakdown() {
+    // A3 & A4: 多色立體圓餅圖與左側緊湊文字
+    function renderComboBreakdownAnd3DRing() {
         const box = document.getElementById("comboCatList");
         const entries = Object.entries(dashboardData.breakdown).sort((a,b) => b[1]-a[1]);
+        const budget = dashboardData.budget || 1;
+        const spent = dashboardData.spent || 0;
+        const leftover = dashboardData.leftover || 0;
+        const pct = Math.min((spent / budget) * 100, 100) || 0;
+
+        document.getElementById("budgetPct").textContent = Math.round(pct) + "%";
+        document.getElementById("budgetLeft").textContent = "剩餘 " + money(leftover);
+
         if (!entries.length) {
             box.innerHTML = '<span style="font-size:12px; color:var(--muted);">本月尚無生活支出</span>';
+            document.getElementById("budgetRing").style.background = "#E3E9F2";
             return;
         }
-        // 最多展示花費最高的前 4 項
+
+        // A4: 類別項目與金額空間縮短
         box.innerHTML = entries.slice(0, 4).map(([cat, amt]) => `
             <div class="combo-cat-row">
                 <div class="combo-cat-left">
                     <span class="dot" style="background:${CAT_COLOR[cat]||'#999'}"></span>
                     <span>${cat}</span>
                 </div>
-                <div>$${money(amt)}</div>
+                <div style="font-weight:700;">$${money(amt)}</div>
             </div>
         `).join("");
+
+        // A3: 各項代表顏色反映在立體圓環上
+        let gradientParts = [];
+        let accumulatedDeg = 0;
+        const totalDegree = (pct / 100) * 360;
+
+        entries.forEach(([cat, amt]) => {
+            const sliceDeg = (amt / (spent || 1)) * totalDegree;
+            const color = CAT_COLOR[cat] || '#2BB3A0';
+            gradientParts.push(`${color} ${accumulatedDeg}deg ${accumulatedDeg + sliceDeg}deg`);
+            accumulatedDeg += sliceDeg;
+        });
+        if (accumulatedDeg < 360) {
+            gradientParts.push(`#E3E9F2 ${accumulatedDeg}deg 360deg`);
+        }
+        document.getElementById("budgetRing").style.background = `conic-gradient(${gradientParts.join(', ')})`;
     }
 
-    // 2A. 計算總資產淨額
     function calcAndRenderOverviewNetWorth() {
         let twdCash = 0;
         let foreignCash = 0;
@@ -1222,9 +1263,8 @@
             if (p.type === 'tw' || p.type === 'us') stockMktVal += p.mktVal;
         });
 
-        // 現金淨額 = 台幣活存 + 外幣市值 - 信用卡卡費 - 固定應繳費用 - 即時支出
+        // 流動現金淨額計算公式
         const cashNet = (twdCash + foreignCash) - creditDebt - unpaidBillsSum - currentSpent;
-        // 總資產淨額 = 現金淨額 + 股票市值
         const totalNet = cashNet + stockMktVal;
 
         document.getElementById("overviewNetWorth").innerText = "NT$" + money(Math.round(totalNet));
@@ -1232,7 +1272,6 @@
         document.getElementById("overviewStockNet").innerText = "NT$" + money(Math.round(stockMktVal));
     }
 
-    // 4. 第三頁：整合「帳戶資產」與「投資組合」
     function renderAssetsPage() {
         renderAccountsList();
         renderInvestList();
@@ -1260,7 +1299,7 @@
         renderInvestList();
     }
 
-    // 4C. 渲染帳戶列表（不顯示帳號）
+    // 4C: 銀行存簿不顯示帳號
     function renderAccountsList() {
         const list = document.getElementById("accountList");
         list.innerHTML = "";
@@ -1440,20 +1479,16 @@
         document.querySelectorAll("#page-records .filters .pill").forEach(b => b.classList.remove("active"));
         if (btn) btn.classList.add("active");
         document.getElementById("customBox").classList.add("show");
-        // 3A. 未選擇完整日期前，明細先隱藏
+        // B4: 未按查詢前先清空，等待選擇
         document.getElementById("historyList").innerHTML = "";
         document.getElementById("histEmpty").style.display = "none";
     }
 
     function onCustomDateChange() {
-        const s = document.getElementById("hist-start").value;
-        const e = document.getElementById("hist-end").value;
-        if (s && e) {
-            loadHistory('custom', null);
-        }
+        // 等待點擊「查詢期間明細」或選定後送出
     }
 
-    // 3A. 第二頁紀錄篩選：近期明細(近7天)、近3個月、自訂時間
+    // 3A. 第二頁明細載入（支援近期明細、近3個月、自訂時間）
     async function loadHistory(mode, btn) {
         lastHistoryMode = mode;
         if (mode !== "custom") document.getElementById("customBox").classList.remove("show");
@@ -1489,9 +1524,10 @@
         } else {
             const s = document.getElementById("hist-start").value;
             const e = document.getElementById("hist-end").value;
-            // 未選妥兩個日期時不顯示
+            // B4: 未選擇完整日期前不顯示
             if (!s || !e) { 
                 loading.style.display = "none"; 
+                toast("請選擇開始與結束日期");
                 return; 
             }
             startDate = s; endDate = e;
@@ -1507,12 +1543,20 @@
         list.innerHTML = records.map(r => rowHTML(r, true)).join("");
     }
 
+    // B3: 刪除模式與取消按鈕切換
     function toggleDeleteMode() {
-        isDeleteMode = !isDeleteMode;
-        document.getElementById("historyList").classList.toggle("delete-on", isDeleteMode);
-        document.getElementById("btnDelete").style.display = isDeleteMode ? "none" : "inline-block";
-        document.getElementById("btnConfirmDel").style.display = isDeleteMode ? "inline-block" : "none";
-        if (!isDeleteMode) document.querySelectorAll(".row-checkbox").forEach(cb => cb.checked = false);
+        isDeleteMode = true;
+        document.getElementById("historyList").classList.add("delete-on");
+        document.getElementById("btnDelete").style.display = "none";
+        document.getElementById("btnConfirmDel").style.display = "inline-block";
+    }
+
+    function cancelDeleteMode() {
+        isDeleteMode = false;
+        document.getElementById("historyList").classList.remove("delete-on");
+        document.getElementById("btnDelete").style.display = "inline-block";
+        document.getElementById("btnConfirmDel").style.display = "none";
+        document.querySelectorAll(".row-checkbox").forEach(cb => cb.checked = false);
     }
 
     async function executeDelete() {
@@ -1524,7 +1568,7 @@
         if (error) toast("刪除失敗：" + error.message);
         else {
             toast("刪除完成");
-            toggleDeleteMode();
+            cancelDeleteMode();
             loadHistory(lastHistoryMode);
             loadDashboard();
         }
