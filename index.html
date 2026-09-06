@@ -153,40 +153,53 @@
         }
         .linkish { color: var(--muted); font-size: 12px; cursor: pointer; font-weight: 700; }
 
-        .budget-combo-card {
-            display: grid;
-            grid-template-columns: 1fr 125px;
-            align-items: center;
-            gap: 8px;
-            padding: 4px 0;
+        /* 1a. 兩個獨立小正方格並排 */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .square-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 14px;
+            box-shadow: var(--shadow);
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .combo-cats { display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
+        .square-card h3 {
+            margin: 0 0 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+        .combo-cats-col { display: flex; flex-direction: column; gap: 7px; overflow: hidden; }
         .combo-cat-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
         }
-        .combo-cat-left { display: flex; align-items: center; gap: 6px; }
-        .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
+        .combo-cat-left { display: flex; align-items: center; gap: 5px; }
+        .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
 
-        .ring-wrap { display: grid; place-items: center; }
+        /* 立體多色圓環 */
+        .ring-wrap { display: grid; place-items: center; margin: auto; }
         .ring {
-            width: 122px; height: 122px; border-radius: 50%;
+            width: 108px; height: 108px; border-radius: 50%;
             display: grid; place-items: center;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.14), inset 0 2px 4px rgba(255,255,255,0.4);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12), inset 0 2px 4px rgba(255,255,255,0.4);
             position: relative;
             transition: background 0.3s ease;
         }
         .ring-inner {
-            width: 82px; height: 82px; border-radius: 50%;
+            width: 76px; height: 76px; border-radius: 50%;
             background: #fff; display: grid; place-items: center; text-align: center;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.08);
         }
-        .ring-inner b { font-size: 18px; color: var(--ink); line-height: 1.1; }
+        .ring-inner b { font-size: 16px; color: var(--ink); line-height: 1.1; }
         .ring-inner span { font-size: 9px; color: var(--muted); font-weight: 600; }
 
+        /* 限制 6 條記錄高度 */
         .records-scroll-wrap {
             height: 460px;
             overflow-y: auto;
@@ -205,6 +218,7 @@
             gap: 10px;
             box-shadow: 0 4px 12px rgba(27,39,68,0.03);
             border-bottom: 1px dashed var(--line);
+            cursor: pointer;
         }
         .row:last-child { border-bottom: none; }
         .ico {
@@ -319,18 +333,14 @@
             font-weight: 500;
         }
 
-        #chart-container { position: relative; height: 260px; }
-        #chart_donut, #trend_chart_div { width: 100%; height: 250px; }
-        #center-text {
+        #chart-container, #year-chart-container { position: relative; height: 260px; }
+        #chart_donut, #chart_donut_year, #trend_chart_div { width: 100%; height: 250px; }
+        #center-text, #year-center-text {
             position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
             text-align: center; pointer-events: none; z-index: 2;
         }
-        #center-label { font-size: 12px; color: var(--muted); display: block; font-weight: 600; }
-        #center-value { font-size: 20px; font-weight: 800; }
-
-        .progress { height: 10px; background: #E8EDF4; border-radius: 999px; overflow: hidden; margin: 8px 0; }
-        #progress-bar { height: 100%; width: 0; background: var(--gold); transition: width .8s ease; }
-        #progress-text { font-size: 12px; color: var(--muted); text-align: right; margin: 0; }
+        #center-label, #year-center-label { font-size: 12px; color: var(--muted); display: block; font-weight: 600; }
+        #center-value, #year-center-value { font-size: 20px; font-weight: 800; }
 
         .kpi { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .kpi > div { background: #fff; border-radius: 16px; padding: 12px; box-shadow: var(--shadow); }
@@ -339,7 +349,7 @@
 
         .seg { display: flex; gap: 6px; margin: 10px 0 12px; flex-wrap: wrap; }
         .seg button {
-            border: 0; background: #F3F5F9; border-radius: 999px; padding: 6px 12px;
+            border: 0; background: #F3F5F9; border-radius: 999px; padding: 6px 14px;
             font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer;
         }
         .seg button.on { background: var(--navy); color: #fff; }
@@ -348,6 +358,7 @@
             background: #fff; border-radius: 16px; padding: 12px 14px;
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid var(--line);
+            cursor: pointer;
         }
         .stock-item:last-child { border-bottom: none; }
         .stock-title { font-size: 15px; font-weight: 800; color: var(--ink); display: flex; align-items: center; gap: 6px; }
@@ -358,6 +369,20 @@
         .stock-pnl { font-size: 12px; font-weight: 700; margin-top: 2px; }
         .pnl-up { color: #E5484D; }
         .pnl-down { color: #1F9D7A; }
+
+        .account-card {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 13px 0; border-bottom: 1px solid var(--line);
+            cursor: pointer;
+        }
+        .account-card:last-child { border-bottom: none; }
+        .acc-info b { font-size: 14px; color: var(--ink); display: block; }
+        .acc-amt { font-size: 15px; font-weight: 800; text-align: right; }
+        .acc-amt small { display: block; font-size: 10px; color: var(--teal); font-weight: 600; }
+
+        .bill-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+        .bill-table th { text-align: left; padding: 8px 4px; color: var(--muted); border-bottom: 1px solid var(--line); font-size: 11px; }
+        .bill-table td { padding: 10px 4px; border-bottom: 1px dashed var(--line); color: var(--ink); }
 
         .page-kicker {
             font-size: 12px; color: var(--muted); font-weight: 700;
@@ -381,36 +406,35 @@
         .set-row .fa-chevron-right { color: #C5CAD6; font-size: 12px; }
         .settings-pad { padding: 16px; }
 
-        .account-card {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid var(--line);
+        /* 3c. 外幣匯率輸入列樣式 */
+        .fx-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
         }
-        .account-card:last-child { border-bottom: none; }
-        .acc-info b { font-size: 14px; color: var(--ink); display: block; }
-        .acc-info span { font-size: 11px; color: var(--muted); }
-        .acc-amt { font-size: 15px; font-weight: 800; text-align: right; }
-        .acc-amt small { display: block; font-size: 10px; color: var(--teal); font-weight: 600; }
-
-        .goalbar { height: 5px; background: #E8EDF4; border-radius: 99px; margin-top: 5px; overflow: hidden; width: 120px; }
-        .goalbar > i { display: block; height: 100%; background: var(--gold); width: 0; }
-
-        .bill-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 0; border-bottom: 1px dashed var(--line); font-size: 13px;
+        .fx-label { font-size: 13px; font-weight: 700; width: 60px; }
+        .fx-input-wrap {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
         }
-        .bill-item:last-child { border-bottom: none; }
-        .bill-status { cursor: pointer; color: var(--muted); font-size: 20px; }
-        .bill-status.paid { color: var(--ok); }
-
-        .import-card {
-            border: 1.5px dashed #cfd6e2;
-            border-radius: 18px;
-            padding: 16px;
-            text-align: center;
-            background: #fbfcfe;
-            margin-top: 14px;
+        .fx-input-wrap input {
+            padding-right: 48px;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: right;
         }
-        .import-card p { margin: 6px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+        .fx-unit {
+            position: absolute;
+            right: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            pointer-events: none;
+        }
 
         .tabbar {
             position: fixed; 
@@ -527,7 +551,7 @@
     <div class="content-body">
         <!-- 頁面 1: 總覽 -->
         <section id="page-overview" class="page active">
-            <!-- 2A. 第一層：總資產淨額 (莫蘭迪淡黃色) -->
+            <!-- 總資產淨額 (最上層) -->
             <div class="hero wealth-hero">
                 <div class="hero-kicker">總資產淨額 (現金淨額 + 股票市值)</div>
                 <div class="hero-num" id="overviewNetWorth">NT$0</div>
@@ -543,7 +567,7 @@
                 </div>
             </div>
 
-            <!-- 2B. 第二層：本月剩餘預算 (右上角標示本月預算) -->
+            <!-- 本月剩餘預算 (第二層) -->
             <div class="hero budget-hero">
                 <div class="hero-row" style="align-items: center; margin-bottom: 6px;">
                     <div class="hero-kicker" style="margin-bottom:0;">本月剩餘預算</div>
@@ -554,11 +578,13 @@
                 </div>
             </div>
 
-            <!-- 2C & A3, A4: 第三層：左側分類使用金額緊湊排版、右側多色3D立體圓環 -->
-            <div class="panel">
-                <h3>本月支出結構與使用率</h3>
-                <div class="budget-combo-card">
-                    <div class="combo-cats" id="comboCatList"></div>
+            <!-- 1a. 第三層：分開為左文字、右圓餅圖兩個小正方格 -->
+            <div class="grid-2">
+                <div class="square-card">
+                    <h3>支出結構</h3>
+                    <div class="combo-cats-col" id="comboCatList"></div>
+                </div>
+                <div class="square-card" style="align-items:center; justify-content:center;">
                     <div class="ring-wrap">
                         <div class="ring" id="budgetRing" style="--p:0%">
                             <div class="ring-inner">
@@ -572,30 +598,26 @@
 
         <!-- 頁面 2: 明細紀錄 -->
         <section id="page-records" class="page">
-            <!-- 3A. 篩選切換標籤 -->
             <div class="filters">
                 <button class="pill active" onclick="loadHistory('recent7', this)">近期明細</button>
                 <button class="pill" onclick="loadHistory('m3', this)">近3個月</button>
                 <button class="pill" onclick="toggleCustom(this)">自訂時間</button>
             </div>
-            <!-- B4. 自訂時間：中間加 ~，手機排版不擁擠 -->
             <div id="customBox" class="custom-box">
                 <div class="custom-date-inputs">
-                    <input type="date" id="hist-start" onchange="onCustomDateChange()">
+                    <input type="date" id="hist-start">
                     <span style="font-weight:700; color:var(--muted); font-size:16px;">~</span>
-                    <input type="date" id="hist-end" onchange="onCustomDateChange()">
+                    <input type="date" id="hist-end">
                 </div>
                 <button class="btn-solid" style="padding:10px; font-size:13px;" onclick="loadHistory('custom', null)">查詢期間明細</button>
             </div>
 
-            <!-- B1 & B2: 限制 6 條高度，獨立內部捲動 -->
             <div class="records-scroll-wrap">
                 <div id="historyList" class="list"></div>
                 <div id="histLoading" class="loading" style="display:none;">載入中...</div>
                 <div id="histEmpty" class="empty" style="display:none;">這段期間查無紀錄</div>
             </div>
 
-            <!-- B3. 刪除列：包含正圓紅圈與取消按鈕 -->
             <div class="actions" id="tableActions">
                 <button class="btn-ghost" onclick="cancelDeleteMode()">取消</button>
                 <button class="btn-ghost" id="btnDelete" onclick="toggleDeleteMode()">選擇刪除</button>
@@ -603,9 +625,9 @@
             </div>
         </section>
 
-        <!-- 頁面 3: 資產 (整合「帳戶資產」與「投資組合」) -->
+        <!-- 頁面 3: 資產 (整合「帳戶」與「投資」) -->
         <section id="page-invest" class="page">
-            <p class="page-kicker">資產 · 口袋現金與投資庫存</p>
+            <p class="page-kicker">資產 · 資金儲備與市場持倉</p>
             <div class="kpi">
                 <div><span>台幣活存</span><b id="kpiCash">NT$0</b></div>
                 <div><span>外幣約當</span><b id="kpiFx">NT$0</b></div>
@@ -613,28 +635,30 @@
                 <div><span>信用卡欠款</span><b id="kpiDebts" style="color:var(--danger)">NT$0</b></div>
             </div>
 
-            <div class="seg" id="assetsSeg">
-                <button class="on" onclick="filterAssetsPage('bank', this)">帳戶</button>
-                <button onclick="filterAssetsPage('stock', this)">投資</button>
-                <button onclick="filterAssetsPage('bills', this)">應付</button>
+            <!-- 2a. 取消「全部」，預設標籤切換 -->
+            <div class="seg" id="assetsMainSeg">
+                <button class="on" onclick="switchAssetSection('bank', this)">銀行資金</button>
+                <button onclick="switchAssetSection('stock', this)">投資</button>
             </div>
 
+            <!-- 2b. 銀行資金區塊 -->
             <div class="panel" id="bankAccountsBox">
-                <h3>銀行與外幣 <span class="linkish" onclick="openSheetForType('transfer')">＋ 互轉</span></h3>
+                <h3>銀行資金 
+                    <span>
+                        <span class="linkish" onclick="openAddAccountSheet()">＋ 新增</span>
+                        ·
+                        <span class="linkish" onclick="openSheetForType('transfer')">互轉</span>
+                    </span>
+                </h3>
                 <div class="seg" id="acctSubSeg" style="margin-top:0;">
-                    <button class="on" onclick="filterAcctType('all', this)">全部</button>
-                    <button onclick="filterAcctType('bank', this)">台幣</button>
+                    <button class="on" onclick="filterAcctType('bank', this)">台幣</button>
                     <button onclick="filterAcctType('foreign', this)">外幣</button>
                     <button onclick="filterAcctType('debt', this)">信用卡</button>
                 </div>
                 <div id="accountList"></div>
-                <div id="fxLedgerBox" style="margin-top:12px;display:none;">
-                    <h3 style="margin-top:8px;">外幣流水帳 <span class="linkish" onclick="openFxSheet()">＋ 一筆</span></h3>
-                    <p style="font-size:11px;color:var(--muted);margin:0 0 8px;">登錄買進或賣出外幣，系統同步增減外幣存簿餘額並計算市值。</p>
-                    <div id="fxLedgerList"></div>
-                </div>
             </div>
 
+            <!-- 2c. 投資持倉區塊 -->
             <div class="panel" id="stockPortfolioBox" style="display:none;">
                 <h3>投資持倉組合
                     <span>
@@ -643,7 +667,7 @@
                         <span class="linkish" onclick="openHoldingSheet()">＋ 持股</span>
                     </span>
                 </h3>
-                <p id="quoteHint" style="font-size:11px;color:var(--muted);margin:-4px 0 8px;">市價來源：台股證交所/Yahoo、美股即時。點擊卡片可修改。</p>
+                <p id="quoteHint" style="font-size:11px;color:var(--muted);margin:-4px 0 8px;">市價自動連線中，點擊持股可直接編輯股數/現價。</p>
                 <div class="seg" id="holdSubSeg" style="margin-top:0;">
                     <button class="on" onclick="filterHoldType('all', this)">全部</button>
                     <button onclick="filterHoldType('tw', this)">台股</button>
@@ -652,37 +676,62 @@
                 </div>
                 <div id="investList"></div>
             </div>
-
-            <div class="panel" id="billsBox" style="display:none;">
-                <h3>本月固定費用應繳 <span class="linkish" onclick="openSheetForType('bill')">＋ 繳費</span></h3>
-                <div id="fixedExpenseList"></div>
-                <p class="hint" style="font-size:12px;color:var(--muted);margin:8px 0 8px;">勾選項目表示本月已繳完畢。點擊按鈕可匯入範本。</p>
-                <button class="btn-ghost" style="width:100%;" onclick="seedKnownBills()">匯入固定花費範本</button>
-            </div>
         </section>
 
         <!-- 頁面 4: 設定 -->
         <section id="page-assets" class="page">
-            <p class="page-kicker">設定 · 預算、匯入與系統偏好</p>
+            <p class="page-kicker">設定 · 預算、報表與偏好</p>
 
-            <div class="panel settings-group" style="margin-bottom:12px;">
-                <h3>生活預算設定</h3>
-                <div class="settings-pad">
-                    <div class="field">
-                        <label>每月固定生活預算</label>
-                        <input type="number" id="input_starting" placeholder="輸入預算金額" inputmode="numeric">
-                    </div>
-                    <button class="btn-solid" onclick="executeUpdateBudget()">儲存生活預算</button>
+            <!-- 3a. 每月生活預算設定 (縮小並排) -->
+            <div class="panel" style="margin-bottom:12px;">
+                <h3 style="margin-bottom:12px;">每月生活預算</h3>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <input type="number" id="input_starting" placeholder="生活預算" style="flex:1; padding:10px 12px; font-size:15px; font-weight:700;" inputmode="numeric">
+                    <button class="btn-solid" style="width:auto; padding:10px 18px; white-space:nowrap;" onclick="executeUpdateBudget()">儲存</button>
                 </div>
             </div>
 
+            <!-- 3c. 外幣匯率換算設定 -->
+            <div class="panel" style="margin-bottom:12px;">
+                <h3>外幣匯率設定 <span class="linkish" onclick="openAddFxSheet()">＋ 新增</span></h3>
+                <div id="fxRatesInputsBox">
+                    <!-- 動態生成匯率輸入列 -->
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+                    <button class="btn-ghost" style="padding:10px 6px; font-size:12px;" onclick="refreshFxRates()">自動抓取即時匯率</button>
+                    <button class="btn-solid" style="padding:10px 6px; font-size:12px;" onclick="saveFxRates()">儲存匯率</button>
+                </div>
+            </div>
+
+            <!-- 3d. 圖表與報表 -->
             <div class="panel settings-group" style="margin-bottom:12px;">
+                <h3>圖表與報表</h3>
+                <div class="set-row" onclick="switchTab('analysis')">
+                    <div class="set-ico" style="background:#7A6FF0;"><i class="fa-solid fa-chart-pie"></i></div>
+                    <div class="set-main">
+                        <b>消費與年度趨勢分析</b>
+                        <span>本月與本年消費比例、同期花費對比</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="set-row" onclick="openKnownBillsReport()">
+                    <div class="set-ico" style="background:#2BB3A0;"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div class="set-main">
+                        <b>每年已知固定花費 (應付)</b>
+                        <span>項目年總額、付款月份及換算平均每月預備金</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <!-- 3b. 資料與同步 (置於最底層) -->
+            <div class="panel settings-group">
                 <h3>資料與同步</h3>
                 <div class="set-row" onclick="document.getElementById('csvInput').click()">
                     <div class="set-ico" style="background:#20c997;"><i class="fa-solid fa-file-csv"></i></div>
                     <div class="set-main">
                         <b>智慧發票匯入</b>
-                        <span>支援財政部 CSV 或日期/金額/備註格式</span>
+                        <span>財政部 CSV 或日期/金額/備註格式</span>
                     </div>
                     <i class="fa-solid fa-chevron-right"></i>
                 </div>
@@ -690,39 +739,17 @@
                     <div class="set-ico" style="background:#5B8DEF;"><i class="fa-solid fa-cloud"></i></div>
                     <div class="set-main">
                         <b>雲端同步狀態</b>
-                        <span id="setCloudHint">連線狀態即時顯示於右上角雲朵</span>
+                        <span id="setCloudText" style="font-weight:700;">連線中</span>
                     </div>
                 </div>
                 <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)">
                 <div id="import-status" style="font-size:11px;color:var(--muted);padding:0 16px 12px;"></div>
             </div>
-
-            <div class="panel settings-group" style="margin-bottom:12px;">
-                <h3>外幣匯率換算設定</h3>
-                <div class="settings-pad">
-                    <div class="field"><label>USD → TWD</label><input type="number" id="fxUsd" step="0.01" inputmode="decimal"></div>
-                    <div class="field"><label>JPY → TWD</label><input type="number" id="fxJpy" step="0.0001" inputmode="decimal"></div>
-                    <button class="btn-solid" onclick="saveFxRates()">儲存匯率</button>
-                    <button class="btn-ghost" style="width:100%;margin-top:8px;" onclick="refreshFxRates()">自動抓取即時匯率</button>
-                </div>
-            </div>
-
-            <div class="panel settings-group">
-                <h3>圖表與報表</h3>
-                <div class="set-row" onclick="switchTab('analysis')">
-                    <div class="set-ico" style="background:#7A6FF0;"><i class="fa-solid fa-chart-simple"></i></div>
-                    <div class="set-main">
-                        <b>消費與年度趨勢分析</b>
-                        <span>本月圓餅佔比、年度同期花費對比</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-            </div>
         </section>
 
         <!-- 頁面 5: 分析圖表 -->
         <section id="page-analysis" class="page">
-            <p class="page-kicker"><span class="linkish" onclick="switchTab('assets')">‹ 設定</span> · 消費分析</p>
+            <p class="page-kicker"><span class="linkish" onclick="switchTab('assets')">‹ 設定</span> · 消費分析報表</p>
             <div class="insight" id="insightBox">載入洞察中...</div>
             <div class="panel">
                 <h3>本月消費比例</h3>
@@ -734,14 +761,43 @@
                     </div>
                 </div>
             </div>
+            <!-- 3d. 新增本年消費比例圓餅圖 -->
             <div class="panel">
-                <h3>年度花費對比 (長條:今年 / 折線:去年)</h3>
-                <div id="trend_chart_div"></div>
+                <h3>本年累計消費比例</h3>
+                <div id="year-chart-container">
+                    <div id="chart_donut_year"></div>
+                    <div id="year-center-text">
+                        <span id="year-center-label">本年總計</span>
+                        <span id="year-center-value">$0</span>
+                    </div>
+                </div>
             </div>
             <div class="panel">
-                <h3>預算使用進度</h3>
-                <div class="progress"><div id="progress-bar"></div></div>
-                <p id="progress-text">0%</p>
+                <h3>年度同期花費對比</h3>
+                <div id="trend_chart_div"></div>
+            </div>
+        </section>
+
+        <!-- 頁面 6: 應付 (每年已知固定花費) 專屬獨立報表 -->
+        <section id="page-known-bills" class="page">
+            <p class="page-kicker"><span class="linkish" onclick="switchTab('assets')">‹ 設定</span> · 每年已知固定花費</p>
+            <div class="kpi">
+                <div><span>年度應付總額</span><b id="kpiAnnualBills">NT$0</b></div>
+                <div><span>平均每月需提撥</span><b id="kpiMonthlyBillsAvg">NT$0</b></div>
+            </div>
+            <div class="panel">
+                <h3>固定花費清單與繳費月份</h3>
+                <table class="bill-table" id="knownBillsTable">
+                    <thead>
+                        <tr>
+                            <th>項目</th>
+                            <th>繳納月份</th>
+                            <th style="text-align:right;">年總額</th>
+                            <th style="text-align:right;">平均每月</th>
+                        </tr>
+                    </thead>
+                    <tbody id="knownBillsBody"></tbody>
+                </table>
             </div>
         </section>
     </div>
@@ -756,7 +812,7 @@
     </nav>
 </div>
 
-<!-- 記帳／轉帳／繳費彈窗 -->
+<!-- 4. 記帳／轉帳彈窗 (取消繳固定費) -->
 <div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
     <div class="grab"></div>
@@ -769,7 +825,6 @@
         <button class="on" id="typeExpense" onclick="setType('expense')">支出</button>
         <button id="typeIncome" onclick="setType('income')">收入</button>
         <button id="typeTransfer" onclick="setType('transfer')">戶頭互轉</button>
-        <button id="typeBill" onclick="setType('bill')">繳固定費</button>
     </div>
 
     <!-- 支出/收入區塊 -->
@@ -795,18 +850,6 @@
         </div>
     </div>
 
-    <!-- 繳固定費區塊 -->
-    <div id="billForm" style="display:none;">
-        <div class="field">
-            <label>應繳項目</label>
-            <select id="billItemSelect" onchange="onBillItemChange()"></select>
-        </div>
-        <div class="field">
-            <label>扣款帳戶</label>
-            <select id="billAccountSelect"></select>
-        </div>
-    </div>
-
     <div class="field">
         <label>金額</label>
         <input type="number" id="amount" placeholder="0" inputmode="decimal" oninput="syncAmountPreview()">
@@ -823,6 +866,32 @@
     <button class="btn-gold" style="width:100%; padding:14px; font-size:16px; margin-top:6px;" onclick="executeSubmit()">確認送出</button>
 </div>
 
+<!-- 新增/編輯 銀行帳戶與信用卡彈窗 -->
+<div class="sheet-bg" id="accEditBg" onclick="closeAccountSheet()"></div>
+<div class="sheet" id="accEditSheet">
+    <div class="grab"></div>
+    <div class="sheet-head">
+        <h2 id="accEditTitle">帳戶設定</h2>
+        <button class="icon-btn" onclick="closeAccountSheet()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <input type="hidden" id="accEditId" value="">
+    <div class="field"><label>帳戶類型</label>
+        <select id="accEditType">
+            <option value="bank">台幣銀行</option>
+            <option value="foreign">外幣帳戶</option>
+            <option value="debt">信用卡 (欠款以負數計)</option>
+        </select>
+    </div>
+    <div class="field"><label>幣別</label>
+        <input id="accEditCurrency" value="TWD">
+    </div>
+    <div class="field"><label>名稱</label><input id="accEditName" placeholder="例如: 華南SnY(008)"></div>
+    <div class="field"><label>當前餘額 / 欠款額度</label><input type="number" id="accEditBalance" step="any" inputmode="decimal"></div>
+    <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="saveAccountItem()">儲存帳戶</button>
+    <button class="btn-ghost" id="accDelBtn" style="width:100%;margin-top:8px;display:none;" onclick="deleteAccountItem()">刪除此帳戶</button>
+</div>
+
+<!-- 持股設定彈窗 -->
 <div class="sheet-bg" id="holdBg" onclick="closeHoldingSheet()"></div>
 <div class="sheet" id="holdSheet">
     <div class="grab"></div>
@@ -838,29 +907,27 @@
             <option value="crypto">虛擬幣</option>
         </select>
     </div>
-    <div class="field"><label>股票代號</label><input id="holdSymbol" placeholder="例如: 0056 或 QQQ"></div>
+    <div class="field"><label>代號</label><input id="holdSymbol" placeholder="例如: 0056 或 QQQ"></div>
     <div class="field"><label>標的名稱</label><input id="holdName" placeholder="例如: 元大高股息"></div>
-    <div class="field"><label>券商帳戶</label><input id="holdBroker" placeholder="例如: 國泰證券"></div>
-    <div class="field"><label>持有股數</label><input type="number" id="holdShares" inputmode="decimal"></div>
-    <div class="field"><label>平均買入成本</label><input type="number" id="holdAvg" inputmode="decimal"></div>
-    <div class="field"><label>現價</label><input type="number" id="holdPrice" inputmode="decimal"></div>
+    <div class="field"><label>存放/券商</label><input id="holdBroker" placeholder="例如: 國泰證券 / 幣託"></div>
+    <div class="field"><label id="holdSharesLabel">持有數量 (股 / 顆)</label><input type="number" id="holdShares" step="any" inputmode="decimal"></div>
+    <div class="field"><label>平均買入成本</label><input type="number" id="holdAvg" step="any" inputmode="decimal"></div>
+    <div class="field"><label>現價</label><input type="number" id="holdPrice" step="any" inputmode="decimal"></div>
     <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="saveHolding()">儲存持股資料</button>
     <button class="btn-ghost" id="holdDelBtn" style="width:100%;margin-top:8px;display:none;" onclick="deleteHolding()">刪除此持股</button>
 </div>
 
-<div class="sheet-bg" id="fxBg" onclick="closeFxSheet()"></div>
-<div class="sheet" id="fxSheet">
+<!-- 新增外幣幣別彈窗 -->
+<div class="sheet-bg" id="addFxBg" onclick="closeAddFxSheet()"></div>
+<div class="sheet" id="addFxSheet">
     <div class="grab"></div>
     <div class="sheet-head">
-        <h2>登錄外幣流水</h2>
-        <button class="icon-btn" onclick="closeFxSheet()"><i class="fa-solid fa-xmark"></i></button>
+        <h2>新增外幣匯率</h2>
+        <button class="icon-btn" onclick="closeAddFxSheet()"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <div class="field"><label>外幣帳戶</label><select id="fxAcc"></select></div>
-    <div class="field"><label>外幣金額（買入為正、賣出為負）</label><input type="number" id="fxAmt" inputmode="decimal" placeholder="例如 10000 或 -500"></div>
-    <div class="field"><label>匯率（1 外幣 = ? 台幣）</label><input type="number" id="fxRate" inputmode="decimal"></div>
-    <div class="field"><label>日期</label><input type="date" id="fxDate"></div>
-    <div class="field"><label>用途備註</label><input id="fxNote" placeholder="例如: 旅遊備用 / 美股交割"></div>
-    <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="saveFxLedger()">記入外幣帳戶</button>
+    <div class="field"><label>幣別代碼 (例如 EUR, GBP)</label><input id="newFxCode" placeholder="EUR"></div>
+    <div class="field"><label>對台幣匯率 (1 外幣 = ? TWD)</label><input type="number" id="newFxVal" step="0.0001" placeholder="34.5"></div>
+    <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="addNewFxRate()">確認新增</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -871,9 +938,17 @@
     const { createClient } = supabase;
     const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let FX_RATES = { JPY: 0.2004, USD: 31.44 };
-    let fxLedger = [];
+    let FX_RATES = { USD: 31.4400, JPY: 0.2004 };
     let quoteUpdatedAt = "";
+
+    // 預載台幣銀行與信用卡規範順序
+    const SEED_TAIWAN_BANKS = [
+        "上海銀行(011)", "第一銀行(007)", "一銀ileo(007)", "郵局(700)", 
+        "華南銀行(008)", "華南SnY(008)", "國泰世華銀行(013)", "LINE BANK(824)", "永豐銀行(807)"
+    ];
+    const SEED_CREDIT_CARDS = [
+        "國泰cube卡(2288)", "國泰Cube卡(2288)", "華南商務御璽卡(5123)", "永豐鈦豐卡(4300)", "富邦Costco卡(4368)"
+    ];
 
     const DEFAULT_PORTFOLIO = [
         { type: 'tw', name: '至上', symbol: '8112', broker: '國泰證券', shares: 1000, costPrice: 53.86, currPrice: 85.3, cost: 53860, mktVal: 85300 },
@@ -885,23 +960,26 @@
         { type: 'tw', name: '中鋼', symbol: '2002', broker: '國泰證券', shares: 500, costPrice: 24.38, currPrice: 18.15, cost: 12190, mktVal: 9075 },
         { type: 'us', name: 'Invesco QQQ', symbol: 'QQQ', broker: '永豐美股', shares: 0.3292, costPrice: 607.57, currPrice: 607.01, cost: 6289, mktVal: 6283 },
         { type: 'us', name: 'Vanguard S&P500', symbol: 'VOO', broker: '永豐美股', shares: 0.3207, costPrice: 623.74, currPrice: 630.68, cost: 6289, mktVal: 6359 },
-        { type: 'crypto', name: 'BitoPro 加密貨幣', symbol: 'BTC/USDT', broker: '幣託BitoPro', shares: 1, costPrice: 78215, currPrice: 79236, cost: 78215, mktVal: 79236 }
+        { type: 'crypto', name: 'BitoPro 加密貨幣', symbol: 'BTC/USDT', broker: '幣託BitoPro', shares: 1.0, costPrice: 78215, currPrice: 79236, cost: 78215, mktVal: 79236 }
     ];
     let PORTFOLIO_DATA = JSON.parse(JSON.stringify(DEFAULT_PORTFOLIO));
 
-    const KNOWN_BILLS_SEED = [
-        { name: "勞保", amount: 1050, pay_day: "1", bank_name: "華南銀行", total_periods: 0 },
-        { name: "健保", amount: 1302, pay_day: "1", bank_name: "華南銀行", total_periods: 0 },
-        { name: "手機費", amount: 1399, pay_day: "15", bank_name: "華南銀行", total_periods: 0 },
-        { name: "網路電視", amount: 1099, pay_day: "15", bank_name: "華南銀行", total_periods: 0 },
-        { name: "停車強迫儲蓄", amount: 4800, pay_day: "1", bank_name: "郵局", total_periods: 0 },
-        { name: "幼稚園學費", amount: 7206, pay_day: "28", bank_name: "LINE BANK", total_periods: 0 },
-        { name: "幼稚園羊奶", amount: 672, pay_day: "28", bank_name: "LINE BANK", total_periods: 0 },
-        { name: "信貸", amount: 1810, pay_day: "10", bank_name: "LINE BANK", total_periods: 0 },
-        { name: "ETF 定期定額", amount: 2000, pay_day: "16", bank_name: "永豐銀行", total_periods: 0 },
-        { name: "永豐強迫儲蓄", amount: 5000, pay_day: "1", bank_name: "永豐銀行", total_periods: 0 },
-        { name: "保險-個人", amount: 1909, pay_day: "1", bank_name: "華南銀行", total_periods: 0 },
-        { name: "保險-女兒", amount: 1596, pay_day: "1", bank_name: "華南銀行", total_periods: 0 }
+    // 每年已知固定花費完整數據清單 (Excel 換算平均每月提撥)
+    const KNOWN_ANNUAL_EXPENSES = [
+        { name: "勞保", annual: 12600, months: "每月", monthlyAvg: 1050 },
+        { name: "健保", annual: 15624, months: "每月", monthlyAvg: 1302 },
+        { name: "手機電話費", annual: 16788, months: "每月", monthlyAvg: 1399 },
+        { name: "第四台與網路", annual: 13188, months: "每季", monthlyAvg: 1099 },
+        { name: "電費", annual: 9907, months: "1,3,5,7,9,11月", monthlyAvg: 826 },
+        { name: "水費", annual: 3166, months: "1,3,5,7,9,11月", monthlyAvg: 264 },
+        { name: "活存定儲(停車費)", annual: 57600, months: "每月", monthlyAvg: 4800 },
+        { name: "地價稅", annual: 1463, months: "11月", monthlyAvg: 122 },
+        { name: "房屋稅", annual: 3611, months: "5月", monthlyAvg: 301 },
+        { name: "牌照稅與燃料稅", annual: 1400, months: "4,7月", monthlyAvg: 117 },
+        { name: "飲水機濾心保養", annual: 6500, months: "8月", monthlyAvg: 542 },
+        { name: "大樓管理費", annual: 6000, months: "每月", monthlyAvg: 500 },
+        { name: "幼稚園學雜費", annual: 86473, months: "每月", monthlyAvg: 7206 },
+        { name: "幼稚園羊奶費", annual: 8058, months: "每月", monthlyAvg: 672 }
     ];
 
     const subData = {
@@ -932,12 +1010,14 @@
     let currentSub = "";
     let currentType = "expense";
     let dashboardData = { budget: 0, spent: 0, income: 0, leftover: 0, breakdown: {}, recent: [] };
+    let yearBreakdown = {};
+    let yearTotalSpent = 0;
     let accountsData = [];
     let billsData = [];
-    let assetsFilterKind = "bank";
-    let acctTypeFilter = "all";
+    let assetSection = "bank";
+    let acctTypeFilter = "bank";
     let holdTypeFilter = "all";
-    let donutChart;
+    let donutChart, yearDonutChart;
     let isDeleteMode = false;
     let lastHistoryMode = "recent7";
     let chartsReady = false;
@@ -951,6 +1031,7 @@
         loadDashboard();
         loadPortfolioState().then(() => loadAssetsData());
         loadHistory("recent7");
+        renderFxInputs();
     };
 
     function todayStr() {
@@ -966,6 +1047,8 @@
         const z = n => String(n).padStart(2, "0");
         return `${d.getFullYear()}-${z(d.getMonth()+1)}-${new Date(d.getFullYear(), d.getMonth()+1, 0).getDate()}`; 
     }
+    function yearStart(d = new Date()) { return `${d.getFullYear()}-01-01`; }
+    function yearEnd(d = new Date()) { return `${d.getFullYear()}-12-31`; }
     function isIncome(r) { return r.category === "收"; }
     function isLivingSpend(r) { return r.category !== "收" && r.category !== "金" && r.category !== "轉"; }
     function money(n) { return Number(n || 0).toLocaleString(); }
@@ -980,6 +1063,11 @@
         const el = document.getElementById("cloudStatus");
         el.classList.toggle("ok", !!ok);
         el.innerHTML = ok ? '<i class="fa-solid fa-cloud"></i>' : '<i class="fa-solid fa-cloud-arrow-down"></i>';
+        const txt = document.getElementById("setCloudText");
+        if (txt) {
+            txt.innerText = ok ? "連線中" : "未連線";
+            txt.style.color = ok ? "var(--ok)" : "var(--danger)";
+        }
     }
 
     function switchTab(name, el) {
@@ -996,6 +1084,7 @@
         if (isDeleteMode) cancelDeleteMode();
         if (name === "analysis") {
             drawDonutChart();
+            drawYearDonutChart();
             drawTrendChart();
             renderInsight();
         }
@@ -1052,20 +1141,15 @@
         document.getElementById("typeExpense").classList.toggle("on", type === "expense");
         document.getElementById("typeIncome").classList.toggle("on", type === "income");
         document.getElementById("typeTransfer").classList.toggle("on", type === "transfer");
-        document.getElementById("typeBill").classList.toggle("on", type === "bill");
 
         const normal = document.getElementById("normalForm");
         const transfer = document.getElementById("transferForm");
-        const bill = document.getElementById("billForm");
 
         normal.style.display = (type === "expense" || type === "income") ? "block" : "none";
         transfer.style.display = (type === "transfer") ? "block" : "none";
-        bill.style.display = (type === "bill") ? "block" : "none";
 
         if (type === "transfer") {
             populateTransferSelects();
-        } else if (type === "bill") {
-            populateBillSelects();
         } else {
             if (type === "income") selectMainCat("收");
             else if (currentMainCat === "收") {
@@ -1175,31 +1259,6 @@
         if (toSel.options.length > 1) toSel.selectedIndex = 1;
     }
 
-    function populateBillSelects() {
-        const bSel = document.getElementById("billItemSelect");
-        const aSel = document.getElementById("billAccountSelect");
-        bSel.innerHTML = "";
-        aSel.innerHTML = "";
-        
-        billsData.forEach(b => {
-            bSel.innerHTML += `<option value="${b.id}">${b.name} ($${money(b.amount)})</option>`;
-        });
-        accountsData.filter(a => a.type === 'bank').forEach(acc => {
-            aSel.innerHTML += `<option value="${acc.id}">${acc.name} ($${money(acc.balance)})</option>`;
-        });
-        onBillItemChange();
-    }
-
-    function onBillItemChange() {
-        const bId = document.getElementById("billItemSelect").value;
-        const bill = billsData.find(b => b.id == bId);
-        if (bill) {
-            document.getElementById("amount").value = bill.amount;
-            document.getElementById("note").value = `繳納: ${bill.name}`;
-            syncAmountPreview();
-        }
-    }
-
     async function executeSubmit() {
         const amt = parseFloat(document.getElementById("amount").value);
         const editId = document.getElementById("editingId").value;
@@ -1228,39 +1287,6 @@
             }]);
 
             toast("互轉完成，帳戶餘額已更新");
-            closeSheet();
-            loadAssetsData();
-            loadDashboard();
-            loadHistory(lastHistoryMode);
-            return;
-        }
-
-        if (currentType === "bill") {
-            const billId = document.getElementById("billItemSelect").value;
-            const accId = document.getElementById("billAccountSelect").value;
-            const bill = billsData.find(b => b.id == billId);
-            const acc = accountsData.find(a => a.id == accId);
-
-            await _supabase.from("accounts").update({ balance: Number(acc.balance) - amt }).eq("id", accId);
-
-            const updates = { is_paid: true };
-            if (bill.total_periods > 0) updates.paid_periods = Number(bill.paid_periods) + 1;
-            await _supabase.from("fixed_expenses").update(updates).eq("id", billId);
-
-            let targetCat = "雜";
-            let targetSub = "其他";
-            if (bill.name.includes("幼兒園") || bill.name.includes("學費")) { targetCat = "育"; targetSub = "學費"; }
-            else if (bill.name.includes("電信") || bill.name.includes("電話")) { targetCat = "住"; targetSub = "手機費"; }
-            else if (bill.name.includes("電視") || bill.name.includes("網路")) { targetCat = "樂"; targetSub = "電視費"; }
-            else if (bill.name.includes("保險")) { targetCat = "雜"; targetSub = "保險費"; }
-            else if (bill.name.includes("停車")) { targetCat = "行"; targetSub = "停車費"; }
-
-            await _supabase.from("expenses").insert([{
-                date: dateVal, category: targetCat, subcategory: targetSub,
-                amount: amt, note: `[固定扣款] ${bill.name} (${acc.name})${noteVal ? ' · ' + noteVal : ''}`
-            }]);
-
-            toast("已成功繳納並扣款");
             closeSheet();
             loadAssetsData();
             loadDashboard();
@@ -1303,11 +1329,20 @@
     async function loadDashboard() {
         const { data: configData, error: cErr } = await _supabase.from("config").select("value").eq("key", "monthly_budget").single();
         const budget = configData ? parseFloat(configData.value) : 0;
+        
+        // 當月消費
         const { data: expenses, error } = await _supabase.from("expenses")
             .select("*")
             .gte("date", monthStart())
             .lte("date", monthEnd())
             .order("date", { ascending: false });
+        
+        // 本年消費
+        const { data: yearExpenses } = await _supabase.from("expenses")
+            .select("*")
+            .gte("date", yearStart())
+            .lte("date", yearEnd());
+
         setCloud(!error && !cErr);
 
         const rows = expenses || [];
@@ -1323,13 +1358,24 @@
         const leftover = budget - spent;
         dashboardData = { budget, spent, income, leftover, breakdown, recent: rows.slice(0, 5) };
 
+        // 整理本年統計
+        yearBreakdown = {};
+        yearTotalSpent = 0;
+        (yearExpenses || []).forEach(e => {
+            const amt = parseFloat(e.amount) || 0;
+            if (isLivingSpend(e)) {
+                yearTotalSpent += amt;
+                yearBreakdown[e.category] = (yearBreakdown[e.category] || 0) + amt;
+            }
+        });
+
+        // 總覽剩餘金額與預算標示
         const hero = document.getElementById("heroNum");
         hero.textContent = "NT$" + money(leftover);
         hero.classList.toggle("neg", leftover < 0);
         document.getElementById("heroInitBudget").innerText = `本月預算: NT$${money(budget)}`;
 
         renderComboBreakdownAnd3DRing();
-        updateProgressBar();
         renderInsight();
         calcAndRenderOverviewNetWorth();
     }
@@ -1346,7 +1392,7 @@
         document.getElementById("budgetLeft").textContent = "剩餘 " + money(leftover);
 
         if (!entries.length) {
-            box.innerHTML = '<span style="font-size:12px; color:var(--muted);">本月尚無生活支出</span>';
+            box.innerHTML = '<span style="font-size:11px; color:var(--muted);">尚無生活支出</span>';
             document.getElementById("budgetRing").style.background = "#E3E9F2";
             return;
         }
@@ -1392,7 +1438,8 @@
             }
         });
 
-        let unpaidBillsSum = billsData.reduce((s, b) => s + (b.is_paid ? 0 : Number(b.amount || 0)), 0);
+        // 固定費用預估總額
+        let unpaidBillsSum = KNOWN_ANNUAL_EXPENSES.reduce((s, b) => s + b.monthlyAvg, 0);
         let currentSpent = dashboardData.spent || 0;
 
         let stockMktVal = 0;
@@ -1400,6 +1447,7 @@
             if (p.type === 'tw' || p.type === 'us') stockMktVal += p.mktVal;
         });
 
+        // 流動現金淨額計算
         const cashNet = (twdCash + foreignCash) - creditDebt - unpaidBillsSum - currentSpent;
         const totalNet = cashNet + stockMktVal;
 
@@ -1408,30 +1456,14 @@
         document.getElementById("overviewStockNet").innerText = "NT$" + money(Math.round(stockMktVal));
     }
 
-    function renderAssetsPage() {
-        renderAccountsList();
-        renderInvestList();
-    }
-
-    function filterAssetsPage(kind, btn) {
-        assetsFilterKind = kind || "bank";
-        document.querySelectorAll("#assetsSeg button").forEach(b => b.classList.remove("on"));
+    // 2. 資產頁簽切換 (銀行資金 vs 投資)
+    function switchAssetSection(sec, btn) {
+        assetSection = sec;
+        document.querySelectorAll("#assetsMainSeg button").forEach(b => b.classList.remove("on"));
         if (btn) btn.classList.add("on");
-        else {
-            const labels = { bank: 0, stock: 1, bills: 2 };
-            const btns = document.querySelectorAll("#assetsSeg button");
-            if (btns[labels[assetsFilterKind]]) btns[labels[assetsFilterKind]].classList.add("on");
-        }
 
-        const bankBox = document.getElementById("bankAccountsBox");
-        const stockBox = document.getElementById("stockPortfolioBox");
-        const billsBox = document.getElementById("billsBox");
-        bankBox.style.display = assetsFilterKind === "bank" ? "block" : "none";
-        stockBox.style.display = assetsFilterKind === "stock" ? "block" : "none";
-        billsBox.style.display = assetsFilterKind === "bills" ? "block" : "none";
-        renderAccountsList();
-        renderInvestList();
-        renderBillsList();
+        document.getElementById("bankAccountsBox").style.display = sec === "bank" ? "block" : "none";
+        document.getElementById("stockPortfolioBox").style.display = sec === "stock" ? "block" : "none";
     }
 
     function filterAcctType(kind, btn) {
@@ -1439,7 +1471,6 @@
         document.querySelectorAll("#acctSubSeg button").forEach(b => b.classList.remove("on"));
         if (btn) btn.classList.add("on");
         renderAccountsList();
-        renderFxLedger();
     }
 
     function filterHoldType(kind, btn) {
@@ -1449,12 +1480,12 @@
         renderInvestList();
     }
 
+    // 2b. 渲染銀行帳戶 (移除備註與帳號)
     function renderAccountsList() {
         const list = document.getElementById("accountList");
         list.innerHTML = "";
 
-        let filtered = accountsData;
-        if (acctTypeFilter !== 'all') filtered = accountsData.filter(a => a.type === acctTypeFilter);
+        let filtered = accountsData.filter(a => a.type === acctTypeFilter);
 
         if (!filtered.length) {
             list.innerHTML = '<div class="empty">無此類別帳戶資料</div>';
@@ -1463,9 +1494,6 @@
 
         filtered.forEach(acc => {
             const bal = parseFloat(acc.balance) || 0;
-            const goal = parseFloat(acc.target_amount) || 0;
-            const pct = goal > 0 ? Math.min(100, Math.round(bal / goal * 100)) : 0;
-            
             let fxConverted = "";
             if (acc.type === 'foreign') {
                 const rate = FX_RATES[acc.currency] || 1;
@@ -1473,11 +1501,9 @@
             }
 
             list.innerHTML += `
-                <div class="account-card">
+                <div class="account-card" onclick="openEditAccountSheet(${acc.id})">
                     <div class="acc-info">
                         <b>${acc.name}</b>
-                        <span>${goal > 0 ? '目標: $' + money(goal) : (acc.type==='debt'?'應繳負債':'活存儲蓄')}</span>
-                        ${goal > 0 ? `<div class="goalbar"><i style="width:${pct}%;"></i></div>` : ''}
                     </div>
                     <div class="acc-amt" style="color:${acc.type === 'debt' ? 'var(--danger)' : 'var(--ink)'};">
                         ${acc.currency} ${money(bal)}
@@ -1488,6 +1514,7 @@
         });
     }
 
+    // 2c. 渲染投資持股清單 (包含虛擬幣)
     function renderInvestList() {
         const list = document.getElementById("investList");
         list.innerHTML = "";
@@ -1500,6 +1527,12 @@
             const pnlPct = (pnl / (p.cost || 1)) * 100;
             const isUp = pnl >= 0;
 
+            // 虛擬幣採用合理的顯示方式
+            let detailSub = `${p.broker} · 持有 ${p.shares} 股 · 均價 $${p.costPrice}`;
+            if (p.type === 'crypto') {
+                detailSub = `${p.broker} · 持有 ${p.shares} 顆 · 均價 $${money(p.costPrice)}`;
+            }
+
             list.innerHTML += `
                 <div class="stock-item" onclick="openHoldingSheet(${PORTFOLIO_DATA.indexOf(p)})">
                     <div>
@@ -1508,7 +1541,7 @@
                             <span class="stock-badge">${p.symbol}</span>
                         </div>
                         <div class="stock-sub">
-                            ${p.broker} · 持有 ${p.shares} 股 · 均價 $${p.costPrice}
+                            ${detailSub}
                         </div>
                     </div>
                     <div class="stock-val">
@@ -1525,8 +1558,9 @@
     }
 
     function recalcHolding(p) {
-        p.cost = Number(p.shares || 0) * Number(p.costPrice || 0) * (p.type === "us" ? (FX_RATES.USD || 31.44) : 1);
-        p.mktVal = Number(p.shares || 0) * Number(p.currPrice || 0) * (p.type === "us" ? (FX_RATES.USD || 31.44) : 1);
+        const rate = (p.type === "us") ? (FX_RATES.USD || 31.44) : 1;
+        p.cost = Number(p.shares || 0) * Number(p.costPrice || 0) * rate;
+        p.mktVal = Number(p.shares || 0) * Number(p.currPrice || 0) * rate;
         if (p.type === "crypto") {
             p.cost = Number(p.costPrice || 0);
             p.mktVal = Number(p.currPrice || 0);
@@ -1546,113 +1580,148 @@
                 if (parsed && Array.isArray(parsed.holdings)) applyPortfolioState(parsed);
             } catch (e) {}
         }
-        fillFxInputs();
     }
 
     function applyPortfolioState(st) {
         if (st.holdings && st.holdings.length) PORTFOLIO_DATA = st.holdings;
         if (st.fxRates) FX_RATES = st.fxRates;
-        if (Array.isArray(st.fxLedger)) fxLedger = st.fxLedger;
         if (st.quoteUpdatedAt) quoteUpdatedAt = st.quoteUpdatedAt;
     }
 
     async function savePortfolioState() {
-        const payload = { holdings: PORTFOLIO_DATA, fxRates: FX_RATES, fxLedger, quoteUpdatedAt };
+        const payload = { holdings: PORTFOLIO_DATA, fxRates: FX_RATES, quoteUpdatedAt };
         localStorage.setItem("portfolio_state", JSON.stringify(payload));
-        const { error } = await _supabase.from("config").upsert({ key: "portfolio_state", value: JSON.stringify(payload) });
-        if (error) console.warn(error);
-        fillFxInputs();
+        await _supabase.from("config").upsert({ key: "portfolio_state", value: JSON.stringify(payload) });
+        renderFxInputs();
         calcAndRenderOverviewNetWorth();
         renderInvestList();
-        renderFxLedger();
-        if (typeof renderAccountsList === "function") renderAccountsList();
+        renderAccountsList();
     }
 
-    function fillFxInputs() {
-        const usd = document.getElementById("fxUsd");
-        const jpy = document.getElementById("fxJpy");
-        if (usd) usd.value = FX_RATES.USD;
-        if (jpy) jpy.value = FX_RATES.JPY;
+    // 3c. 渲染外幣匯率輸入列
+    function renderFxInputs() {
+        const box = document.getElementById("fxRatesInputsBox");
+        if (!box) return;
+        box.innerHTML = "";
+        Object.entries(FX_RATES).forEach(([code, rate]) => {
+            box.innerHTML += `
+                <div class="fx-row">
+                    <span class="fx-label">${code}</span>
+                    <div class="fx-input-wrap">
+                        <input type="number" id="fxRate_${code}" value="${Number(rate).toFixed(4)}" step="0.0001" inputmode="decimal">
+                        <span class="fx-unit">TWD</span>
+                    </div>
+                </div>
+            `;
+        });
     }
 
     async function saveFxRates() {
-        FX_RATES.USD = parseFloat(document.getElementById("fxUsd").value) || FX_RATES.USD;
-        FX_RATES.JPY = parseFloat(document.getElementById("fxJpy").value) || FX_RATES.JPY;
+        Object.keys(FX_RATES).forEach(code => {
+            const el = document.getElementById(`fxRate_${code}`);
+            if (el) FX_RATES[code] = parseFloat(el.value) || FX_RATES[code];
+        });
         PORTFOLIO_DATA.forEach(recalcHolding);
         await savePortfolioState();
         loadAssetsData();
-        toast("匯率已儲存，外幣約當與美股市值已重算");
+        toast("匯率已儲存，外幣與美股市值已重算");
     }
 
-    async function fetchJsonSilent(url) {
-        const r = await fetch(url);
-        if (!r.ok) throw new Error(String(r.status));
-        return r.json();
+    // 免 Token 即時抓取國際外匯公開 API
+    async function refreshFxRates() {
+        toast("抓取即時匯率中…");
+        try {
+            const res = await fetch("https://open.er-api.com/v6/latest/USD");
+            if (!res.ok) throw new Error("Network error");
+            const data = await res.json();
+            if (data && data.rates && data.rates.TWD) {
+                const usdTwd = data.rates.TWD;
+                FX_RATES.USD = Number(usdTwd);
+                if (data.rates.JPY) {
+                    FX_RATES.JPY = Number(usdTwd / data.rates.JPY);
+                }
+                PORTFOLIO_DATA.forEach(recalcHolding);
+                await savePortfolioState();
+                loadAssetsData();
+                toast("即時匯率更新成功！");
+                return;
+            }
+        } catch (e) {
+            console.warn(e);
+        }
+        toast("即時匯率抓取失敗，請手動輸入");
     }
 
-    async function quoteYahoo(symbol) {
-        const target = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=1d&interval=1d`;
-        const urls = [target, "https://api.allorigins.win/raw?url=" + encodeURIComponent(target)];
-        for (const u of urls) {
+    function openAddFxSheet() {
+        document.getElementById("newFxCode").value = "";
+        document.getElementById("newFxVal").value = "";
+        document.getElementById("addFxBg").classList.add("show");
+        document.getElementById("addFxSheet").classList.add("show");
+    }
+    function closeAddFxSheet() {
+        document.getElementById("addFxBg").classList.remove("show");
+        document.getElementById("addFxSheet").classList.remove("show");
+    }
+    async function addNewFxRate() {
+        const code = document.getElementById("newFxCode").value.trim().toUpperCase();
+        const val = parseFloat(document.getElementById("newFxVal").value);
+        if (!code || isNaN(val)) return toast("請輸入完整幣別與匯率");
+        FX_RATES[code] = val;
+        closeAddFxSheet();
+        saveFxRates();
+    }
+
+    // 解決 CORS 跨域限制的即時股市抓取
+    async function fetchWithCorsProxy(url) {
+        const proxies = [
+            url,
+            `https://corsproxy.io/?${encodeURIComponent(url)}`,
+            `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+        ];
+        for (const u of proxies) {
             try {
-                const j = await fetchJsonSilent(u);
-                const meta = j && j.chart && j.chart.result && j.chart.result[0] && j.chart.result[0].meta;
-                const p = meta && (meta.regularMarketPrice || meta.previousClose);
-                if (p) return Number(p);
+                const res = await fetch(u);
+                if (res.ok) return await res.json();
             } catch (e) {}
         }
         return null;
     }
 
-    async function quoteTw(symbol) {
-        for (const prefix of ["tse_", "otc_"]) {
-            try {
-                const j = await fetchJsonSilent(`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${prefix}${symbol}.tw&json=1`);
-                const row = (j.msgArray || [])[0];
-                const z = parseFloat(row && (row.z !== "-" ? row.z : row.y));
-                if (z > 0) return z;
-            } catch (e) {}
-        }
-        return quoteYahoo(symbol + ".TW");
+    async function quoteYahoo(symbol) {
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=1d&interval=1d`;
+        const j = await fetchWithCorsProxy(url);
+        const meta = j && j.chart && j.chart.result && j.chart.result[0] && j.chart.result[0].meta;
+        const p = meta && (meta.regularMarketPrice || meta.previousClose);
+        return p ? Number(p) : null;
     }
 
     async function refreshQuotes() {
-        toast("更新市價中…");
-        let ok = 0, fail = 0;
+        toast("連線即時行情中…");
+        let ok = 0;
         for (const p of PORTFOLIO_DATA) {
             try {
                 let price = null;
-                if (p.type === "tw") price = await quoteTw(p.symbol);
-                else if (p.type === "us") price = await quoteYahoo(p.symbol);
-                if (price) {
+                if (p.type === "tw") {
+                    price = await quoteYahoo(p.symbol + ".TW") || await quoteYahoo(p.symbol + ".TWO");
+                } else if (p.type === "us") {
+                    price = await quoteYahoo(p.symbol);
+                }
+                if (price && !isNaN(price)) {
                     p.currPrice = price;
                     recalcHolding(p);
                     ok++;
-                } else fail++;
-            } catch (e) { fail++; }
+                }
+            } catch (e) {}
         }
-        quoteUpdatedAt = new Date().toLocaleString("zh-TW");
+        quoteUpdatedAt = new Date().toLocaleTimeString("zh-TW", { hour: '2-digit', minute: '2-digit' });
         await savePortfolioState();
         loadAssetsData();
-        toast(ok ? `已更新 ${ok} 檔市價${fail ? "，" + fail + " 檔失敗" : ""}` : "市價更新失敗，可手動改現價");
-    }
-
-    async function refreshFxRates() {
-        toast("抓取匯率中…");
-        const usd = await quoteYahoo("TWD=X") || await quoteYahoo("USDTWD=X");
-        const usdjpy = await quoteYahoo("JPY=X");
-        if (usd) FX_RATES.USD = Number(usd);
-        if (usd && usdjpy) FX_RATES.JPY = Number(usd) / Number(usdjpy);
-        fillFxInputs();
-        PORTFOLIO_DATA.forEach(recalcHolding);
-        await savePortfolioState();
-        loadAssetsData();
-        toast(usd ? `匯率已更新 USD ${FX_RATES.USD.toFixed(2)}` : "匯率抓取失敗，請手動輸入");
+        toast(ok ? `已更新 ${ok} 檔最新市價` : "行情連線忙碌中，可直接手動點擊修改現價");
     }
 
     function openHoldingSheet(idx) {
         const p = idx >= 0 ? PORTFOLIO_DATA[idx] : null;
-        document.getElementById("holdTitle").textContent = p ? "調整持股" : "新增持股";
+        document.getElementById("holdTitle").textContent = p ? "持股設定" : "新增持股";
         document.getElementById("holdIndex").value = idx >= 0 ? idx : -1;
         document.getElementById("holdType").value = p ? p.type : "tw";
         document.getElementById("holdSymbol").value = p ? p.symbol : "";
@@ -1700,81 +1769,91 @@
         closeHoldingSheet();
     }
 
-    function renderFxLedger() {
-        const box = document.getElementById("fxLedgerBox");
-        const list = document.getElementById("fxLedgerList");
-        if (!box || !list) return;
-        box.style.display = (acctTypeFilter === "foreign" || acctTypeFilter === "all") ? "block" : "none";
-        if (!fxLedger.length) {
-            list.innerHTML = '<div class="empty">尚無外幣流水。可從 Excel 外幣分頁一筆筆補上。</div>';
-            return;
+    // 銀行與信用卡維護
+    function openAddAccountSheet() {
+        document.getElementById("accEditTitle").innerText = "新增帳戶/卡片";
+        document.getElementById("accEditId").value = "";
+        document.getElementById("accEditName").value = "";
+        document.getElementById("accEditBalance").value = "";
+        document.getElementById("accEditCurrency").value = "TWD";
+        document.getElementById("accDelBtn").style.display = "none";
+        document.getElementById("accEditBg").classList.add("show");
+        document.getElementById("accEditSheet").classList.add("show");
+    }
+
+    function openEditAccountSheet(id) {
+        const acc = accountsData.find(a => a.id === id);
+        if (!acc) return;
+        document.getElementById("accEditTitle").innerText = "編輯帳戶";
+        document.getElementById("accEditId").value = acc.id;
+        document.getElementById("accEditType").value = acc.type;
+        document.getElementById("accEditName").value = acc.name;
+        document.getElementById("accEditBalance").value = acc.balance;
+        document.getElementById("accEditCurrency").value = acc.currency || "TWD";
+        document.getElementById("accDelBtn").style.display = "block";
+        document.getElementById("accEditBg").classList.add("show");
+        document.getElementById("accEditSheet").classList.add("show");
+    }
+    function closeAccountSheet() {
+        document.getElementById("accEditBg").classList.remove("show");
+        document.getElementById("accEditSheet").classList.remove("show");
+    }
+    async function saveAccountItem() {
+        const id = document.getElementById("accEditId").value;
+        const type = document.getElementById("accEditType").value;
+        const name = document.getElementById("accEditName").value.trim();
+        const currency = document.getElementById("accEditCurrency").value.trim().toUpperCase() || "TWD";
+        const balance = parseFloat(document.getElementById("accEditBalance").value || "0");
+        if (!name) return toast("請輸入帳戶名稱");
+
+        const payload = { type, name, currency, balance };
+        let res;
+        if (id) res = await _supabase.from("accounts").update(payload).eq("id", id);
+        else res = await _supabase.from("accounts").insert([payload]);
+
+        if (res.error) toast("儲存失敗: " + res.error.message);
+        else {
+            toast("帳戶已儲存");
+            closeAccountSheet();
+            loadAssetsData();
         }
-        list.innerHTML = fxLedger.slice().reverse().slice(0, 20).map(r => {
-            const acc = accountsData.find(a => String(a.id) === String(r.accId));
-            return `<div class="bill-item">
-                <div><b>${r.note || (r.amt > 0 ? "買入" : "賣出")}</b>
-                <div style="font-size:11px;color:var(--muted);">${r.date} · ${acc ? acc.name : ""} · 匯率 ${r.rate}</div></div>
-                <span style="font-weight:700;">${r.amt > 0 ? "+" : ""}${r.amt}</span>
-            </div>`;
-        }).join("");
+    }
+    async function deleteAccountItem() {
+        const id = document.getElementById("accEditId").value;
+        if (!id || !confirm("確定要刪除此帳戶？")) return;
+        const res = await _supabase.from("accounts").delete().eq("id", id);
+        if (res.error) toast("刪除失敗");
+        else {
+            toast("帳戶已刪除");
+            closeAccountSheet();
+            loadAssetsData();
+        }
     }
 
-    function openFxSheet() {
-        const fxAccs = accountsData.filter(a => a.type === "foreign");
-        document.getElementById("fxAcc").innerHTML = fxAccs.map(a =>
-            `<option value="${a.id}">${a.name}（${a.currency} ${a.balance}）</option>`
-        ).join("");
-        document.getElementById("fxDate").value = todayStr();
-        document.getElementById("fxAmt").value = "";
-        document.getElementById("fxRate").value = "";
-        document.getElementById("fxNote").value = "";
-        document.getElementById("fxBg").classList.add("show");
-        document.getElementById("fxSheet").classList.add("show");
-    }
-    function closeFxSheet() {
-        document.getElementById("fxBg").classList.remove("show");
-        document.getElementById("fxSheet").classList.remove("show");
-    }
-    async function saveFxLedger() {
-        const accId = document.getElementById("fxAcc").value;
-        const amt = parseFloat(document.getElementById("fxAmt").value || "0");
-        const rate = parseFloat(document.getElementById("fxRate").value || "0");
-        if (!accId || !amt) return toast("請填帳戶與金額");
-        const acc = accountsData.find(a => String(a.id) === String(accId));
-        if (!acc) return toast("找不到外幣帳戶");
-        const next = Number(acc.balance || 0) + amt;
-        await _supabase.from("accounts").update({ balance: next }).eq("id", accId);
-        fxLedger.push({
-            date: document.getElementById("fxDate").value || todayStr(),
-            accId, amt, rate,
-            note: document.getElementById("fxNote").value || ""
-        });
-        await savePortfolioState();
-        closeFxSheet();
-        toast("已記入外幣流水");
-        loadAssetsData();
-    }
-
-    async function seedKnownBills() {
-        if (billsData.length && !confirm("將把 Excel 常見固定花費加到應付清單（已有的同名項目不重複）。繼續？")) return;
-        const exist = new Set(billsData.map(b => b.name));
-        const rows = KNOWN_BILLS_SEED.filter(b => !exist.has(b.name)).map(b => ({
-            ...b, is_paid: false, paid_periods: 0
-        }));
-        if (!rows.length) return toast("固定花費已存在，未新增");
-        const { error } = await _supabase.from("fixed_expenses").insert(rows);
-        if (error) toast("匯入失敗：" + error.message);
-        else toast("已加入 " + rows.length + " 筆固定花費");
-        loadAssetsData();
-    }
-
+    // 載入資產資料庫與同步初始化台幣銀行/信用卡規範清單
     async function loadAssetsData() {
         const { data: accs } = await _supabase.from("accounts").select("*").order("id");
-        const { data: bills } = await _supabase.from("fixed_expenses").select("*").order("id");
-        
         accountsData = accs || [];
-        billsData = bills || [];
-        
+
+        // 自動同步缺少的台幣銀行與信用卡
+        let needRefresh = false;
+        for (const name of SEED_TAIWAN_BANKS) {
+            if (!accountsData.some(a => a.name === name)) {
+                await _supabase.from("accounts").insert([{ name, type: "bank", currency: "TWD", balance: 0 }]);
+                needRefresh = true;
+            }
+        }
+        for (const name of SEED_CREDIT_CARDS) {
+            if (!accountsData.some(a => a.name === name)) {
+                await _supabase.from("accounts").insert([{ name, type: "debt", currency: "TWD", balance: 0 }]);
+                needRefresh = true;
+            }
+        }
+        if (needRefresh) {
+            const { data: refreshed } = await _supabase.from("accounts").select("*").order("id");
+            accountsData = refreshed || [];
+        }
+
         let totalTwdBanks = 0;
         let totalForeignTwd = 0;
         let totalDebts = 0;
@@ -1797,42 +1876,35 @@
         document.getElementById("kpiStockTotal").innerText = "NT$" + money(Math.round(totalStockMkt));
         document.getElementById("kpiDebts").innerText = "NT$" + money(Math.round(Math.abs(totalDebts)));
 
-        renderAssetsPage();
-        renderBillsList();
-        renderFxLedger();
-        filterAssetsPage(assetsFilterKind);
+        renderAccountsList();
+        renderInvestList();
         calcAndRenderOverviewNetWorth();
     }
 
-    function renderBillsList() {
-        const list = document.getElementById("fixedExpenseList");
-        list.innerHTML = "";
-        if (!billsData.length) {
-            list.innerHTML = '<div class="empty">尚無固定扣款設定</div>';
-            return;
-        }
+    // 3d. 應付報表頁面渲染
+    function openKnownBillsReport() {
+        document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+        document.getElementById("page-known-bills").classList.add("active");
 
-        billsData.forEach(b => {
-            const periodInfo = b.total_periods > 0 ? ` (${b.paid_periods}/${b.total_periods}期)` : '';
-            list.innerHTML += `
-                <div class="bill-item">
-                    <div>
-                        <b>${b.name}</b>${periodInfo}
-                        <div style="font-size:11px; color:var(--muted);">${b.bank_name} · 扣款日: ${b.pay_day}</div>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <span style="font-weight:700; font-size:14px;">$${money(b.amount)}</span>
-                        <i class="fa-solid fa-circle-check bill-status ${b.is_paid ? 'paid' : ''}" 
-                           onclick="toggleBillPaid(${b.id}, ${!b.is_paid})" title="切換繳納狀態"></i>
-                    </div>
-                </div>
+        let annualTotal = 0;
+        let monthlyTotal = 0;
+        const tbody = document.getElementById("knownBillsBody");
+        tbody.innerHTML = "";
+
+        KNOWN_ANNUAL_EXPENSES.forEach(b => {
+            annualTotal += b.annual;
+            monthlyTotal += b.monthlyAvg;
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${b.name}</b></td>
+                    <td><span class="stock-badge">${b.months}</span></td>
+                    <td style="text-align:right; font-weight:700;">$${money(b.annual)}</td>
+                    <td style="text-align:right; color:var(--teal); font-weight:800;">$${money(Math.round(b.monthlyAvg))}</td>
+                </tr>
             `;
         });
-    }
-
-    async function toggleBillPaid(id, paid) {
-        await _supabase.from("fixed_expenses").update({ is_paid: paid }).eq("id", id);
-        loadAssetsData();
+        document.getElementById("kpiAnnualBills").innerText = "NT$" + money(Math.round(annualTotal));
+        document.getElementById("kpiMonthlyBillsAvg").innerText = "NT$" + money(Math.round(monthlyTotal));
     }
 
     function amountColorClass(r) {
@@ -1879,14 +1951,6 @@
         document.getElementById("histEmpty").style.display = "none";
     }
 
-    function onCustomDateChange() {
-        const s = document.getElementById("hist-start").value;
-        const e = document.getElementById("hist-end").value;
-        if (s && e) {
-            loadHistory('custom', null);
-        }
-    }
-
     async function loadHistory(mode, btn) {
         lastHistoryMode = mode;
         if (mode !== "custom") document.getElementById("customBox").classList.remove("show");
@@ -1922,6 +1986,7 @@
             const e = document.getElementById("hist-end").value;
             if (!s || !e) { 
                 loading.style.display = "none"; 
+                toast("請選擇開始與結束日期");
                 return; 
             }
             startDate = s; endDate = e;
@@ -1965,13 +2030,6 @@
             loadHistory(lastHistoryMode);
             loadDashboard();
         }
-    }
-
-    function updateProgressBar() {
-        const percent = Math.min((dashboardData.spent / (dashboardData.budget || 1)) * 100, 100) || 0;
-        document.getElementById("progress-bar").style.width = percent + "%";
-        document.getElementById("progress-text").innerText =
-            Math.round(percent) + "%（已花費 " + money(dashboardData.spent) + " / " + money(dashboardData.budget) + "）";
     }
 
     function renderInsight() {
@@ -2020,6 +2078,39 @@
         document.getElementById("center-label").innerText = "本月總計";
         document.getElementById("center-value").innerText = "$" + money(dashboardData.spent);
         donutChart.draw(data, options);
+    }
+
+    // 3d. 繪製本年消費比例圓餅圖
+    function drawYearDonutChart() {
+        if (!chartsReady) return;
+        const dataArray = [["Category", "Amount"]];
+        Object.entries(yearBreakdown).forEach(([k,v]) => dataArray.push([k, v]));
+        if (dataArray.length === 1) dataArray.push(["無消費", 1]);
+        const data = google.visualization.arrayToDataTable(dataArray);
+        const options = {
+            pieHole: 0.72,
+            pieSliceText: "none",
+            backgroundColor: "transparent",
+            chartArea: { left: "auto", top: 10, width: "100%", height: "78%" },
+            legend: { position: "bottom", maxLines: 2, textStyle: { fontSize: 12, color: "#1B2744" } },
+            colors: DONUT_COLORS,
+            tooltip: { trigger: "focus" }
+        };
+        yearDonutChart = new google.visualization.PieChart(document.getElementById("chart_donut_year"));
+        google.visualization.events.addListener(yearDonutChart, "select", function () {
+            const sel = yearDonutChart.getSelection();
+            if (sel.length) {
+                const row = sel[0].row;
+                document.getElementById("year-center-label").innerText = data.getValue(row, 0);
+                document.getElementById("year-center-value").innerText = "$" + money(data.getValue(row, 1));
+            } else {
+                document.getElementById("year-center-label").innerText = "本年總計";
+                document.getElementById("year-center-value").innerText = "$" + money(yearTotalSpent);
+            }
+        });
+        document.getElementById("year-center-label").innerText = "本年總計";
+        document.getElementById("year-center-value").innerText = "$" + money(yearTotalSpent);
+        yearDonutChart.draw(data, options);
     }
 
     async function drawTrendChart() {
