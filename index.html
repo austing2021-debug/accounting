@@ -153,7 +153,6 @@
         }
         .linkish { color: var(--muted); font-size: 12px; cursor: pointer; font-weight: 700; }
 
-        /* 1a. 兩個獨立小正方格並排 */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
         .square-card {
             background: var(--card);
@@ -182,7 +181,6 @@
         .combo-cat-left { display: flex; align-items: center; gap: 5px; }
         .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
 
-        /* 立體多色圓環 */
         .ring-wrap { display: grid; place-items: center; margin: auto; }
         .ring {
             width: 108px; height: 108px; border-radius: 50%;
@@ -199,7 +197,6 @@
         .ring-inner b { font-size: 16px; color: var(--ink); line-height: 1.1; }
         .ring-inner span { font-size: 9px; color: var(--muted); font-weight: 600; }
 
-        /* 限制 6 條記錄高度 */
         .records-scroll-wrap {
             height: 460px;
             overflow-y: auto;
@@ -282,10 +279,10 @@
 
         .empty, .loading { text-align: center; color: var(--muted); padding: 30px 10px; font-size: 13px; }
 
-        .actions { display: none; justify-content: flex-end; gap: 8px; margin-top: 10px; }
-        .actions.show { display: flex; }
+        /* 1. 刪除按鈕操作列樣式微調 */
+        .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
         .btn-ghost, .btn-danger, .btn-solid {
-            border: 0; border-radius: 12px; padding: 9px 15px; font-weight: 700; cursor: pointer; font-size: 13px;
+            border: 0; border-radius: 12px; padding: 9px 16px; font-weight: 700; cursor: pointer; font-size: 13px;
         }
         .btn-ghost { background: #fff; color: var(--muted); border: 1px solid var(--line); }
         .btn-danger { background: var(--danger); color: #fff; display: none; box-shadow: 0 4px 10px rgba(229,72,77,0.25); }
@@ -406,7 +403,6 @@
         .set-row .fa-chevron-right { color: #C5CAD6; font-size: 12px; }
         .settings-pad { padding: 16px; }
 
-        /* 3c. 外幣匯率輸入列樣式 */
         .fx-row {
             display: flex;
             align-items: center;
@@ -578,7 +574,7 @@
                 </div>
             </div>
 
-            <!-- 1a. 第三層：分開為左文字、右圓餅圖兩個小正方格 -->
+            <!-- 第三層：左文字、右圓餅圖兩個小正方格 -->
             <div class="grid-2">
                 <div class="square-card">
                     <h3>支出結構</h3>
@@ -618,14 +614,15 @@
                 <div id="histEmpty" class="empty" style="display:none;">這段期間查無紀錄</div>
             </div>
 
+            <!-- 1. 刪除與取消按鈕控制區塊 -->
             <div class="actions" id="tableActions">
-                <button class="btn-ghost" onclick="cancelDeleteMode()">取消</button>
-                <button class="btn-ghost" id="btnDelete" onclick="toggleDeleteMode()">選擇刪除</button>
+                <button class="btn-ghost" id="btnCancelDel" style="display:none;" onclick="cancelDeleteMode()">取消</button>
+                <button class="btn-ghost" id="btnDelete" onclick="toggleDeleteMode()">刪除</button>
                 <button class="btn-danger" id="btnConfirmDel" onclick="executeDelete()">確認刪除</button>
             </div>
         </section>
 
-        <!-- 頁面 3: 資產 (整合「帳戶」與「投資」) -->
+        <!-- 頁面 3: 資產 -->
         <section id="page-invest" class="page">
             <p class="page-kicker">資產 · 資金儲備與市場持倉</p>
             <div class="kpi">
@@ -635,13 +632,12 @@
                 <div><span>信用卡欠款</span><b id="kpiDebts" style="color:var(--danger)">NT$0</b></div>
             </div>
 
-            <!-- 2a. 取消「全部」，預設標籤切換 -->
             <div class="seg" id="assetsMainSeg">
                 <button class="on" onclick="switchAssetSection('bank', this)">銀行資金</button>
                 <button onclick="switchAssetSection('stock', this)">投資</button>
             </div>
 
-            <!-- 2b. 銀行資金區塊 -->
+            <!-- 銀行資金區塊 -->
             <div class="panel" id="bankAccountsBox">
                 <h3>銀行資金 
                     <span>
@@ -658,7 +654,7 @@
                 <div id="accountList"></div>
             </div>
 
-            <!-- 2c. 投資持倉區塊 -->
+            <!-- 投資持倉區塊 -->
             <div class="panel" id="stockPortfolioBox" style="display:none;">
                 <h3>投資持倉組合
                     <span>
@@ -668,9 +664,9 @@
                     </span>
                 </h3>
                 <p id="quoteHint" style="font-size:11px;color:var(--muted);margin:-4px 0 8px;">市價自動連線中，點擊持股可直接編輯股數/現價。</p>
+                <!-- 4. 取消「全部」，只有台股、美股、虛擬幣 -->
                 <div class="seg" id="holdSubSeg" style="margin-top:0;">
-                    <button class="on" onclick="filterHoldType('all', this)">全部</button>
-                    <button onclick="filterHoldType('tw', this)">台股</button>
+                    <button class="on" onclick="filterHoldType('tw', this)">台股</button>
                     <button onclick="filterHoldType('us', this)">美股</button>
                     <button onclick="filterHoldType('crypto', this)">虛擬幣</button>
                 </div>
@@ -682,7 +678,6 @@
         <section id="page-assets" class="page">
             <p class="page-kicker">設定 · 預算、報表與偏好</p>
 
-            <!-- 3a. 每月生活預算設定 (縮小並排) -->
             <div class="panel" style="margin-bottom:12px;">
                 <h3 style="margin-bottom:12px;">每月生活預算</h3>
                 <div style="display:flex; gap:8px; align-items:center;">
@@ -691,19 +686,15 @@
                 </div>
             </div>
 
-            <!-- 3c. 外幣匯率換算設定 -->
             <div class="panel" style="margin-bottom:12px;">
                 <h3>外幣匯率設定 <span class="linkish" onclick="openAddFxSheet()">＋ 新增</span></h3>
-                <div id="fxRatesInputsBox">
-                    <!-- 動態生成匯率輸入列 -->
-                </div>
+                <div id="fxRatesInputsBox"></div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
                     <button class="btn-ghost" style="padding:10px 6px; font-size:12px;" onclick="refreshFxRates()">自動抓取即時匯率</button>
                     <button class="btn-solid" style="padding:10px 6px; font-size:12px;" onclick="saveFxRates()">儲存匯率</button>
                 </div>
             </div>
 
-            <!-- 3d. 圖表與報表 -->
             <div class="panel settings-group" style="margin-bottom:12px;">
                 <h3>圖表與報表</h3>
                 <div class="set-row" onclick="switchTab('analysis')">
@@ -724,7 +715,7 @@
                 </div>
             </div>
 
-            <!-- 3b. 資料與同步 (置於最底層) -->
+            <!-- 資料與同步 (置於最底層) -->
             <div class="panel settings-group">
                 <h3>資料與同步</h3>
                 <div class="set-row" onclick="document.getElementById('csvInput').click()">
@@ -761,7 +752,6 @@
                     </div>
                 </div>
             </div>
-            <!-- 3d. 新增本年消費比例圓餅圖 -->
             <div class="panel">
                 <h3>本年累計消費比例</h3>
                 <div id="year-chart-container">
@@ -812,7 +802,7 @@
     </nav>
 </div>
 
-<!-- 4. 記帳／轉帳彈窗 (取消繳固定費) -->
+<!-- 記帳／轉帳彈窗 -->
 <div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
     <div class="grab"></div>
@@ -866,7 +856,7 @@
     <button class="btn-gold" style="width:100%; padding:14px; font-size:16px; margin-top:6px;" onclick="executeSubmit()">確認送出</button>
 </div>
 
-<!-- 新增/編輯 銀行帳戶與信用卡彈窗 -->
+<!-- 5. 編輯帳戶彈窗 (幣別改為下拉式選單 TWD, USD, JPY) -->
 <div class="sheet-bg" id="accEditBg" onclick="closeAccountSheet()"></div>
 <div class="sheet" id="accEditSheet">
     <div class="grab"></div>
@@ -882,13 +872,18 @@
             <option value="debt">信用卡 (欠款以負數計)</option>
         </select>
     </div>
+    <!-- 5. 幣別下拉選單 -->
     <div class="field"><label>幣別</label>
-        <input id="accEditCurrency" value="TWD">
+        <select id="accEditCurrency">
+            <option value="TWD">TWD</option>
+            <option value="USD">USD</option>
+            <option value="JPY">JPY</option>
+        </select>
     </div>
     <div class="field"><label>名稱</label><input id="accEditName" placeholder="例如: 華南SnY(008)"></div>
     <div class="field"><label>當前餘額 / 欠款額度</label><input type="number" id="accEditBalance" step="any" inputmode="decimal"></div>
     <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="saveAccountItem()">儲存帳戶</button>
-    <button class="btn-ghost" id="accDelBtn" style="width:100%;margin-top:8px;display:none;" onclick="deleteAccountItem()">刪除此帳戶</button>
+    <button class="btn-ghost" id="accDelBtn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteAccountItem()">刪除此帳戶</button>
 </div>
 
 <!-- 持股設定彈窗 -->
@@ -914,7 +909,7 @@
     <div class="field"><label>平均買入成本</label><input type="number" id="holdAvg" step="any" inputmode="decimal"></div>
     <div class="field"><label>現價</label><input type="number" id="holdPrice" step="any" inputmode="decimal"></div>
     <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="saveHolding()">儲存持股資料</button>
-    <button class="btn-ghost" id="holdDelBtn" style="width:100%;margin-top:8px;display:none;" onclick="deleteHolding()">刪除此持股</button>
+    <button class="btn-ghost" id="holdDelBtn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteHolding()">刪除此持股</button>
 </div>
 
 <!-- 新增外幣幣別彈窗 -->
@@ -941,13 +936,15 @@
     let FX_RATES = { USD: 31.4400, JPY: 0.2004 };
     let quoteUpdatedAt = "";
 
-    // 預載台幣銀行與信用卡規範順序
+    // 2. 台幣銀行嚴格指定排序
     const SEED_TAIWAN_BANKS = [
         "上海銀行(011)", "第一銀行(007)", "一銀ileo(007)", "郵局(700)", 
         "華南銀行(008)", "華南SnY(008)", "國泰世華銀行(013)", "LINE BANK(824)", "永豐銀行(807)"
     ];
+
+    // 3. 信用卡指定排序 (已去除大小寫重複，統一為國泰CUBE卡(2288))
     const SEED_CREDIT_CARDS = [
-        "國泰cube卡(2288)", "國泰Cube卡(2288)", "華南商務御璽卡(5123)", "永豐鈦豐卡(4300)", "富邦Costco卡(4368)"
+        "國泰CUBE卡(2288)", "華南商務御璽卡(5123)", "永豐鈦豐卡(4300)", "富邦Costco卡(4368)"
     ];
 
     const DEFAULT_PORTFOLIO = [
@@ -964,7 +961,6 @@
     ];
     let PORTFOLIO_DATA = JSON.parse(JSON.stringify(DEFAULT_PORTFOLIO));
 
-    // 每年已知固定花費完整數據清單 (Excel 換算平均每月提撥)
     const KNOWN_ANNUAL_EXPENSES = [
         { name: "勞保", annual: 12600, months: "每月", monthlyAvg: 1050 },
         { name: "健保", annual: 15624, months: "每月", monthlyAvg: 1302 },
@@ -1013,10 +1009,9 @@
     let yearBreakdown = {};
     let yearTotalSpent = 0;
     let accountsData = [];
-    let billsData = [];
     let assetSection = "bank";
     let acctTypeFilter = "bank";
-    let holdTypeFilter = "all";
+    let holdTypeFilter = "tw"; // 4. 預設先看台股
     let donutChart, yearDonutChart;
     let isDeleteMode = false;
     let lastHistoryMode = "recent7";
@@ -1330,14 +1325,12 @@
         const { data: configData, error: cErr } = await _supabase.from("config").select("value").eq("key", "monthly_budget").single();
         const budget = configData ? parseFloat(configData.value) : 0;
         
-        // 當月消費
         const { data: expenses, error } = await _supabase.from("expenses")
             .select("*")
             .gte("date", monthStart())
             .lte("date", monthEnd())
             .order("date", { ascending: false });
         
-        // 本年消費
         const { data: yearExpenses } = await _supabase.from("expenses")
             .select("*")
             .gte("date", yearStart())
@@ -1358,7 +1351,6 @@
         const leftover = budget - spent;
         dashboardData = { budget, spent, income, leftover, breakdown, recent: rows.slice(0, 5) };
 
-        // 整理本年統計
         yearBreakdown = {};
         yearTotalSpent = 0;
         (yearExpenses || []).forEach(e => {
@@ -1369,7 +1361,6 @@
             }
         });
 
-        // 總覽剩餘金額與預算標示
         const hero = document.getElementById("heroNum");
         hero.textContent = "NT$" + money(leftover);
         hero.classList.toggle("neg", leftover < 0);
@@ -1438,7 +1429,6 @@
             }
         });
 
-        // 固定費用預估總額
         let unpaidBillsSum = KNOWN_ANNUAL_EXPENSES.reduce((s, b) => s + b.monthlyAvg, 0);
         let currentSpent = dashboardData.spent || 0;
 
@@ -1447,7 +1437,6 @@
             if (p.type === 'tw' || p.type === 'us') stockMktVal += p.mktVal;
         });
 
-        // 流動現金淨額計算
         const cashNet = (twdCash + foreignCash) - creditDebt - unpaidBillsSum - currentSpent;
         const totalNet = cashNet + stockMktVal;
 
@@ -1456,7 +1445,6 @@
         document.getElementById("overviewStockNet").innerText = "NT$" + money(Math.round(stockMktVal));
     }
 
-    // 2. 資產頁簽切換 (銀行資金 vs 投資)
     function switchAssetSection(sec, btn) {
         assetSection = sec;
         document.querySelectorAll("#assetsMainSeg button").forEach(b => b.classList.remove("on"));
@@ -1473,6 +1461,7 @@
         renderAccountsList();
     }
 
+    // 4. 投資標籤取消全部 (只有台股、美股、虛擬幣)
     function filterHoldType(kind, btn) {
         holdTypeFilter = kind;
         document.querySelectorAll("#holdSubSeg button").forEach(b => b.classList.remove("on"));
@@ -1480,12 +1469,27 @@
         renderInvestList();
     }
 
-    // 2b. 渲染銀行帳戶 (移除備註與帳號)
+    // 2 & 3. 嚴格排序台幣銀行與信用卡，並過濾重複
     function renderAccountsList() {
         const list = document.getElementById("accountList");
         list.innerHTML = "";
 
         let filtered = accountsData.filter(a => a.type === acctTypeFilter);
+
+        // 依要求精確排序
+        if (acctTypeFilter === "bank") {
+            filtered.sort((a, b) => {
+                const ia = SEED_TAIWAN_BANKS.indexOf(a.name);
+                const ib = SEED_TAIWAN_BANKS.indexOf(b.name);
+                return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+            });
+        } else if (acctTypeFilter === "debt") {
+            filtered.sort((a, b) => {
+                const ia = SEED_CREDIT_CARDS.indexOf(a.name);
+                const ib = SEED_CREDIT_CARDS.indexOf(b.name);
+                return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+            });
+        }
 
         if (!filtered.length) {
             list.innerHTML = '<div class="empty">無此類別帳戶資料</div>';
@@ -1514,20 +1518,23 @@
         });
     }
 
-    // 2c. 渲染投資持股清單 (包含虛擬幣)
     function renderInvestList() {
         const list = document.getElementById("investList");
         list.innerHTML = "";
 
-        let filtered = PORTFOLIO_DATA;
-        if (holdTypeFilter !== 'all') filtered = PORTFOLIO_DATA.filter(p => p.type === holdTypeFilter);
+        // 4. 依照標籤嚴格篩選
+        let filtered = PORTFOLIO_DATA.filter(p => p.type === holdTypeFilter);
+
+        if (!filtered.length) {
+            list.innerHTML = '<div class="empty">尚無此分類持股，點右上角可新增</div>';
+            return;
+        }
 
         filtered.forEach(p => {
             const pnl = p.mktVal - p.cost;
             const pnlPct = (pnl / (p.cost || 1)) * 100;
             const isUp = pnl >= 0;
 
-            // 虛擬幣採用合理的顯示方式
             let detailSub = `${p.broker} · 持有 ${p.shares} 股 · 均價 $${p.costPrice}`;
             if (p.type === 'crypto') {
                 detailSub = `${p.broker} · 持有 ${p.shares} 顆 · 均價 $${money(p.costPrice)}`;
@@ -1598,7 +1605,6 @@
         renderAccountsList();
     }
 
-    // 3c. 渲染外幣匯率輸入列
     function renderFxInputs() {
         const box = document.getElementById("fxRatesInputsBox");
         if (!box) return;
@@ -1627,7 +1633,6 @@
         toast("匯率已儲存，外幣與美股市值已重算");
     }
 
-    // 免 Token 即時抓取國際外匯公開 API
     async function refreshFxRates() {
         toast("抓取即時匯率中…");
         try {
@@ -1649,7 +1654,7 @@
         } catch (e) {
             console.warn(e);
         }
-        toast("即時匯率抓取失敗，請手動輸入");
+        toast("即時匯率連線忙碌中，請手動調整數值");
     }
 
     function openAddFxSheet() {
@@ -1671,7 +1676,6 @@
         saveFxRates();
     }
 
-    // 解決 CORS 跨域限制的即時股市抓取
     async function fetchWithCorsProxy(url) {
         const proxies = [
             url,
@@ -1716,7 +1720,7 @@
         quoteUpdatedAt = new Date().toLocaleTimeString("zh-TW", { hour: '2-digit', minute: '2-digit' });
         await savePortfolioState();
         loadAssetsData();
-        toast(ok ? `已更新 ${ok} 檔最新市價` : "行情連線忙碌中，可直接手動點擊修改現價");
+        toast(ok ? `已更新 ${ok} 檔最新市價` : "行情伺服器忙碌，可點擊卡片手動更新現價");
     }
 
     function openHoldingSheet(idx) {
@@ -1769,7 +1773,7 @@
         closeHoldingSheet();
     }
 
-    // 銀行與信用卡維護
+    // 5. 帳戶新增與編輯 (支援下拉選單 TWD, USD, JPY)
     function openAddAccountSheet() {
         document.getElementById("accEditTitle").innerText = "新增帳戶/卡片";
         document.getElementById("accEditId").value = "";
@@ -1802,7 +1806,7 @@
         const id = document.getElementById("accEditId").value;
         const type = document.getElementById("accEditType").value;
         const name = document.getElementById("accEditName").value.trim();
-        const currency = document.getElementById("accEditCurrency").value.trim().toUpperCase() || "TWD";
+        const currency = document.getElementById("accEditCurrency").value;
         const balance = parseFloat(document.getElementById("accEditBalance").value || "0");
         if (!name) return toast("請輸入帳戶名稱");
 
@@ -1818,11 +1822,12 @@
             loadAssetsData();
         }
     }
+    // 3. 確保可正常刪除重複信用卡或帳戶
     async function deleteAccountItem() {
         const id = document.getElementById("accEditId").value;
         if (!id || !confirm("確定要刪除此帳戶？")) return;
         const res = await _supabase.from("accounts").delete().eq("id", id);
-        if (res.error) toast("刪除失敗");
+        if (res.error) toast("刪除失敗: " + res.error.message);
         else {
             toast("帳戶已刪除");
             closeAccountSheet();
@@ -1830,12 +1835,25 @@
         }
     }
 
-    // 載入資產資料庫與同步初始化台幣銀行/信用卡規範清單
+    // 載入與自動過濾重複帳戶
     async function loadAssetsData() {
         const { data: accs } = await _supabase.from("accounts").select("*").order("id");
         accountsData = accs || [];
 
-        // 自動同步缺少的台幣銀行與信用卡
+        // 自動清理重複大小寫的舊國泰信用卡 (保留唯一國泰CUBE卡(2288))
+        const cubeCards = accountsData.filter(a => a.name.toLowerCase().includes("cube"));
+        if (cubeCards.length > 1) {
+            for (let i = 1; i < cubeCards.length; i++) {
+                await _supabase.from("accounts").delete().eq("id", cubeCards[i].id);
+            }
+            if (cubeCards[0].name !== "國泰CUBE卡(2288)") {
+                await _supabase.from("accounts").update({ name: "國泰CUBE卡(2288)" }).eq("id", cubeCards[0].id);
+            }
+            const { data: cleaned } = await _supabase.from("accounts").select("*").order("id");
+            accountsData = cleaned || [];
+        }
+
+        // 補齊預載銀行
         let needRefresh = false;
         for (const name of SEED_TAIWAN_BANKS) {
             if (!accountsData.some(a => a.name === name)) {
@@ -1881,7 +1899,6 @@
         calcAndRenderOverviewNetWorth();
     }
 
-    // 3d. 應付報表頁面渲染
     function openKnownBillsReport() {
         document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
         document.getElementById("page-known-bills").classList.add("active");
@@ -1963,11 +1980,9 @@
         const list = document.getElementById("historyList");
         const loading = document.getElementById("histLoading");
         const empty = document.getElementById("histEmpty");
-        const actions = document.getElementById("tableActions");
         list.innerHTML = "";
         loading.style.display = "block";
         empty.style.display = "none";
-        actions.classList.remove("show");
 
         let startDate, endDate;
         const now = new Date();
@@ -1998,14 +2013,15 @@
         loading.style.display = "none";
         if (error) { toast("載入失敗"); setCloud(false); return; }
         if (!records || !records.length) { empty.style.display = "block"; return; }
-        actions.classList.add("show");
         list.innerHTML = records.map(r => rowHTML(r, true)).join("");
     }
 
+    // 1. 刪除與取消按鈕連動邏輯
     function toggleDeleteMode() {
         isDeleteMode = true;
         document.getElementById("historyList").classList.add("delete-on");
         document.getElementById("btnDelete").style.display = "none";
+        document.getElementById("btnCancelDel").style.display = "inline-block";
         document.getElementById("btnConfirmDel").style.display = "inline-block";
     }
 
@@ -2013,6 +2029,7 @@
         isDeleteMode = false;
         document.getElementById("historyList").classList.remove("delete-on");
         document.getElementById("btnDelete").style.display = "inline-block";
+        document.getElementById("btnCancelDel").style.display = "none";
         document.getElementById("btnConfirmDel").style.display = "none";
         document.querySelectorAll(".row-checkbox").forEach(cb => cb.checked = false);
     }
@@ -2080,7 +2097,6 @@
         donutChart.draw(data, options);
     }
 
-    // 3d. 繪製本年消費比例圓餅圖
     function drawYearDonutChart() {
         if (!chartsReady) return;
         const dataArray = [["Category", "Amount"]];
