@@ -1471,60 +1471,76 @@
     }
 
     function onCcPayCardChange() {
-        const cardId = document.getElementById("ccPayCardSelect").value;
-        const card = accountsData.find(a => a.id == cardId);
-        if (card) {
-            const debt = Math.abs(parseFloat(card.balance) || 0);
-            document.getElementById("ccPayAmount").value = debt > 0 ? debt : "";
+    const cardId = document.getElementById("ccPayCardSelect").value;
+    const card = accountsData.find(a => a.id == cardId);
+    if (card) {
+        const debt = Math.abs(parseFloat(card.balance) || 0);
+        document.getElementById("ccPayAmount").value = debt > 0 ? debt : "";
+    }
+}
+
+function setCcFullAmount() {
+    const cardId = document.getElementById("ccPayCardSelect").value;
+    const card = accountsData.find(a => a.id == cardId);
+    if (card) {
+        document.getElementById("ccPayAmount").value = Math.abs(parseFloat(card.balance) || 0);
+    }
+}
+
+    // 執行信用卡扣款 (已修正增加欠款問題，支援防呆自動歸零)
+async function executeCreditCardPayment() {
+    const cardId = document.getElementById("ccPayCardSelect").value;
+    const bankId = document.getElementById("ccPayBankSelect").value;
+    const amt = parseFloat(document.getElementById("ccPayAmount").value);
+    const dateVal = document.getElementById("ccPayDate").value;
+
+    if (!amt || amt <= 0) return toast("請輸入有效繳款金額");
+
+    const card = accountsData.find(a => a.id == cardId);
+    const bank = accountsData.find(a => a.id == bankId);
+
+    if (!card || !bank) return toast("帳戶資料錯誤");
+
+    if (Number(bank.balance || 0) < amt) {
+        if (!confirm(`銀行可用餘額 ($${money(bank.balance)}) 小於繳款金額 ($${money(amt)})，確定要扣款嗎？`)) {
+            return;
         }
     }
 
-    function setCcFullAmount() {
-        const cardId = document.getElementById("ccPayCardSelect").value;
-        const card = accountsData.find(a => a.id == cardId);
-        if (card) {
-            document.getElementById("ccPayAmount").value = Math.abs(parseFloat(card.balance) || 0);
-        }
-    }
+    // 1. 銀行帳戶餘額扣除
+    const nextBankBal = Number(bank.balance || 0) - amt;
+    await _supabase.from("accounts").update({ balance: nextBankBal }).eq("id", bank.id);
 
-    // 執行信用卡扣款
-    async function executeCreditCardPayment() {
-        const cardId = document.getElementById("ccPayCardSelect").value;
-        const bankId = document.getElementById("ccPayBankSelect").value;
-        const amt = parseFloat(document.getElementById("ccPayAmount").value);
-        const dateVal = document.getElementById("ccPayDate").value;
+    // 2. 信用卡欠款扣抵 (防呆：以絕對值計算欠款，減去繳費金額，最小歸零)
+    const currentDebt = Math.abs(Number(card.balance || 0));
+    const nextDebt = Math.max(0, currentDebt - amt);
+    
+    // 將扣除後的欠款存回資料庫 (統一以 0 或正數記錄當前剩餘欠款)
+    await _supabase.from("accounts").update({ balance: nextDebt }).eq("id", card.id);
 
-        if (!amt || amt <= 0) return toast("請輸入有效繳款金額");
+    // 3. 記錄金流與流水明細
+    await _supabase.from("fund_transfers").insert([{
+        date: dateVal, 
+        from_account_id: bank.id, 
+        to_account_id: card.id, 
+        amount: amt, 
+        note: `繳納 ${card.name}`
+    }]);
 
-        const card = accountsData.find(a => a.id == cardId);
-        const bank = accountsData.find(a => a.id == bankId);
+    await _supabase.from("expenses").insert([{
+        date: dateVal, 
+        category: '轉', 
+        subcategory: `繳卡費➔${card.name}`,
+        amount: amt, 
+        note: `由 ${bank.name} 扣繳卡費 (剩餘應繳: $${money(nextDebt)})`
+    }]);
 
-        if (!card || !bank) return toast("帳戶資料錯誤");
-
-        // 銀行帳戶扣款
-        const nextBankBal = Number(bank.balance || 0) - amt;
-        await _supabase.from("accounts").update({ balance: nextBankBal }).eq("id", bank.id);
-
-        // 信用卡負債沖銷 (餘額增加靠近0)
-        const nextCardBal = Number(card.balance || 0) + amt;
-        await _supabase.from("accounts").update({ balance: nextCardBal }).eq("id", card.id);
-
-        // 寫入金流與流水表記錄
-        await _supabase.from("fund_transfers").insert([{
-            date: dateVal, from_account_id: bank.id, to_account_id: card.id, amount: amt, note: `繳納 ${card.name}`
-        }]);
-
-        await _supabase.from("expenses").insert([{
-            date: dateVal, category: '轉', subcategory: `繳卡費➔${card.name}`,
-            amount: amt, note: `由 ${bank.name} 扣繳卡費`
-        }]);
-
-        toast("信用卡繳費完成！");
-        closeCreditCardPaySheet();
-        loadAssetsData();
-        loadDashboard();
-        loadHistory(lastHistoryMode);
-    }
+    toast(`信用卡繳費完成！已扣除 $${money(amt)}`);
+    closeCreditCardPaySheet();
+    loadAssetsData();
+    loadDashboard();
+    loadHistory(lastHistoryMode);
+}
 
     // 2. 匯出 Excel 報表彈窗
     function openExportModal() {
@@ -1826,26 +1842,28 @@
             return;
         }
 
-        filtered.forEach(acc => {
-            const bal = parseFloat(acc.balance) || 0;
-            let fxConverted = "";
-            if (acc.type === 'foreign') {
-                const rate = FX_RATES[acc.currency] || 1;
-                fxConverted = `<small>≈ NT$ ${money(Math.round(bal * rate))}</small>`;
-            }
+        // 尋找 renderAccountsList 裡面的 filtered.forEach
+filtered.forEach(acc => {
+    // 信用卡類型一律取絕對值顯示應繳欠款
+    const displayBal = acc.type === 'debt' ? Math.abs(parseFloat(acc.balance) || 0) : (parseFloat(acc.balance) || 0);
+    let fxConverted = "";
+    if (acc.type === 'foreign') {
+        const rate = FX_RATES[acc.currency] || 1;
+        fxConverted = `<small>≈ NT$ ${money(Math.round(displayBal * rate))}</small>`;
+    }
 
-            list.innerHTML += `
-                <div class="account-card" onclick="openEditAccountSheet(${acc.id})">
-                    <div class="acc-info">
-                        <b>${acc.name}</b>
-                    </div>
-                    <div class="acc-amt" style="color:${acc.type === 'debt' ? 'var(--danger)' : 'var(--ink)'};">
-                        ${acc.currency} ${money(bal)}
-                        ${fxConverted}
-                    </div>
-                </div>
-            `;
-        });
+    list.innerHTML += `
+        <div class="account-card" onclick="openEditAccountSheet(${acc.id})">
+            <div class="acc-info">
+                <b>${acc.name}</b>
+            </div>
+            <div class="acc-amt" style="color:${acc.type === 'debt' ? 'var(--danger)' : 'var(--ink)'};">
+                ${acc.currency} ${money(displayBal)}
+                ${fxConverted}
+            </div>
+        </div>
+    `;
+});
     }
 
     function renderInvestList() {
