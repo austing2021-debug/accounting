@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- 引入 SheetJS 支援產生 Excel 報表 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -155,7 +154,6 @@
         }
         .linkish { color: var(--muted); font-size: 12px; cursor: pointer; font-weight: 700; }
 
-        /* 總覽雙方格佈局 */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
         .square-card {
             background: var(--card);
@@ -190,7 +188,6 @@
         .combo-cat-left { display: flex; align-items: center; gap: 5px; }
         .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
 
-        /* 總覽 Google 向量甜甜圈圓餅圖容器 */
         #overview-donut-box {
             position: relative;
             width: 100%;
@@ -561,7 +558,6 @@
     <div class="content-body">
         <!-- 頁面 1: 總覽 -->
         <section id="page-overview" class="page active">
-            <!-- 總資產淨額 -->
             <div class="hero wealth-hero">
                 <div class="hero-kicker">總資產淨額 (現金淨額 + 股票市值)</div>
                 <div class="hero-num" id="overviewNetWorth">NT$0</div>
@@ -577,7 +573,6 @@
                 </div>
             </div>
 
-            <!-- 本月剩餘預算 -->
             <div class="hero budget-hero">
                 <div class="hero-row" style="align-items: center; margin-bottom: 6px;">
                     <div class="hero-kicker" style="margin-bottom:0;">本月剩餘預算</div>
@@ -588,7 +583,6 @@
                 </div>
             </div>
 
-            <!-- 1. 左側文字、右側向量立體圓餅圖 -->
             <div class="grid-2">
                 <div class="square-card">
                     <h3>支出結構</h3>
@@ -628,7 +622,6 @@
                 <div id="histEmpty" class="empty" style="display:none;">這段期間查無紀錄</div>
             </div>
 
-            <!-- 刪除與取消按鈕控制區塊 -->
             <div class="actions" id="tableActions">
                 <button class="btn-ghost" id="btnCancelDel" style="display:none;" onclick="cancelDeleteMode()">取消</button>
                 <button class="btn-ghost" id="btnDelete" onclick="toggleDeleteMode()">刪除</button>
@@ -636,7 +629,7 @@
             </div>
         </section>
 
-        <!-- 頁面 3: 資產 (銀行資金 + 投資持股) -->
+        <!-- 頁面 3: 資產 -->
         <section id="page-invest" class="page">
             <p class="page-kicker">資產 · 資金儲備與市場持倉</p>
             <div class="kpi">
@@ -655,6 +648,8 @@
             <div class="panel" id="bankAccountsBox">
                 <h3>銀行資金 
                     <span>
+                        <!-- 1. 當切換到信用卡時，右上角顯示繳費按鈕 -->
+                        <span class="linkish" id="btnCreditCardPay" style="display:none; color:var(--danger); margin-right:6px;" onclick="openCreditCardPaySheet()">繳費</span>
                         <span class="linkish" onclick="openAddAccountSheet()">＋ 新增</span>
                         ·
                         <span class="linkish" onclick="openSheetForType('transfer')">互轉</span>
@@ -677,7 +672,7 @@
                         <span class="linkish" onclick="openHoldingSheet()">＋ 持股</span>
                     </span>
                 </h3>
-                <p id="quoteHint" style="font-size:11px;color:var(--muted);margin:-4px 0 8px;">市價更新中，點擊持股可直接編輯數量/現價。</p>
+                <p id="quoteHint" style="font-size:11px;color:var(--muted);margin:-4px 0 8px;">市價自動連線中，點擊持股可直接編輯股數/現價。</p>
                 <div class="seg" id="holdSubSeg" style="margin-top:0;">
                     <button class="on" onclick="filterHoldType('tw', this)">台股</button>
                     <button onclick="filterHoldType('us', this)">美股</button>
@@ -728,7 +723,7 @@
                 </div>
             </div>
 
-            <!-- 資料與同步 -->
+            <!-- 資料與同步 (置於最底層) -->
             <div class="panel settings-group">
                 <h3>資料與同步</h3>
                 <div class="set-row" onclick="document.getElementById('csvInput').click()">
@@ -751,7 +746,7 @@
             </div>
         </section>
 
-        <!-- 頁面 5: 分析圖表 (含產生 Excel 報表) -->
+        <!-- 頁面 5: 分析圖表 -->
         <section id="page-analysis" class="page">
             <p class="page-kicker"><span class="linkish" onclick="switchTab('assets')">‹ 設定</span> · 消費分析報表</p>
             <div class="insight" id="insightBox">載入洞察中...</div>
@@ -779,13 +774,13 @@
                 <h3>年度同期花費對比</h3>
                 <div id="trend_chart_div"></div>
             </div>
-            <!-- 3. 產生 Excel 報表按鈕 -->
-            <button class="btn-solid" style="background:var(--ok); margin-top:8px;" onclick="exportFinancialExcelReport()">
+            <!-- 2. 匯出 Excel 報表彈窗按鈕 -->
+            <button class="btn-solid" style="background:var(--ok); margin-top:8px;" onclick="openExportModal()">
                 <i class="fa-solid fa-file-excel" style="margin-right:6px;"></i> 產生資金變動 Excel 報表
             </button>
         </section>
 
-        <!-- 頁面 6: 每年已知固定花費 (應付) 管理專頁 -->
+        <!-- 頁面 6: 應付 (每年已知固定花費) 專屬獨立報表 -->
         <section id="page-known-bills" class="page">
             <p class="page-kicker"><span class="linkish" onclick="switchTab('assets')">‹ 設定</span> · 每年已知固定花費</p>
             <div class="kpi">
@@ -821,7 +816,7 @@
     </nav>
 </div>
 
-<!-- 記帳／轉帳彈窗 (已整合扣款/入帳帳戶選擇，預設為「現金」) -->
+<!-- 記帳／轉帳彈窗 (預設帳戶為「現金」) -->
 <div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
     <div class="grab"></div>
@@ -836,7 +831,6 @@
         <button id="typeTransfer" onclick="setType('transfer')">戶頭互轉</button>
     </div>
 
-    <!-- 4. 新增銀行/現金支付帳戶選擇 -->
     <div class="field" id="txAccountField">
         <label id="txAccountLabel">扣款帳戶 (預設現金)</label>
         <select id="txAccountSelect"></select>
@@ -879,6 +873,57 @@
     </div>
     <input type="hidden" id="editingId" value="">
     <button class="btn-gold" style="width:100%; padding:14px; font-size:16px; margin-top:6px;" onclick="executeSubmit()">確認送出</button>
+</div>
+
+<!-- 1. 信用卡專屬繳費彈窗 -->
+<div class="sheet-bg" id="ccPayBg" onclick="closeCreditCardPaySheet()"></div>
+<div class="sheet" id="ccPaySheet">
+    <div class="grab"></div>
+    <div class="sheet-head">
+        <h2>信用卡繳費</h2>
+        <button class="icon-btn" onclick="closeCreditCardPaySheet()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="field">
+        <label>繳費信用卡</label>
+        <select id="ccPayCardSelect" onchange="onCcPayCardChange()"></select>
+    </div>
+    <div class="field">
+        <label>扣款銀行帳戶</label>
+        <select id="ccPayBankSelect"></select>
+    </div>
+    <div class="field">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="margin-bottom:0;">繳費金額 (TWD)</label>
+            <button type="button" class="btn-ghost" style="padding:4px 10px; font-size:11px; border-radius:8px;" onclick="setCcFullAmount()">全額繳款</button>
+        </div>
+        <input type="number" id="ccPayAmount" placeholder="輸入繳款金額" inputmode="decimal">
+    </div>
+    <div class="field">
+        <label>扣繳日期</label>
+        <input type="date" id="ccPayDate">
+    </div>
+    <button class="btn-gold" style="width:100%; padding:14px; font-size:16px; margin-top:6px;" onclick="executeCreditCardPayment()">確認繳款並扣帳</button>
+</div>
+
+<!-- 2. 產生 Excel 報表篩選自訂彈窗 -->
+<div class="sheet-bg" id="exportModalBg" onclick="closeExportModal()"></div>
+<div class="sheet" id="exportModalSheet">
+    <div class="grab"></div>
+    <div class="sheet-head">
+        <h2>匯出資金變動 Excel 報表</h2>
+        <button class="icon-btn" onclick="closeExportModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p style="font-size:12px; color:var(--muted); margin:0 0 12px;">選擇報表區間或直接匯出全部歷史資金變動記錄：</p>
+    <div class="field">
+        <label>開始年月日</label>
+        <input type="date" id="exportStartDate">
+    </div>
+    <div class="field">
+        <label>結束年月日</label>
+        <input type="date" id="exportEndDate">
+    </div>
+    <button class="btn-gold" style="width:100%; padding:12px; font-size:15px; margin-top:4px;" onclick="executeExportReport('range')">匯出指定日期區間</button>
+    <button class="btn-solid" style="width:100%; padding:12px; font-size:15px; margin-top:8px; background:var(--teal);" onclick="executeExportReport('all')">匯出全部歷史資料</button>
 </div>
 
 <!-- 編輯帳戶彈窗 -->
@@ -980,6 +1025,7 @@
         "上海銀行(011)", "第一銀行(007)", "一銀ileo(007)", "郵局(700)", 
         "華南銀行(008)", "華南SnY(008)", "國泰世華銀行(013)", "LINE BANK(824)", "永豐銀行(807)"
     ];
+
     const SEED_CREDIT_CARDS = [
         "國泰CUBE卡(2288)", "華南商務御璽卡(5123)", "永豐鈦豐卡(4300)", "富邦Costco卡(4368)"
     ];
@@ -1015,6 +1061,7 @@
         { name: "幼稚園羊奶費", annual: 8058, months: "每月", monthlyAvg: 672 }
     ];
 
+    // 3. 在「雜」項新增「醫療費」
     const subData = {
         "食": ["早餐", "中餐", "晚餐", "點心", "菜錢"],
         "衣": ["上衣", "褲子", "內衣", "內褲", "襪子", "配件"],
@@ -1023,7 +1070,7 @@
         "育": ["學費", "書費", "教育費", "AI費"],
         "樂": ["娛樂費", "電視費"],
         "金": ["存款", "股票", "虛擬幣"],
-        "雜": ["保險費", "其他"],
+        "雜": ["保險費", "醫療費", "其他"],
         "收": ["薪資", "獎金", "投資收益", "其他收入"]
     };
 
@@ -1062,6 +1109,9 @@
 
     window.onload = function () {
         document.getElementById("date").value = todayStr();
+        document.getElementById("ccPayDate").value = todayStr();
+        document.getElementById("exportEndDate").value = todayStr();
+        document.getElementById("exportStartDate").value = `${new Date().getFullYear()}-01-01`;
         buildCatGrid();
         loadDashboard();
         loadPortfolioState().then(() => loadAssetsData());
@@ -1135,7 +1185,6 @@
         document.getElementById("quickBox").style.display = isEdit ? "none" : "block";
         document.getElementById("editingId").value = isEdit ? editRecord.id : "";
 
-        // 重新填充記帳帳戶下拉選單
         populateTxAccountSelect();
 
         if (isEdit) {
@@ -1208,7 +1257,6 @@
         }
     }
 
-    // 填充一般記帳帳戶下拉選單 (首選為現金)
     function populateTxAccountSelect() {
         const sel = document.getElementById("txAccountSelect");
         sel.innerHTML = '<option value="cash">現金 (不扣銀行帳戶)</option>';
@@ -1324,7 +1372,6 @@
 
         if (!amt || amt <= 0) return toast("請輸入有效金額");
 
-        // 1. 戶頭互轉邏輯
         if (currentType === "transfer") {
             const fromId = document.getElementById("transferFrom").value;
             const toId = document.getElementById("transferTo").value;
@@ -1352,7 +1399,6 @@
             return;
         }
 
-        // 2. 一般支出/收入 (連動選取的銀行帳戶餘額)
         if (!currentMainCat) return toast("請選擇主分類");
         
         let bankNoteTag = "";
@@ -1389,6 +1435,167 @@
         loadDashboard();
         loadAssetsData();
         loadHistory(lastHistoryMode);
+    }
+
+    // 1. 信用卡繳費視窗開啟與填值
+    function openCreditCardPaySheet() {
+        const cardSel = document.getElementById("ccPayCardSelect");
+        const bankSel = document.getElementById("ccPayBankSelect");
+        cardSel.innerHTML = "";
+        bankSel.innerHTML = "";
+
+        const creditCards = accountsData.filter(a => a.type === "debt");
+        const banks = accountsData.filter(a => a.type === "bank");
+
+        if (!creditCards.length) return toast("目前無信用卡資料");
+        if (!banks.length) return toast("請先建立台幣銀行帳戶以供扣繳");
+
+        creditCards.forEach(c => {
+            const debt = Math.abs(parseFloat(c.balance) || 0);
+            cardSel.innerHTML += `<option value="${c.id}">${c.name} (應繳: $${money(debt)})</option>`;
+        });
+
+        banks.forEach(b => {
+            bankSel.innerHTML += `<option value="${b.id}">${b.name} (可用: $${money(b.balance)})</option>`;
+        });
+
+        onCcPayCardChange();
+        document.getElementById("ccPayDate").value = todayStr();
+        document.getElementById("ccPayBg").classList.add("show");
+        document.getElementById("ccPaySheet").classList.add("show");
+    }
+
+    function closeCreditCardPaySheet() {
+        document.getElementById("ccPayBg").classList.remove("show");
+        document.getElementById("ccPaySheet").classList.remove("show");
+    }
+
+    function onCcPayCardChange() {
+        const cardId = document.getElementById("ccPayCardSelect").value;
+        const card = accountsData.find(a => a.id == cardId);
+        if (card) {
+            const debt = Math.abs(parseFloat(card.balance) || 0);
+            document.getElementById("ccPayAmount").value = debt > 0 ? debt : "";
+        }
+    }
+
+    function setCcFullAmount() {
+        const cardId = document.getElementById("ccPayCardSelect").value;
+        const card = accountsData.find(a => a.id == cardId);
+        if (card) {
+            document.getElementById("ccPayAmount").value = Math.abs(parseFloat(card.balance) || 0);
+        }
+    }
+
+    // 執行信用卡扣款
+    async function executeCreditCardPayment() {
+        const cardId = document.getElementById("ccPayCardSelect").value;
+        const bankId = document.getElementById("ccPayBankSelect").value;
+        const amt = parseFloat(document.getElementById("ccPayAmount").value);
+        const dateVal = document.getElementById("ccPayDate").value;
+
+        if (!amt || amt <= 0) return toast("請輸入有效繳款金額");
+
+        const card = accountsData.find(a => a.id == cardId);
+        const bank = accountsData.find(a => a.id == bankId);
+
+        if (!card || !bank) return toast("帳戶資料錯誤");
+
+        // 銀行帳戶扣款
+        const nextBankBal = Number(bank.balance || 0) - amt;
+        await _supabase.from("accounts").update({ balance: nextBankBal }).eq("id", bank.id);
+
+        // 信用卡負債沖銷 (餘額增加靠近0)
+        const nextCardBal = Number(card.balance || 0) + amt;
+        await _supabase.from("accounts").update({ balance: nextCardBal }).eq("id", card.id);
+
+        // 寫入金流與流水表記錄
+        await _supabase.from("fund_transfers").insert([{
+            date: dateVal, from_account_id: bank.id, to_account_id: card.id, amount: amt, note: `繳納 ${card.name}`
+        }]);
+
+        await _supabase.from("expenses").insert([{
+            date: dateVal, category: '轉', subcategory: `繳卡費➔${card.name}`,
+            amount: amt, note: `由 ${bank.name} 扣繳卡費`
+        }]);
+
+        toast("信用卡繳費完成！");
+        closeCreditCardPaySheet();
+        loadAssetsData();
+        loadDashboard();
+        loadHistory(lastHistoryMode);
+    }
+
+    // 2. 匯出 Excel 報表彈窗
+    function openExportModal() {
+        document.getElementById("exportModalBg").classList.add("show");
+        document.getElementById("exportModalSheet").classList.add("show");
+    }
+
+    function closeExportModal() {
+        document.getElementById("exportModalBg").classList.remove("show");
+        document.getElementById("exportModalSheet").classList.remove("show");
+    }
+
+    async function executeExportReport(mode) {
+        let sDate = null, eDate = null;
+        if (mode === "range") {
+            sDate = document.getElementById("exportStartDate").value;
+            eDate = document.getElementById("exportEndDate").value;
+            if (!sDate || !eDate) return toast("請選擇開始與結束日期");
+        }
+
+        toast("正在匯出 Excel 報表…");
+        closeExportModal();
+
+        let query = _supabase.from("expenses").select("*").order("date", { ascending: false });
+        if (sDate && eDate) {
+            query = query.gte("date", sDate).lte("date", eDate);
+        }
+
+        const { data: records } = await query;
+        const wb = XLSX.utils.book_new();
+
+        // 工作表 1: 資金總結
+        const summaryData = [
+            ["財務總結報表", ""],
+            ["產出時間", new Date().toLocaleString()],
+            ["統計區間", mode === "all" ? "全部歷史資料" : `${sDate} ~ ${eDate}`],
+            ["總資產淨額 (TWD)", document.getElementById("overviewNetWorth").innerText.replace("NT$", "")],
+            ["流動現金淨額 (TWD)", document.getElementById("overviewCashNet").innerText.replace("NT$", "")],
+            ["股票投資市值 (TWD)", document.getElementById("overviewStockNet").innerText.replace("NT$", "")],
+            ["本月生活預算", dashboardData.budget],
+            ["本月已花費", dashboardData.spent],
+            ["本月剩餘預算", dashboardData.leftover]
+        ];
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryData), "資金總結");
+
+        // 工作表 2: 投資組合持股
+        const stockRows = [["市場", "代號", "名稱", "券商", "持股數", "平均成本", "目前現價", "市值(TWD)", "未實現損益(TWD)"]];
+        PORTFOLIO_DATA.forEach(p => {
+            stockRows.push([
+                p.type, p.symbol, p.name, p.broker, p.shares, p.costPrice, p.currPrice, Math.round(p.mktVal), Math.round(p.mktVal - p.cost)
+            ]);
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(stockRows), "投資持倉");
+
+        // 工作表 3: 每年已知固定費用
+        const billRows = [["項目名稱", "繳納月份", "年度總額", "平均每月需提撥"]];
+        KNOWN_ANNUAL_EXPENSES.forEach(b => {
+            billRows.push([b.name, b.months, b.annual, Math.round(b.monthlyAvg)]);
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(billRows), "固定費用應付");
+
+        // 工作表 4: 收支明細
+        const expenseRows = [["日期", "類別", "子項目", "金額", "備註"]];
+        (records || []).forEach(r => {
+            expenseRows.push([r.date, r.category, r.subcategory, r.amount, r.note || ""]);
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(expenseRows), "流水明細");
+
+        const fileName = mode === "all" ? `理財報表_全部_${todayStr()}.xlsx` : `理財報表_${sDate}_${eDate}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+        toast("Excel 報表已成功下載！");
     }
 
     async function executeUpdateBudget() {
@@ -1449,7 +1656,6 @@
         calcAndRenderOverviewNetWorth();
     }
 
-    // 總覽左側列表排版
     function renderComboBreakdown() {
         const box = document.getElementById("comboCatList");
         const entries = Object.entries(dashboardData.breakdown).sort((a,b) => b[1]-a[1]);
@@ -1470,7 +1676,6 @@
         `).join("");
     }
 
-    // 1. 總覽右側 Google 向量甜甜圈圓餅圖繪製
     function drawOverviewDonut() {
         if (!chartsReady || !dashboardData.breakdown) return;
         const container = document.getElementById("chart_donut_overview");
@@ -1581,6 +1786,11 @@
         acctTypeFilter = kind;
         document.querySelectorAll("#acctSubSeg button").forEach(b => b.classList.remove("on"));
         if (btn) btn.classList.add("on");
+
+        // 切換至信用卡時顯示專屬繳費按鈕
+        const payBtn = document.getElementById("btnCreditCardPay");
+        if (payBtn) payBtn.style.display = (kind === "debt") ? "inline" : "none";
+
         renderAccountsList();
     }
 
@@ -1797,7 +2007,6 @@
         saveFxRates();
     }
 
-    // 附帶逾時機制的快速請求
     async function fetchWithTimeout(url, timeoutMs = 3500) {
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), timeoutMs);
@@ -1820,7 +2029,6 @@
         return p ? Number(p) : null;
     }
 
-    // 2. 平行發起連線更新最新市價，並在時間文字補上月日
     async function refreshQuotes() {
         toast("並行查詢行情中…");
         
@@ -1968,7 +2176,6 @@
         const { data: accs } = await _supabase.from("accounts").select("*").order("id");
         accountsData = accs || [];
 
-        // 自動去重信用卡
         const cubeCards = accountsData.filter(a => a.name.toLowerCase().includes("cube"));
         if (cubeCards.length > 1) {
             for (let i = 1; i < cubeCards.length; i++) {
@@ -2026,7 +2233,6 @@
         calcAndRenderOverviewNetWorth();
     }
 
-    // 3. 每年已知固定花費 獨立報表渲染
     function openKnownBillsReport() {
         document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
         document.getElementById("page-known-bills").classList.add("active");
@@ -2110,57 +2316,6 @@
         toast("已刪除項目");
     }
 
-    // 3. 產生 Excel 資金變動完整報表
-    async function exportFinancialExcelReport() {
-        toast("正在產生 Excel 報表…");
-        const { data: allRecords } = await _supabase.from("expenses").select("*").order("date", { ascending: false });
-        
-        const wb = XLSX.utils.book_new();
-
-        // 工作表 1: 資金總結
-        const summaryData = [
-            ["財務總結報表", ""],
-            ["產出時間", new Date().toLocaleString()],
-            ["總資產淨額 (TWD)", document.getElementById("overviewNetWorth").innerText.replace("NT$", "")],
-            ["流動現金淨額 (TWD)", document.getElementById("overviewCashNet").innerText.replace("NT$", "")],
-            ["股票投資市值 (TWD)", document.getElementById("overviewStockNet").innerText.replace("NT$", "")],
-            ["本月生活預算", dashboardData.budget],
-            ["本月已花費", dashboardData.spent],
-            ["本月剩餘預算", dashboardData.leftover]
-        ];
-        const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-        XLSX.utils.book_append_sheet(wb, wsSummary, "資金總結");
-
-        // 工作表 2: 投資組合持股
-        const stockRows = [["市場", "代號", "名稱", "券商", "持股數", "平均成本", "目前現價", "市值(TWD)", "未實現損益(TWD)"]];
-        PORTFOLIO_DATA.forEach(p => {
-            stockRows.push([
-                p.type, p.symbol, p.name, p.broker, p.shares, p.costPrice, p.currPrice, Math.round(p.mktVal), Math.round(p.mktVal - p.cost)
-            ]);
-        });
-        const wsStock = XLSX.utils.aoa_to_sheet(stockRows);
-        XLSX.utils.book_append_sheet(wb, wsStock, "投資持倉");
-
-        // 工作表 3: 每年已知固定費用
-        const billRows = [["項目名稱", "繳納月份", "年度總額", "平均每月需提撥"]];
-        KNOWN_ANNUAL_EXPENSES.forEach(b => {
-            billRows.push([b.name, b.months, b.annual, Math.round(b.monthlyAvg)]);
-        });
-        const wsBills = XLSX.utils.aoa_to_sheet(billRows);
-        XLSX.utils.book_append_sheet(wb, wsBills, "固定費用應付");
-
-        // 工作表 4: 完整收支流水帳
-        const expenseRows = [["日期", "類別", "子項目", "金額", "備註"]];
-        (allRecords || []).forEach(r => {
-            expenseRows.push([r.date, r.category, r.subcategory, r.amount, r.note || ""]);
-        });
-        const wsExpense = XLSX.utils.aoa_to_sheet(expenseRows);
-        XLSX.utils.book_append_sheet(wb, wsExpense, "流水明細");
-
-        XLSX.writeFile(wb, `理財紀錄資金報表_${todayStr()}.xlsx`);
-        toast("Excel 報表匯出成功！");
-    }
-
     function amountColorClass(r) {
         if (isIncome(r)) return "income";
         if (r.category === "轉") return "transfer";
@@ -2217,11 +2372,9 @@
         const list = document.getElementById("historyList");
         const loading = document.getElementById("histLoading");
         const empty = document.getElementById("histEmpty");
-        const actions = document.getElementById("tableActions");
         list.innerHTML = "";
         loading.style.display = "block";
         empty.style.display = "none";
-        actions.style.display = "flex";
 
         let startDate, endDate;
         const now = new Date();
@@ -2255,7 +2408,6 @@
         list.innerHTML = records.map(r => rowHTML(r, true)).join("");
     }
 
-    // 1. 刪除與取消按鈕控制
     function toggleDeleteMode() {
         isDeleteMode = true;
         document.getElementById("historyList").classList.add("delete-on");
