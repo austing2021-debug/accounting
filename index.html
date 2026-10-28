@@ -287,6 +287,12 @@
             outline: none;
         }
         input:focus, select:focus { border-color: var(--gold); background: #fff; }
+        input[readonly] {
+            background: #EDF1F7;
+            color: var(--navy);
+            font-weight: 800;
+            cursor: pointer;
+        }
 
         .empty, .loading { text-align: center; color: var(--muted); padding: 30px 10px; font-size: 13px; }
 
@@ -361,7 +367,6 @@
         }
         .seg button.on { background: var(--navy); color: #fff; }
 
-        /* 2. 記一筆：3種出帳方式切換按鈕 */
         .pay-method-tabs {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -385,7 +390,6 @@
             border-color: var(--navy);
         }
 
-        /* 3. 每年固定花費：週期金額設定網格 */
         .period-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -775,7 +779,7 @@
                 </div>
             </div>
 
-            <!-- 1. 資料與同步 (新增一鍵清空所有舊資料按鈕) -->
+            <!-- 1. 資料與同步 (重置拆分為 3 大獨立區塊：a.消費與轉帳紀錄、b.資產、c.每年固定花費) -->
             <div class="panel settings-group">
                 <h3>資料與同步</h3>
                 <div class="set-row" onclick="document.getElementById('csvInput').click()">
@@ -793,11 +797,30 @@
                         <span id="setCloudText" style="font-weight:700;">連線中</span>
                     </div>
                 </div>
-                <div class="set-row" onclick="resetAllAppData()">
-                    <div class="set-ico" style="background:var(--danger);"><i class="fa-solid fa-trash-can"></i></div>
+                <!-- 1a. 重置消費紀錄與轉帳紀錄 -->
+                <div class="set-row" onclick="resetRecordsOnly()">
+                    <div class="set-ico" style="background:var(--danger);"><i class="fa-solid fa-receipt"></i></div>
                     <div class="set-main">
-                        <b style="color:var(--danger);">重置並清空所有資料</b>
-                        <span>刪除所有消費紀錄、轉帳並將帳戶與持股歸零</span>
+                        <b style="color:var(--danger);">重置消費與轉帳紀錄</b>
+                        <span>僅清空所有日常收支與戶頭互轉歷史明細</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <!-- 1b. 重置資產部分 -->
+                <div class="set-row" onclick="resetAssetsOnly()">
+                    <div class="set-ico" style="background:var(--danger);"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="set-main">
+                        <b style="color:var(--danger);">重置資產與投資持倉</b>
+                        <span>將所有銀行帳戶、信用卡餘額歸零並清空持股</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <!-- 1c. 重置每年固定花費部分 -->
+                <div class="set-row" onclick="resetFixedExpensesOnly()">
+                    <div class="set-ico" style="background:var(--danger);"><i class="fa-solid fa-calendar-xmark"></i></div>
+                    <div class="set-main">
+                        <b style="color:var(--danger);">重置每年固定花費</b>
+                        <span>清空所有每年已知固定花費項目與週期設定</span>
                     </div>
                     <i class="fa-solid fa-chevron-right"></i>
                 </div>
@@ -875,7 +898,7 @@
     </nav>
 </div>
 
-<!-- 2. 記帳／轉帳彈窗 (移除早餐快速輸入列，改為「現金、信用卡、銀行」3種分支) -->
+<!-- 記帳／轉帳彈窗 -->
 <div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
     <div class="grab"></div>
@@ -890,7 +913,6 @@
         <button id="typeTransfer" onclick="setType('transfer')">戶頭互轉</button>
     </div>
 
-    <!-- 2. 支出/收入帳戶 3 大分類分支 -->
     <div class="field" id="txAccountField">
         <label id="txAccountLabel">出帳方式</label>
         <div class="pay-method-tabs">
@@ -903,14 +925,12 @@
         </div>
     </div>
 
-    <!-- 支出/收入分類區塊 (已移除早餐快速輸入列) -->
     <div id="normalForm">
         <div class="amount-preview" id="amountPreview">NT$ 0</div>
         <div class="cats" id="mainCatGrid"></div>
         <div class="subs" id="subWrap"></div>
     </div>
 
-    <!-- 戶頭互轉區塊 -->
     <div id="transferForm" style="display:none;">
         <div class="field">
             <label>轉出帳戶</label>
@@ -1057,7 +1077,7 @@
     <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="addNewFxRate()">確認新增</button>
 </div>
 
-<!-- 3. 每年已知固定花費 編輯/新增彈窗 (含開啟「週期金額設定視窗」按鈕) -->
+<!-- 2. 每年已知固定花費 編輯/新增彈窗 ("年度總額"改為唯讀，不可手動輸入，由設定週期金額帶入) -->
 <div class="sheet-bg" id="knownBillBg" onclick="closeKnownBillSheet()"></div>
 <div class="sheet" id="knownBillSheet">
     <div class="grab"></div>
@@ -1075,13 +1095,13 @@
                 <i class="fa-solid fa-calculator"></i> 設定週期金額
             </button>
         </div>
-        <input type="number" id="kbAnnual" placeholder="可直接輸入，或點右上角依週期填寫" inputmode="decimal">
+        <input type="number" id="kbAnnual" placeholder="請點擊「設定週期金額」計算總和" readonly onclick="openPeriodCalcModal()">
     </div>
     <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="saveKnownBillItem()">儲存項目</button>
     <button class="btn-ghost" id="kbDelBtn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteKnownBillItem()">刪除此項目</button>
 </div>
 
-<!-- 3. 新增：年度總額「週期金額設定視窗」 (年繳1格 / 季繳4格 / 雙月繳6格 / 月繳12格) -->
+<!-- 3. 設定週期金額視窗 (移除按鈕次數文字、雙月繳僅顯示期數) -->
 <div class="sheet-bg" id="periodCalcBg" style="z-index:70;" onclick="closePeriodCalcModal()"></div>
 <div class="sheet" id="periodCalcSheet" style="z-index:71;">
     <div class="grab"></div>
@@ -1090,10 +1110,10 @@
         <button class="icon-btn" onclick="closePeriodCalcModal()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="types">
-        <button type="button" class="on" id="pType_year" onclick="setPeriodCalcType('year')">年繳 (1次)</button>
-        <button type="button" id="pType_quarter" onclick="setPeriodCalcType('quarter')">季繳 (4次)</button>
-        <button type="button" id="pType_bimonth" onclick="setPeriodCalcType('bimonth')">雙月繳 (6次)</button>
-        <button type="button" id="pType_month" onclick="setPeriodCalcType('month')">月繳 (12次)</button>
+        <button type="button" class="on" id="pType_year" onclick="setPeriodCalcType('year')">年繳</button>
+        <button type="button" id="pType_quarter" onclick="setPeriodCalcType('quarter')">季繳</button>
+        <button type="button" id="pType_bimonth" onclick="setPeriodCalcType('bimonth')">雙月繳</button>
+        <button type="button" id="pType_month" onclick="setPeriodCalcType('month')">月繳</button>
     </div>
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
         <span style="font-size:11px; color:var(--muted); font-weight:700;">請填寫各期金額：</span>
@@ -1191,8 +1211,8 @@
     let currentMainCat = "";
     let currentSub = "";
     let currentType = "expense";
-    let currentPayMethod = "cash"; // 'cash', 'card', 'bank'
-    let currentPeriodType = "year"; // 'year', 'quarter', 'bimonth', 'month'
+    let currentPayMethod = "cash";
+    let currentPeriodType = "year";
     let tempPeriodValues = [];
 
     let dashboardData = { budget: 0, spent: 0, income: 0, leftover: 0, breakdown: {}, recent: [] };
@@ -1285,33 +1305,49 @@
         if (name === "records") loadHistory(lastHistoryMode);
     }
 
-    // 1. 一鍵重置並清空所有資料功能
-    async function resetAllAppData() {
-        if (!confirm("⚠️ 警告：這將會刪除所有「消費紀錄」、「轉帳紀錄」，並將所有「銀行帳戶、信用卡、持股與固定花費」全部歸零重置！\n\n確定要全部刪除重新開始嗎？")) return;
-        if (!confirm("再次確認：確定要清空所有雲端與本機資料嗎？（此操作無法復原）")) return;
-
-        toast("正在清空所有數據…");
+    // 1a. 重置「消費紀錄、轉帳紀錄」部分
+    async function resetRecordsOnly() {
+        if (!confirm("確定要清空所有「消費紀錄」與「轉帳紀錄」嗎？\n（您的銀行餘額、持股與固定花費不會被刪除）")) return;
+        toast("正在清空消費與轉帳紀錄…");
         try {
-            // 清空消費與轉帳紀錄 (id > 0)
             await _supabase.from("expenses").delete().gt("id", 0);
             await _supabase.from("fund_transfers").delete().gt("id", 0);
-            // 將所有銀行與信用卡餘額歸零
-            await _supabase.from("accounts").update({ balance: 0 }).gt("id", 0);
-            // 將預算與投資組合重設
-            await _supabase.from("config").upsert({ key: "monthly_budget", value: "0" });
-
-            PORTFOLIO_DATA = [];
-            KNOWN_ANNUAL_EXPENSES = [];
-            quoteUpdatedAt = "";
-            localStorage.removeItem("portfolio_state");
-            await savePortfolioState();
-
             await loadDashboard();
-            await loadAssetsData();
             await loadHistory("recent7");
-            toast("已清空所有舊資料，數據已全部歸零！");
+            toast("消費與轉帳紀錄已全數清空！");
         } catch (e) {
-            toast("重置過程發生錯誤：" + e.message);
+            toast("重置失敗：" + e.message);
+        }
+    }
+
+    // 1b. 重置「資產」部分 (銀行帳戶、信用卡歸零 + 投資持倉清空)
+    async function resetAssetsOnly() {
+        if (!confirm("確定要重置「資產」嗎？\n這會將所有銀行帳戶、信用卡餘額歸零，並清空所有投資持股！（日常消費紀錄與固定花費會保留）")) return;
+        toast("正在重置資產與投資持倉…");
+        try {
+            await _supabase.from("accounts").update({ balance: 0 }).gt("id", 0);
+            PORTFOLIO_DATA = [];
+            quoteUpdatedAt = "";
+            await savePortfolioState();
+            await loadAssetsData();
+            await loadDashboard();
+            toast("資產帳戶與投資持倉已全數重置歸零！");
+        } catch (e) {
+            toast("重置失敗：" + e.message);
+        }
+    }
+
+    // 1c. 重置「每年固定花費」部分
+    async function resetFixedExpensesOnly() {
+        if (!confirm("確定要清空「每年已知固定花費」的所有項目嗎？\n（消費紀錄與銀行資產不會受影響）")) return;
+        toast("正在清空每年固定花費…");
+        try {
+            KNOWN_ANNUAL_EXPENSES = [];
+            await savePortfolioState();
+            await loadDashboard();
+            toast("每年固定花費已全數清空！");
+        } catch (e) {
+            toast("重置失敗：" + e.message);
         }
     }
 
@@ -1391,7 +1427,6 @@
         }
     }
 
-    // 2. 切換「現金 / 信用卡 / 銀行」3種出帳分支
     function setPayMethod(method) {
         currentPayMethod = method;
         document.getElementById("pmCash").classList.toggle("on", method === "cash");
@@ -1533,13 +1568,11 @@
             const acc = accountsData.find(a => a.id == txAccVal);
             if (acc) {
                 if (acc.type === "debt") {
-                    // 信用卡刷卡支出：應繳欠款增加；若為退款/收入則減少欠款
                     const curDebt = Math.abs(Number(acc.balance || 0));
                     const nextDebt = (currentType === "expense") ? (curDebt + amt) : Math.max(0, curDebt - amt);
                     await _supabase.from("accounts").update({ balance: nextDebt }).eq("id", acc.id);
                     bankNoteTag = ` [${acc.name}]`;
                 } else {
-                    // 銀行帳戶：支出扣款，收入入帳
                     const delta = (currentType === "income") ? amt : -amt;
                     const nextBal = Number(acc.balance || 0) + delta;
                     await _supabase.from("accounts").update({ balance: nextBal }).eq("id", acc.id);
@@ -1573,7 +1606,6 @@
         loadHistory(lastHistoryMode);
     }
 
-    // 信用卡繳費視窗開啟與填值
     function openCreditCardPaySheet() {
         const cardSel = document.getElementById("ccPayCardSelect");
         const bankSel = document.getElementById("ccPayBankSelect");
@@ -1623,7 +1655,6 @@
         }
     }
 
-    // 執行信用卡扣款 (防呆自動歸零或扣除)
     async function executeCreditCardPayment() {
         const cardId = document.getElementById("ccPayCardSelect").value;
         const bankId = document.getElementById("ccPayBankSelect").value;
@@ -1666,7 +1697,6 @@
         loadHistory(lastHistoryMode);
     }
 
-    // 匯出 Excel 報表彈窗
     function openExportModal() {
         document.getElementById("exportModalBg").classList.add("show");
         document.getElementById("exportModalSheet").classList.add("show");
@@ -2026,7 +2056,7 @@
             `;
         });
         const hint = document.getElementById("quoteHint");
-        if (hint && quoteUpdatedAt) hint.textContent = "最後更新市價：" + quoteUpdatedAt;
+        if (hint) hint.textContent = quoteUpdatedAt ? ("最後更新市價：" + quoteUpdatedAt) : "點擊「更新市價」可抓取最新行情，或點卡片手動編輯。";
     }
 
     function recalcHolding(p) {
@@ -2043,13 +2073,13 @@
     async function loadPortfolioState() {
         try {
             const local = JSON.parse(localStorage.getItem("portfolio_state") || "null");
-            if (local && Array.isArray(local.holdings)) applyPortfolioState(local);
+            if (local) applyPortfolioState(local);
         } catch (e) {}
         const { data } = await _supabase.from("config").select("value").eq("key", "portfolio_state").maybeSingle();
         if (data && data.value) {
             try {
                 const parsed = typeof data.value === "string" ? JSON.parse(data.value) : data.value;
-                if (parsed && Array.isArray(parsed.holdings)) applyPortfolioState(parsed);
+                if (parsed) applyPortfolioState(parsed);
             } catch (e) {}
         }
     }
@@ -2057,7 +2087,7 @@
     function applyPortfolioState(st) {
         if (Array.isArray(st.holdings)) PORTFOLIO_DATA = st.holdings;
         if (st.fxRates) FX_RATES = st.fxRates;
-        if (st.quoteUpdatedAt) quoteUpdatedAt = st.quoteUpdatedAt;
+        if (st.quoteUpdatedAt !== undefined) quoteUpdatedAt = st.quoteUpdatedAt;
         if (Array.isArray(st.knownBills)) KNOWN_ANNUAL_EXPENSES = st.knownBills;
     }
 
@@ -2378,18 +2408,22 @@
         const tbody = document.getElementById("knownBillsBody");
         tbody.innerHTML = "";
 
-        KNOWN_ANNUAL_EXPENSES.forEach((b, idx) => {
-            annualTotal += b.annual;
-            monthlyTotal += b.monthlyAvg;
-            tbody.innerHTML += `
-                <tr onclick="openEditKnownBillSheet(${idx})">
-                    <td><b>${b.name}</b></td>
-                    <td><span class="stock-badge">${b.months}</span></td>
-                    <td style="text-align:right; font-weight:700;">$${money(b.annual)}</td>
-                    <td style="text-align:right; color:var(--teal); font-weight:800;">$${money(Math.round(b.monthlyAvg))}</td>
-                </tr>
-            `;
-        });
+        if (!KNOWN_ANNUAL_EXPENSES.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="empty">目前尚無固定花費項目，點右上角可新增</td></tr>';
+        } else {
+            KNOWN_ANNUAL_EXPENSES.forEach((b, idx) => {
+                annualTotal += b.annual;
+                monthlyTotal += b.monthlyAvg;
+                tbody.innerHTML += `
+                    <tr onclick="openEditKnownBillSheet(${idx})">
+                        <td><b>${b.name}</b></td>
+                        <td><span class="stock-badge">${b.months}</span></td>
+                        <td style="text-align:right; font-weight:700;">$${money(b.annual)}</td>
+                        <td style="text-align:right; color:var(--teal); font-weight:800;">$${money(Math.round(b.monthlyAvg))}</td>
+                    </tr>
+                `;
+            });
+        }
         document.getElementById("kpiAnnualBills").innerText = "NT$" + money(Math.round(annualTotal));
         document.getElementById("kpiMonthlyBillsAvg").innerText = "NT$" + money(Math.round(monthlyTotal));
     }
@@ -2427,7 +2461,6 @@
         document.getElementById("knownBillSheet").classList.remove("show");
     }
 
-    // 3. 開啟「週期金額設定視窗」 (年繳1格 / 季繳4格 / 雙月繳6格 / 月繳12格)
     function openPeriodCalcModal() {
         const currentTotal = parseFloat(document.getElementById("kbAnnual").value || "0");
         if (!tempPeriodValues.length && currentTotal > 0) {
@@ -2443,6 +2476,7 @@
         document.getElementById("periodCalcSheet").classList.remove("show");
     }
 
+    // 3. 週期金額設定：雙月繳只顯示「第 1 期 ～ 第 6 期」，不顯示月份
     function setPeriodCalcType(type) {
         currentPeriodType = type;
         ["year", "quarter", "bimonth", "month"].forEach(t => {
@@ -2460,7 +2494,7 @@
         for (let i = 0; i < count; i++) {
             let label = "年度金額";
             if (type === "quarter") label = `第 ${i + 1} 季`;
-            else if (type === "bimonth") label = `第 ${i + 1} 期 (${i*2+1}-${i*2+2}月)`;
+            else if (type === "bimonth") label = `第 ${i + 1} 期`;
             else if (type === "month") label = `${i + 1} 月`;
 
             const val = (tempPeriodValues.length === count && tempPeriodValues[i] !== undefined) ? tempPeriodValues[i] : "";
@@ -2504,7 +2538,6 @@
         });
         document.getElementById("kbAnnual").value = Math.round(sum);
 
-        // 自動連動更新繳納月份提示文字
         const monthTagMap = { year: "年繳", quarter: "每季", bimonth: "雙月繳", month: "每月" };
         const kbMonthsInput = document.getElementById("kbMonths");
         if (!kbMonthsInput.value || ["年繳", "每季", "雙月繳", "每月"].includes(kbMonthsInput.value)) {
@@ -2520,7 +2553,7 @@
         const name = document.getElementById("kbName").value.trim();
         const months = document.getElementById("kbMonths").value.trim();
         const annual = parseFloat(document.getElementById("kbAnnual").value || "0");
-        if (!name || annual <= 0) return toast("請輸入項目與有效年總額");
+        if (!name || annual <= 0) return toast("請輸入項目名稱，並點選「設定週期金額」計算總額");
 
         const monthlyAvg = annual / 12;
         const row = { 
