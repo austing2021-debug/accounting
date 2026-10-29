@@ -92,7 +92,7 @@
         }
 
         .page { display: none; }
-        .page.active { display: block; animation: fade .25s ease; }
+        .page.active { display: block; animation: fade .22s ease; }
         @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
         .hero {
@@ -446,32 +446,63 @@
         .acc-amt { font-size: 15px; font-weight: 800; text-align: right; }
         .acc-amt small { display: block; font-size: 10px; color: var(--teal); font-weight: 600; }
 
-        .bill-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
-        .bill-table th { text-align: left; padding: 8px 4px; color: var(--muted); border-bottom: 1px solid var(--line); font-size: 11px; }
-        .bill-table td { padding: 10px 4px; border-bottom: 1px dashed var(--line); color: var(--ink); cursor: pointer; }
+        .bill-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-top: 8px; }
+        .bill-table th { text-align: left; padding: 8px 3px; color: var(--muted); border-bottom: 1px solid var(--line); font-size: 10.5px; white-space: nowrap; }
+        .bill-table td { padding: 10px 3px; border-bottom: 1px dashed var(--line); color: var(--ink); cursor: pointer; vertical-align: middle; }
         .bill-table tr:hover td { background: #FAFBFD; }
 
+        /* 貸款與保單卡片列表樣式 */
+        .fin-card-item {
+            padding: 12px 2px;
+            border-bottom: 1px dashed var(--line);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .fin-card-item:last-child { border-bottom: none; }
+        .fin-card-item:hover { background: #FAFBFD; }
+        .fin-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .fin-card-title { font-weight: 800; font-size: 14px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+        .fin-card-amt { font-weight: 800; font-size: 14px; color: var(--teal); }
+        .fin-card-meta { font-size: 11px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; line-height: 1.4; }
+
         .page-kicker {
-            font-size: 12px; color: var(--muted); font-weight: 700;
-            margin: 0 0 10px; letter-spacing: 0.2px;
+            font-size: 13px; color: var(--muted); font-weight: 700;
+            margin: 0 0 12px; letter-spacing: 0.2px;
+            display: flex; align-items: center; gap: 6px;
         }
-        .settings-group { overflow: hidden; padding: 0; }
-        .settings-group h3 { padding: 14px 16px 0; margin: 0; }
+        .back-nav-btn {
+            color: var(--navy); font-weight: 800; font-size: 14px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 8px 4px 0;
+        }
+
+        /* 1. iOS 系統設定列表大方格樣式 */
+        .ios-settings-card {
+            background: var(--card);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
         .set-row {
-            display: flex; align-items: center; gap: 12px;
-            padding: 14px 16px; border-bottom: 1px solid var(--line);
+            display: flex; align-items: center; gap: 14px;
+            padding: 15px 18px; border-bottom: 1px solid var(--line);
             cursor: pointer; background: #fff;
+            transition: background 0.15s;
         }
+        .set-row:active { background: #F2F4F8; }
         .set-row:last-child { border-bottom: none; }
         .set-ico {
-            width: 34px; height: 34px; border-radius: 10px;
-            display: grid; place-items: center; flex: 0 0 auto; color: #fff; font-size: 13px;
+            width: 34px; height: 34px; border-radius: 9px;
+            display: grid; place-items: center; flex: 0 0 auto; color: #fff; font-size: 15px;
         }
-        .set-main { flex: 1; min-width: 0; }
-        .set-main b { display: block; font-size: 14px; }
-        .set-main span { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
-        .set-row .fa-chevron-right { color: #C5CAD6; font-size: 12px; }
-        .settings-pad { padding: 16px; }
+        .set-main { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; }
+        .set-main b { font-size: 15px; font-weight: 700; color: var(--ink); }
+        .set-main span { font-size: 12px; color: var(--muted); font-weight: 600; }
+        .set-row .fa-chevron-right { color: #C5CAD6; font-size: 13px; }
+
+        .settings-group { overflow: hidden; padding: 0; }
+        .settings-group h3 { padding: 14px 16px 0; margin: 0; }
 
         .fx-row {
             display: flex;
@@ -738,19 +769,75 @@
             </div>
         </section>
 
-        <!-- 頁面 4: 設定 -->
+        <!-- 1. 頁面 4: 設定主選單 (iOS 系統設定列表大方格) -->
         <section id="page-assets" class="page">
-            <p class="page-kicker">設定 · 預算、報表與偏好</p>
+            <p class="page-kicker">設定</p>
+            <div class="ios-settings-card">
+                <div class="set-row" onclick="switchTab('set-budget')">
+                    <div class="set-ico" style="background:#F0B429;"><i class="fa-solid fa-sliders"></i></div>
+                    <div class="set-main">
+                        <b>預算</b>
+                        <span id="iosBudgetPreview">NT$0</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="set-row" onclick="switchTab('set-fx')">
+                    <div class="set-ico" style="background:#3BA3D9;"><i class="fa-solid fa-coins"></i></div>
+                    <div class="set-main">
+                        <b>外幣</b>
+                        <span>即時匯率設定</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="set-row" onclick="switchTab('analysis')">
+                    <div class="set-ico" style="background:#7A6FF0;"><i class="fa-solid fa-chart-pie"></i></div>
+                    <div class="set-main">
+                        <b>圖表</b>
+                        <span>消費與年度趨勢分析</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="set-row" onclick="openKnownBillsReport()">
+                    <div class="set-ico" style="background:#2BB3A0;"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div class="set-main">
+                        <b>固定花費</b>
+                        <span>固定花費 · 貸款 · 保單與訂閱</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="set-row" onclick="switchTab('set-data')">
+                    <div class="set-ico" style="background:#5B8DEF;"><i class="fa-solid fa-database"></i></div>
+                    <div class="set-main">
+                        <b>資料處理</b>
+                        <span>同步 · 匯入 · 重置</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+            </div>
+        </section>
 
-            <div class="panel" style="margin-bottom:12px;">
+        <!-- 子視窗 4-1: 預算設定 -->
+        <section id="page-set-budget" class="page">
+            <div class="page-kicker">
+                <span class="back-nav-btn" onclick="switchTab('assets')"><i class="fa-solid fa-chevron-left"></i> 設定</span>
+                <span>· 預算</span>
+            </div>
+            <div class="panel">
                 <h3 style="margin-bottom:12px;">每月生活預算</h3>
                 <div style="display:flex; gap:8px; align-items:center;">
                     <input type="number" id="input_starting" placeholder="生活預算" style="flex:1; padding:10px 12px; font-size:15px; font-weight:700;" inputmode="numeric">
                     <button class="btn-solid" style="width:auto; padding:10px 18px; white-space:nowrap;" onclick="executeUpdateBudget()">儲存</button>
                 </div>
             </div>
+        </section>
 
-            <div class="panel" style="margin-bottom:12px;">
+        <!-- 子視窗 4-2: 外幣匯率設定 -->
+        <section id="page-set-fx" class="page">
+            <div class="page-kicker">
+                <span class="back-nav-btn" onclick="switchTab('assets')"><i class="fa-solid fa-chevron-left"></i> 設定</span>
+                <span>· 外幣</span>
+            </div>
+            <div class="panel">
                 <h3>外幣匯率設定 <span class="linkish" onclick="openAddFxSheet()">＋ 新增</span></h3>
                 <div id="fxRatesInputsBox"></div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
@@ -758,80 +845,14 @@
                     <button class="btn-solid" style="padding:10px 6px; font-size:12px;" onclick="saveFxRates()">儲存匯率</button>
                 </div>
             </div>
-
-            <div class="panel settings-group" style="margin-bottom:12px;">
-                <h3>圖表與報表</h3>
-                <div class="set-row" onclick="switchTab('analysis')">
-                    <div class="set-ico" style="background:#7A6FF0;"><i class="fa-solid fa-chart-pie"></i></div>
-                    <div class="set-main">
-                        <b>消費與年度趨勢分析</b>
-                        <span>本月與本年消費比例、同期花費對比</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-                <div class="set-row" onclick="openKnownBillsReport()">
-                    <div class="set-ico" style="background:#2BB3A0;"><i class="fa-solid fa-calendar-check"></i></div>
-                    <div class="set-main">
-                        <b>每年已知固定花費 (應付)</b>
-                        <span>週期金額設定、付款月份及換算平均每月預備金</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-            </div>
-
-            <!-- 1. 資料與同步 (重置拆分為 3 大獨立區塊：a.消費與轉帳紀錄、b.資產、c.每年固定花費) -->
-            <div class="panel settings-group">
-                <h3>資料與同步</h3>
-                <div class="set-row" onclick="document.getElementById('csvInput').click()">
-                    <div class="set-ico" style="background:#20c997;"><i class="fa-solid fa-file-csv"></i></div>
-                    <div class="set-main">
-                        <b>智慧發票匯入</b>
-                        <span>財政部 CSV 或日期/金額/備註格式</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-                <div class="set-row" style="cursor:default;">
-                    <div class="set-ico" style="background:#5B8DEF;"><i class="fa-solid fa-cloud"></i></div>
-                    <div class="set-main">
-                        <b>雲端同步狀態</b>
-                        <span id="setCloudText" style="font-weight:700;">連線中</span>
-                    </div>
-                </div>
-                <!-- 1a. 重置消費紀錄與轉帳紀錄 -->
-                <div class="set-row" onclick="resetRecordsOnly()">
-                    <div class="set-ico" style="background:var(--danger);"><i class="fa-solid fa-receipt"></i></div>
-                    <div class="set-main">
-                        <b style="color:var(--danger);">重置消費與轉帳紀錄</b>
-                        <span>僅清空所有日常收支與戶頭互轉歷史明細</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-                <!-- 1b. 重置資產部分 -->
-                <div class="set-row" onclick="resetAssetsOnly()">
-                    <div class="set-ico" style="background:var(--danger);"><i class="fa-solid fa-wallet"></i></div>
-                    <div class="set-main">
-                        <b style="color:var(--danger);">重置資產與投資持倉</b>
-                        <span>將所有銀行帳戶、信用卡餘額歸零並清空持股</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-                <!-- 1c. 重置每年固定花費部分 -->
-                <div class="set-row" onclick="resetFixedExpensesOnly()">
-                    <div class="set-ico" style="background:var(--danger);"><i class="fa-solid fa-calendar-xmark"></i></div>
-                    <div class="set-main">
-                        <b style="color:var(--danger);">重置每年固定花費</b>
-                        <span>清空所有每年已知固定花費項目與週期設定</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </div>
-                <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)">
-                <div id="import-status" style="font-size:11px;color:var(--muted);padding:0 16px 12px;"></div>
-            </div>
         </section>
 
-        <!-- 頁面 5: 分析圖表 -->
+        <!-- 子視窗 4-3: 圖表 (消費與年度趨勢分析) -->
         <section id="page-analysis" class="page">
-            <p class="page-kicker"><span class="linkish" onclick="switchTab('assets')">‹ 設定</span> · 消費分析報表</p>
+            <div class="page-kicker">
+                <span class="back-nav-btn" onclick="switchTab('assets')"><i class="fa-solid fa-chevron-left"></i> 設定</span>
+                <span>· 圖表分析</span>
+            </div>
             <div class="insight" id="insightBox">載入洞察中...</div>
             <div class="panel">
                 <h3>本月消費比例</h3>
@@ -862,28 +883,116 @@
             </button>
         </section>
 
-        <!-- 頁面 6: 應付 (每年已知固定花費) 專屬獨立報表 -->
+        <!-- 2. 子視窗 4-4: 固定花費 (三大主題：固定花費、貸款、保單與訂閱) -->
         <section id="page-known-bills" class="page">
-            <p class="page-kicker"><span class="linkish" onclick="switchTab('assets')">‹ 設定</span> · 每年已知固定花費</p>
+            <div class="page-kicker">
+                <span class="back-nav-btn" onclick="switchTab('assets')"><i class="fa-solid fa-chevron-left"></i> 設定</span>
+                <span>· 固定花費管理</span>
+            </div>
             <div class="kpi">
                 <div><span>年度應付總額</span><b id="kpiAnnualBills">NT$0</b></div>
                 <div><span>平均每月需提撥</span><b id="kpiMonthlyBillsAvg">NT$0</b></div>
             </div>
-            <div class="panel">
-                <h3>固定花費清單與繳費月份 
+
+            <div class="seg" id="fixedSubSeg">
+                <button class="on" onclick="switchFixedSubTab('bills', this)">固定花費</button>
+                <button onclick="switchFixedSubTab('loans', this)">貸款</button>
+                <button onclick="switchFixedSubTab('subs', this)">保單與訂閱</button>
+            </div>
+
+            <!-- 2a. 固定花費面板 (新增「繳納方式」A/B 欄) -->
+            <div class="panel" id="fixedTab_bills">
+                <h3>固定花費清單 
                     <span class="linkish" onclick="openAddKnownBillSheet()">＋ 新增項目</span>
                 </h3>
                 <table class="bill-table" id="knownBillsTable">
                     <thead>
                         <tr>
                             <th>項目</th>
-                            <th>繳納月份</th>
+                            <th>月份</th>
+                            <th>繳納方式</th>
                             <th style="text-align:right;">年總額</th>
-                            <th style="text-align:right;">平均每月</th>
+                            <th style="text-align:right;">月均</th>
                         </tr>
                     </thead>
                     <tbody id="knownBillsBody"></tbody>
                 </table>
+            </div>
+
+            <!-- 2b. 貸款面板 -->
+            <div class="panel" id="fixedTab_loans" style="display:none;">
+                <h3>貸款清單 
+                    <span class="linkish" onclick="openAddLoanSheet()">＋ 新增貸款</span>
+                </h3>
+                <div id="loansListBody"></div>
+            </div>
+
+            <!-- 2c. 保單與訂閱面板 -->
+            <div class="panel" id="fixedTab_subs" style="display:none;">
+                <h3>保單與訂閱清單 
+                    <span class="linkish" onclick="openAddSubSheet()">＋ 新增項目</span>
+                </h3>
+                <div id="subsListBody"></div>
+            </div>
+        </section>
+
+        <!-- 子視窗 4-5: 資料處理 -->
+        <section id="page-set-data" class="page">
+            <div class="page-kicker">
+                <span class="back-nav-btn" onclick="switchTab('assets')"><i class="fa-solid fa-chevron-left"></i> 設定</span>
+                <span>· 資料處理</span>
+            </div>
+            <div class="panel settings-group">
+                <h3>資料與同步</h3>
+                <div class="set-row" onclick="document.getElementById('csvInput').click()">
+                    <div class="set-ico" style="background:#20c997;"><i class="fa-solid fa-file-csv"></i></div>
+                    <div class="set-main">
+                        <div>
+                            <b>智慧發票匯入</b>
+                            <span style="display:block; margin-top:2px;">財政部 CSV 或日期/金額/備註格式</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="set-row" style="cursor:default;">
+                    <div class="set-ico" style="background:#5B8DEF;"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="set-main">
+                        <b>雲端同步狀態</b>
+                        <span id="setCloudText" style="font-weight:700;">連線中</span>
+                    </div>
+                </div>
+                <div class="set-row" onclick="resetRecordsOnly()">
+                    <div class="set-ico" style="background:var(--danger);"><i class="fa-solid fa-receipt"></i></div>
+                    <div class="set-main">
+                        <div>
+                            <b style="color:var(--danger);">重置消費與轉帳紀錄</b>
+                            <span style="display:block; margin-top:2px;">僅清空所有日常收支與戶頭互轉歷史明細</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="set-row" onclick="resetAssetsOnly()">
+                    <div class="set-ico" style="background:var(--danger);"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="set-main">
+                        <div>
+                            <b style="color:var(--danger);">重置資產與投資持倉</b>
+                            <span style="display:block; margin-top:2px;">將所有銀行帳戶、信用卡餘額歸零並清空持股</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="set-row" onclick="resetFixedExpensesOnly()">
+                    <div class="set-ico" style="background:var(--danger);"><i class="fa-solid fa-calendar-xmark"></i></div>
+                    <div class="set-main">
+                        <div>
+                            <b style="color:var(--danger);">重置每年固定花費</b>
+                            <span style="display:block; margin-top:2px;">清空固定花費、貸款、保單與訂閱所有設定</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <input type="file" id="csvInput" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)">
+                <div id="import-status" style="font-size:11px;color:var(--muted);padding:0 16px 12px;"></div>
             </div>
         </section>
     </div>
@@ -1077,7 +1186,7 @@
     <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="addNewFxRate()">確認新增</button>
 </div>
 
-<!-- 2. 每年已知固定花費 編輯/新增彈窗 ("年度總額"改為唯讀，不可手動輸入，由設定週期金額帶入) -->
+<!-- 2a. 每年已知固定花費 編輯/新增彈窗 (含 A/B 繳納方式選擇) -->
 <div class="sheet-bg" id="knownBillBg" onclick="closeKnownBillSheet()"></div>
 <div class="sheet" id="knownBillSheet">
     <div class="grab"></div>
@@ -1088,6 +1197,28 @@
     <input type="hidden" id="knownBillIdx" value="-1">
     <div class="field"><label>項目名稱</label><input id="kbName" placeholder="例如: 幼稚園學雜費"></div>
     <div class="field"><label>繳納月份標記</label><input id="kbMonths" placeholder="例如: 每月 或 1,3,5,7,9,11月"></div>
+    
+    <!-- 2a. 新增繳納方式 A/B -->
+    <div class="field">
+        <label>繳納週期 (A)</label>
+        <select id="kbCycleA">
+            <option value="月繳">月繳</option>
+            <option value="季繳">季繳</option>
+            <option value="年繳">年繳</option>
+        </select>
+    </div>
+    <div class="field">
+        <label>扣款來源 (B)</label>
+        <div class="pay-method-tabs">
+            <button type="button" class="pay-method-btn on" id="kbPayB_cash" onclick="setSharedPayB('kb', 'cash')">現金</button>
+            <button type="button" class="pay-method-btn" id="kbPayB_bank" onclick="setSharedPayB('kb', 'bank')">戶頭</button>
+            <button type="button" class="pay-method-btn" id="kbPayB_card" onclick="setSharedPayB('kb', 'card')">信用卡</button>
+        </div>
+        <div id="kbPayBTargetWrap" style="display:none; margin-top:8px;">
+            <select id="kbPayBTarget"></select>
+        </div>
+    </div>
+
     <div class="field">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
             <label style="margin-bottom:0;">年度總額 (TWD)</label>
@@ -1101,7 +1232,80 @@
     <button class="btn-ghost" id="kbDelBtn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteKnownBillItem()">刪除此項目</button>
 </div>
 
-<!-- 3. 設定週期金額視窗 (移除按鈕次數文字、雙月繳僅顯示期數) -->
+<!-- 2b. 貸款 編輯/新增彈窗 -->
+<div class="sheet-bg" id="loanSheetBg" onclick="closeLoanSheet()"></div>
+<div class="sheet" id="loanSheet">
+    <div class="grab"></div>
+    <div class="sheet-head">
+        <h2 id="loanSheetTitle">貸款設定</h2>
+        <button class="icon-btn" onclick="closeLoanSheet()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <input type="hidden" id="loanIdx" value="-1">
+    <div class="field"><label>項目名稱</label><input id="loanName" placeholder="例如: LINE BANK 信貸"></div>
+    <div class="field"><label>貸款總金額 (TWD)</label><input type="number" id="loanTotalAmt" placeholder="0" inputmode="decimal"></div>
+    <div class="grid-2" style="margin-bottom:0;">
+        <div class="field"><label>開始 (年/月)</label><input type="month" id="loanStartYm"></div>
+        <div class="field"><label>結束 (年/月)</label><input type="month" id="loanEndYm"></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:0;">
+        <div class="field"><label>總期數 (期)</label><input type="number" id="loanPeriods" placeholder="例如: 60" inputmode="numeric"></div>
+        <div class="field"><label>每次還款金額</label><input type="number" id="loanPerAmt" placeholder="例如: 1810" inputmode="decimal"></div>
+    </div>
+    <div class="field">
+        <label>還款方式</label>
+        <div class="pay-method-tabs">
+            <button type="button" class="pay-method-btn on" id="loanPayB_cash" onclick="setSharedPayB('loan', 'cash')">現金</button>
+            <button type="button" class="pay-method-btn" id="loanPayB_bank" onclick="setSharedPayB('loan', 'bank')">戶頭</button>
+            <button type="button" class="pay-method-btn" id="loanPayB_card" onclick="setSharedPayB('loan', 'card')">信用卡</button>
+        </div>
+        <div id="loanPayBTargetWrap" style="display:none; margin-top:8px;">
+            <select id="loanPayBTarget"></select>
+        </div>
+    </div>
+    <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="saveLoanItem()">儲存貸款</button>
+    <button class="btn-ghost" id="loanDelBtn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteLoanItem()">刪除此貸款</button>
+</div>
+
+<!-- 2c. 保單與訂閱 編輯/新增彈窗 -->
+<div class="sheet-bg" id="subSheetBg" onclick="closeSubSheet()"></div>
+<div class="sheet" id="subSheet">
+    <div class="grab"></div>
+    <div class="sheet-head">
+        <h2 id="subSheetTitle">保單與訂閱設定</h2>
+        <button class="icon-btn" onclick="closeSubSheet()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <input type="hidden" id="subIdx" value="-1">
+    <div class="field"><label>項目名稱</label><input id="subName" placeholder="例如: 個人保險 / Netflix / AI 訂閱"></div>
+    <div class="grid-2" style="margin-bottom:0;">
+        <div class="field">
+            <label>租約方式</label>
+            <select id="subCycle">
+                <option value="月租">月租</option>
+                <option value="年租">年租</option>
+            </select>
+        </div>
+        <div class="field"><label>租用費用 (TWD)</label><input type="number" id="subFee" placeholder="0" inputmode="decimal"></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:0;">
+        <div class="field"><label>開始 (年/月)</label><input type="month" id="subStartYm"></div>
+        <div class="field"><label>結束 (年/月)</label><input type="month" id="subEndYm"></div>
+    </div>
+    <div class="field">
+        <label>繳款方式</label>
+        <div class="pay-method-tabs">
+            <button type="button" class="pay-method-btn on" id="subPayB_cash" onclick="setSharedPayB('sub', 'cash')">現金</button>
+            <button type="button" class="pay-method-btn" id="subPayB_bank" onclick="setSharedPayB('sub', 'bank')">戶頭</button>
+            <button type="button" class="pay-method-btn" id="subPayB_card" onclick="setSharedPayB('sub', 'card')">信用卡</button>
+        </div>
+        <div id="subPayBTargetWrap" style="display:none; margin-top:8px;">
+            <select id="subPayBTarget"></select>
+        </div>
+    </div>
+    <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="saveSubItem()">儲存項目</button>
+    <button class="btn-ghost" id="subDelBtn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteSubItem()">刪除此項目</button>
+</div>
+
+<!-- 設定週期金額視窗 -->
 <div class="sheet-bg" id="periodCalcBg" style="z-index:70;" onclick="closePeriodCalcModal()"></div>
 <div class="sheet" id="periodCalcSheet" style="z-index:71;">
     <div class="grab"></div>
@@ -1153,6 +1357,19 @@
         "國泰CUBE卡(2288)", "華南商務御璽卡(5123)", "永豐鈦豐卡(4300)", "富邦Costco卡(4368)"
     ];
 
+    // 銀行對應帳號對照表 (供「戶頭(銀行與其帳號)」格式化顯示)
+    const BANK_ACC_NO_MAP = {
+        "上海銀行(011)": "45203000423405",
+        "第一銀行(007)": "16968071161",
+        "一銀ileo(007)": "24557049184",
+        "郵局(700)": "00114310049539",
+        "華南銀行(008)": "168200605791",
+        "華南SnY(008)": "777209496032",
+        "國泰世華銀行(013)": "109506319040",
+        "LINE BANK(824)": "111016268459",
+        "永豐銀行(807)": "12501800100988"
+    };
+
     const DEFAULT_PORTFOLIO = [
         { type: 'tw', name: '至上', symbol: '8112', broker: '國泰證券', shares: 1000, costPrice: 53.86, currPrice: 85.3, cost: 53860, mktVal: 85300 },
         { type: 'tw', name: '國泰金', symbol: '2882', broker: '國泰證券', shares: 300, costPrice: 45.97, currPrice: 78.6, cost: 13791, mktVal: 23580 },
@@ -1167,21 +1384,33 @@
     ];
     let PORTFOLIO_DATA = JSON.parse(JSON.stringify(DEFAULT_PORTFOLIO));
 
+    // 2a. 每年已知固定花費預設清單 (含 A/B 繳納方式)
     let KNOWN_ANNUAL_EXPENSES = [
-        { name: "勞保", annual: 12600, months: "每月", monthlyAvg: 1050, periodType: "month", periodValues: Array(12).fill(1050) },
-        { name: "健保", annual: 15624, months: "每月", monthlyAvg: 1302, periodType: "month", periodValues: Array(12).fill(1302) },
-        { name: "手機電話費", annual: 16788, months: "每月", monthlyAvg: 1399, periodType: "month", periodValues: Array(12).fill(1399) },
-        { name: "第四台與網路", annual: 13188, months: "每季", monthlyAvg: 1099, periodType: "quarter", periodValues: [3297, 3297, 3297, 3297] },
-        { name: "電費", annual: 9907, months: "1,3,5,7,9,11月", monthlyAvg: 826, periodType: "bimonth", periodValues: [1323, 1229, 1853, 2443, 1650, 1409] },
-        { name: "水費", annual: 3166, months: "1,3,5,7,9,11月", monthlyAvg: 264, periodType: "bimonth", periodValues: [595, 580, 310, 536, 625, 520] },
-        { name: "活存定儲(停車費)", annual: 57600, months: "每月", monthlyAvg: 4800, periodType: "month", periodValues: Array(12).fill(4800) },
-        { name: "地價稅", annual: 1463, months: "11月", monthlyAvg: 122, periodType: "year", periodValues: [1463] },
-        { name: "房屋稅", annual: 3611, months: "5月", monthlyAvg: 301, periodType: "year", periodValues: [3611] },
-        { name: "牌照稅與燃料稅", annual: 1400, months: "4,7月", monthlyAvg: 117, periodType: "year", periodValues: [1400] },
-        { name: "飲水機濾心保養", annual: 6500, months: "8月", monthlyAvg: 542, periodType: "year", periodValues: [6500] },
-        { name: "大樓管理費", annual: 6000, months: "每月", monthlyAvg: 500, periodType: "month", periodValues: Array(12).fill(500) },
-        { name: "幼稚園學雜費", annual: 86473, months: "每月", monthlyAvg: 7206, periodType: "month", periodValues: [7500, 6650, 5400, 4600, 5250, 5200, 8750, 8023, 5850, 10550, 7150, 11550] },
-        { name: "幼稚園羊奶費", annual: 8058, months: "每月", monthlyAvg: 672, periodType: "month", periodValues: [680, 680, 680, 680, 680, 680, 680, 680, 680, 680, 544, 714] }
+        { name: "勞保", annual: 12600, months: "每月", monthlyAvg: 1050, periodType: "month", periodValues: Array(12).fill(1050), payCycleA: "月繳", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" },
+        { name: "健保", annual: 15624, months: "每月", monthlyAvg: 1302, periodType: "month", periodValues: Array(12).fill(1302), payCycleA: "月繳", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" },
+        { name: "手機電話費", annual: 16788, months: "每月", monthlyAvg: 1399, periodType: "month", periodValues: Array(12).fill(1399), payCycleA: "月繳", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" },
+        { name: "第四台與網路", annual: 13188, months: "每季", monthlyAvg: 1099, periodType: "quarter", periodValues: [3297, 3297, 3297, 3297], payCycleA: "季繳", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" },
+        { name: "電費", annual: 9907, months: "1,3,5,7,9,11月", monthlyAvg: 826, periodType: "bimonth", periodValues: [1323, 1229, 1853, 2443, 1650, 1409], payCycleA: "月繳", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" },
+        { name: "水費", annual: 3166, months: "1,3,5,7,9,11月", monthlyAvg: 264, periodType: "bimonth", periodValues: [595, 580, 310, 536, 625, 520], payCycleA: "月繳", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" },
+        { name: "活存定儲(停車費)", annual: 57600, months: "每月", monthlyAvg: 4800, periodType: "month", periodValues: Array(12).fill(4800), payCycleA: "月繳", payTypeB: "bank", payTargetB: "郵局(700) 00114310049539" },
+        { name: "地價稅", annual: 1463, months: "11月", monthlyAvg: 122, periodType: "year", periodValues: [1463], payCycleA: "年繳", payTypeB: "cash", payTargetB: "現金" },
+        { name: "房屋稅", annual: 3611, months: "5月", monthlyAvg: 301, periodType: "year", periodValues: [3611], payCycleA: "年繳", payTypeB: "cash", payTargetB: "現金" },
+        { name: "牌照稅與燃料稅", annual: 1400, months: "4,7月", monthlyAvg: 117, periodType: "year", periodValues: [1400], payCycleA: "年繳", payTypeB: "cash", payTargetB: "現金" },
+        { name: "飲水機濾心保養", annual: 6500, months: "8月", monthlyAvg: 542, periodType: "year", periodValues: [6500], payCycleA: "年繳", payTypeB: "cash", payTargetB: "現金" },
+        { name: "大樓管理費", annual: 6000, months: "每月", monthlyAvg: 500, periodType: "month", periodValues: Array(12).fill(500), payCycleA: "月繳", payTypeB: "cash", payTargetB: "現金" },
+        { name: "幼稚園學雜費", annual: 86473, months: "每月", monthlyAvg: 7206, periodType: "month", periodValues: [7500, 6650, 5400, 4600, 5250, 5200, 8750, 8023, 5850, 10550, 7150, 11550], payCycleA: "月繳", payTypeB: "bank", payTargetB: "LINE BANK(824) 111016268459" },
+        { name: "幼稚園羊奶費", annual: 8058, months: "每月", monthlyAvg: 672, periodType: "month", periodValues: [680, 680, 680, 680, 680, 680, 680, 680, 680, 680, 544, 714], payCycleA: "月繳", payTypeB: "bank", payTargetB: "LINE BANK(824) 111016268459" }
+    ];
+
+    // 2b. 貸款預設資料 (對應 Excel LINK BANK 信貸)
+    let LOANS_DATA = [
+        { name: "LINE BANK 信貸", totalAmount: 108600, startDate: "2023-09", endDate: "2028-08", periods: 60, perAmount: 1810, payTypeB: "bank", payTargetB: "LINE BANK(824) 111016268459" }
+    ];
+
+    // 2c. 保單與訂閱預設資料 (對應 Excel 個人與女兒保險)
+    let SUBSCRIPTIONS_DATA = [
+        { name: "保險費(個人)", cycle: "月租", fee: 1909, startDate: "2024-01", endDate: "2044-12", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" },
+        { name: "保險費(女兒)", cycle: "月租", fee: 1596, startDate: "2024-01", endDate: "2044-12", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" }
     ];
 
     const subData = {
@@ -1214,6 +1443,8 @@
     let currentPayMethod = "cash";
     let currentPeriodType = "year";
     let tempPeriodValues = [];
+    let fixedSubTab = "bills"; // 'bills', 'loans', 'subs'
+    let sharedPayBState = { kb: "cash", loan: "cash", sub: "cash" };
 
     let dashboardData = { budget: 0, spent: 0, income: 0, leftover: 0, breakdown: {}, recent: [] };
     let yearBreakdown = {};
@@ -1288,7 +1519,10 @@
         
         if (el) el.classList.add("active");
         else {
-            const map = { overview: 0, records: 1, invest: 2, assets: 3, analysis: 3, "known-bills": 3 };
+            const map = { 
+                overview: 0, records: 1, invest: 2, assets: 3, 
+                "set-budget": 3, "set-fx": 3, analysis: 3, "known-bills": 3, "set-data": 3 
+            };
             const tabs = document.querySelectorAll(".tabbar .tab");
             if (tabs[map[name]]) tabs[map[name]].classList.add("active");
         }
@@ -1301,11 +1535,91 @@
             renderInsight();
         }
         if (name === "invest") loadAssetsData();
-        if (name === "assets") loadDashboard();
+        if (name === "assets" || name === "set-budget") loadDashboard();
+        if (name === "set-fx") renderFxInputs();
         if (name === "records") loadHistory(lastHistoryMode);
     }
 
-    // 1a. 重置「消費紀錄、轉帳紀錄」部分
+    // 計算「固定花費 + 貸款 + 保單與訂閱」的每月總應付預備金
+    function getAllFixedMonthlySum() {
+        const billsAvg = KNOWN_ANNUAL_EXPENSES.reduce((s, b) => s + Number(b.monthlyAvg || 0), 0);
+        const loansMonthly = LOANS_DATA.reduce((s, l) => s + Number(l.perAmount || 0), 0);
+        const subsMonthly = SUBSCRIPTIONS_DATA.reduce((s, sub) => {
+            const fee = Number(sub.fee || 0);
+            return s + (sub.cycle === "年租" ? fee / 12 : fee);
+        }, 0);
+        return billsAvg + loansMonthly + subsMonthly;
+    }
+
+    function getAllFixedAnnualSum() {
+        const billsAnn = KNOWN_ANNUAL_EXPENSES.reduce((s, b) => s + Number(b.annual || 0), 0);
+        const loansAnn = LOANS_DATA.reduce((s, l) => s + Number(l.perAmount || 0) * 12, 0);
+        const subsAnn = SUBSCRIPTIONS_DATA.reduce((s, sub) => {
+            const fee = Number(sub.fee || 0);
+            return s + (sub.cycle === "年租" ? fee : fee * 12);
+        }, 0);
+        return billsAnn + loansAnn + subsAnn;
+    }
+
+    // 共用「現金 / 戶頭(銀行與其帳號) / 信用卡(卡片銀行)」選擇器邏輯
+    function setSharedPayB(prefix, mode, selectedVal = "") {
+        sharedPayBState[prefix] = mode;
+        ["cash", "bank", "card"].forEach(m => {
+            const btn = document.getElementById(`${prefix}PayB_${m}`);
+            if (btn) btn.classList.toggle("on", m === mode);
+        });
+
+        const wrap = document.getElementById(`${prefix}PayBTargetWrap`);
+        const sel = document.getElementById(`${prefix}PayBTarget`);
+        if (!wrap || !sel) return;
+        sel.innerHTML = "";
+
+        if (mode === "cash") {
+            wrap.style.display = "none";
+            return;
+        }
+
+        wrap.style.display = "block";
+        if (mode === "bank") {
+            let banks = accountsData.filter(a => a.type === "bank" || a.type === "foreign");
+            banks.sort((a, b) => {
+                const ia = SEED_TAIWAN_BANKS.indexOf(a.name);
+                const ib = SEED_TAIWAN_BANKS.indexOf(b.name);
+                return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+            });
+            banks.forEach(b => {
+                const accNo = b.account_no || BANK_ACC_NO_MAP[b.name] || "";
+                const label = accNo ? `${b.name} (${accNo})` : b.name;
+                const val = accNo ? `${b.name} ${accNo}` : b.name;
+                sel.innerHTML += `<option value="${val}">${label}</option>`;
+            });
+        } else if (mode === "card") {
+            let cards = accountsData.filter(a => a.type === "debt");
+            cards.sort((a, b) => {
+                const ia = SEED_CREDIT_CARDS.indexOf(a.name);
+                const ib = SEED_CREDIT_CARDS.indexOf(b.name);
+                return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+            });
+            cards.forEach(c => {
+                sel.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+            });
+        }
+
+        if (selectedVal) {
+            const exists = Array.from(sel.options).some(o => o.value === selectedVal);
+            if (!exists) sel.innerHTML += `<option value="${selectedVal}">${selectedVal}</option>`;
+            sel.value = selectedVal;
+        }
+    }
+
+    function getSharedPayBValue(prefix) {
+        const mode = sharedPayBState[prefix] || "cash";
+        if (mode === "cash") return { typeB: "cash", targetB: "現金" };
+        const sel = document.getElementById(`${prefix}PayBTarget`);
+        return { typeB: mode, targetB: (sel && sel.value) ? sel.value : (mode === "bank" ? "戶頭" : "信用卡") };
+    }
+
+    // 1a. 重置「消費紀錄、轉帳紀錄」
     async function resetRecordsOnly() {
         if (!confirm("確定要清空所有「消費紀錄」與「轉帳紀錄」嗎？\n（您的銀行餘額、持股與固定花費不會被刪除）")) return;
         toast("正在清空消費與轉帳紀錄…");
@@ -1320,7 +1634,7 @@
         }
     }
 
-    // 1b. 重置「資產」部分 (銀行帳戶、信用卡歸零 + 投資持倉清空)
+    // 1b. 重置「資產」
     async function resetAssetsOnly() {
         if (!confirm("確定要重置「資產」嗎？\n這會將所有銀行帳戶、信用卡餘額歸零，並清空所有投資持股！（日常消費紀錄與固定花費會保留）")) return;
         toast("正在重置資產與投資持倉…");
@@ -1337,15 +1651,17 @@
         }
     }
 
-    // 1c. 重置「每年固定花費」部分
+    // 1c. 重置「每年固定花費」 (固定花費 + 貸款 + 保單與訂閱)
     async function resetFixedExpensesOnly() {
-        if (!confirm("確定要清空「每年已知固定花費」的所有項目嗎？\n（消費紀錄與銀行資產不會受影響）")) return;
-        toast("正在清空每年固定花費…");
+        if (!confirm("確定要清空「固定花費、貸款、保單與訂閱」的所有項目嗎？\n（消費紀錄與銀行資產不會受影響）")) return;
+        toast("正在清空固定花費與合約…");
         try {
             KNOWN_ANNUAL_EXPENSES = [];
+            LOANS_DATA = [];
+            SUBSCRIPTIONS_DATA = [];
             await savePortfolioState();
             await loadDashboard();
-            toast("每年固定花費已全數清空！");
+            toast("固定花費、貸款與保單已全數清空！");
         } catch (e) {
             toast("重置失敗：" + e.message);
         }
@@ -1747,11 +2063,24 @@
         });
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(stockRows), "投資持倉");
 
-        const billRows = [["項目名稱", "繳納月份", "年度總額", "平均每月需提撥"]];
+        const billRows = [["項目名稱", "繳納月份", "繳納方式", "年度總額", "平均每月需提撥"]];
         KNOWN_ANNUAL_EXPENSES.forEach(b => {
-            billRows.push([b.name, b.months, b.annual, Math.round(b.monthlyAvg)]);
+            const methodStr = `${b.payCycleA || '月繳'}/${b.payTargetB || '現金'}`;
+            billRows.push([b.name, b.months, methodStr, b.annual, Math.round(b.monthlyAvg)]);
         });
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(billRows), "固定費用應付");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(billRows), "固定花費");
+
+        const loanRows = [["貸款項目", "總金額", "期間(起~迄)", "期數", "每次還款金額", "還款方式"]];
+        LOANS_DATA.forEach(l => {
+            loanRows.push([l.name, l.totalAmount, `${l.startDate}~${l.endDate}`, l.periods, l.perAmount, l.payTargetB || "現金"]);
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(loanRows), "貸款");
+
+        const subRows = [["保單/訂閱項目", "租約方式", "租用費用", "期間(起~迄)", "繳款方式"]];
+        SUBSCRIPTIONS_DATA.forEach(s => {
+            subRows.push([s.name, s.cycle, s.fee, `${s.startDate}~${s.endDate}`, s.payTargetB || "現金"]);
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(subRows), "保單與訂閱");
 
         const expenseRows = [["日期", "類別", "子項目", "金額", "備註"]];
         (records || []).forEach(r => {
@@ -1816,6 +2145,8 @@
         hero.classList.toggle("neg", leftover < 0);
         document.getElementById("heroInitBudget").innerText = `本月預算: NT$${money(budget)}`;
         document.getElementById("input_starting").value = budget || "";
+        const iosBudgetEl = document.getElementById("iosBudgetPreview");
+        if (iosBudgetEl) iosBudgetEl.innerText = `NT$${money(budget)}`;
 
         renderComboBreakdown();
         drawOverviewDonut();
@@ -1924,7 +2255,7 @@
             }
         });
 
-        let unpaidBillsSum = KNOWN_ANNUAL_EXPENSES.reduce((s, b) => s + b.monthlyAvg, 0);
+        let unpaidBillsSum = getAllFixedMonthlySum();
         let currentSpent = dashboardData.spent || 0;
 
         let stockMktVal = 0;
@@ -2089,10 +2420,19 @@
         if (st.fxRates) FX_RATES = st.fxRates;
         if (st.quoteUpdatedAt !== undefined) quoteUpdatedAt = st.quoteUpdatedAt;
         if (Array.isArray(st.knownBills)) KNOWN_ANNUAL_EXPENSES = st.knownBills;
+        if (Array.isArray(st.loans)) LOANS_DATA = st.loans;
+        if (Array.isArray(st.subs)) SUBSCRIPTIONS_DATA = st.subs;
     }
 
     async function savePortfolioState() {
-        const payload = { holdings: PORTFOLIO_DATA, fxRates: FX_RATES, quoteUpdatedAt, knownBills: KNOWN_ANNUAL_EXPENSES };
+        const payload = { 
+            holdings: PORTFOLIO_DATA, 
+            fxRates: FX_RATES, 
+            quoteUpdatedAt, 
+            knownBills: KNOWN_ANNUAL_EXPENSES,
+            loans: LOANS_DATA,
+            subs: SUBSCRIPTIONS_DATA
+        };
         localStorage.setItem("portfolio_state", JSON.stringify(payload));
         await _supabase.from("config").upsert({ key: "portfolio_state", value: JSON.stringify(payload) });
         renderFxInputs();
@@ -2357,7 +2697,7 @@
         let needRefresh = false;
         for (const name of SEED_TAIWAN_BANKS) {
             if (!accountsData.some(a => a.name === name)) {
-                await _supabase.from("accounts").insert([{ name, type: "bank", currency: "TWD", balance: 0 }]);
+                await _supabase.from("accounts").insert([{ name, type: "bank", currency: "TWD", balance: 0, account_no: BANK_ACC_NO_MAP[name] || "" }]);
                 needRefresh = true;
             }
         }
@@ -2399,40 +2739,110 @@
         calcAndRenderOverviewNetWorth();
     }
 
+    // 2. 固定花費三大主題視窗渲染 (固定花費 / 貸款 / 保單與訂閱)
     function openKnownBillsReport() {
-        document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-        document.getElementById("page-known-bills").classList.add("active");
+        switchTab("known-bills");
+        renderAllFixedModules();
+    }
 
-        let annualTotal = 0;
-        let monthlyTotal = 0;
+    function switchFixedSubTab(sub, btn) {
+        fixedSubTab = sub;
+        document.querySelectorAll("#fixedSubSeg button").forEach(b => b.classList.remove("on"));
+        if (btn) btn.classList.add("on");
+
+        document.getElementById("fixedTab_bills").style.display = sub === "bills" ? "block" : "none";
+        document.getElementById("fixedTab_loans").style.display = sub === "loans" ? "block" : "none";
+        document.getElementById("fixedTab_subs").style.display = sub === "subs" ? "block" : "none";
+        renderAllFixedModules();
+    }
+
+    function renderAllFixedModules() {
+        // 更新頂部總計 KPI
+        document.getElementById("kpiAnnualBills").innerText = "NT$" + money(Math.round(getAllFixedAnnualSum()));
+        document.getElementById("kpiMonthlyBillsAvg").innerText = "NT$" + money(Math.round(getAllFixedMonthlySum()));
+
+        // 2a. 渲染固定花費列表 (新增繳納方式 A/B)
         const tbody = document.getElementById("knownBillsBody");
         tbody.innerHTML = "";
-
         if (!KNOWN_ANNUAL_EXPENSES.length) {
-            tbody.innerHTML = '<tr><td colspan="4" class="empty">目前尚無固定花費項目，點右上角可新增</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="empty">尚無固定花費項目，點右上角可新增</td></tr>';
         } else {
             KNOWN_ANNUAL_EXPENSES.forEach((b, idx) => {
-                annualTotal += b.annual;
-                monthlyTotal += b.monthlyAvg;
+                const cycleA = b.payCycleA || "月繳";
+                const targetB = b.payTargetB || "現金";
+                const abDisplay = `${cycleA}/${targetB}`;
                 tbody.innerHTML += `
                     <tr onclick="openEditKnownBillSheet(${idx})">
                         <td><b>${b.name}</b></td>
                         <td><span class="stock-badge">${b.months}</span></td>
+                        <td style="font-size:10.5px; color:var(--navy); font-weight:600; max-width:95px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${abDisplay}">${abDisplay}</td>
                         <td style="text-align:right; font-weight:700;">$${money(b.annual)}</td>
                         <td style="text-align:right; color:var(--teal); font-weight:800;">$${money(Math.round(b.monthlyAvg))}</td>
                     </tr>
                 `;
             });
         }
-        document.getElementById("kpiAnnualBills").innerText = "NT$" + money(Math.round(annualTotal));
-        document.getElementById("kpiMonthlyBillsAvg").innerText = "NT$" + money(Math.round(monthlyTotal));
+
+        // 2b. 渲染貸款列表
+        const loansBox = document.getElementById("loansListBody");
+        loansBox.innerHTML = "";
+        if (!LOANS_DATA.length) {
+            loansBox.innerHTML = '<div class="empty">尚無貸款紀錄，點右上角可新增</div>';
+        } else {
+            LOANS_DATA.forEach((l, idx) => {
+                loansBox.innerHTML += `
+                    <div class="fin-card-item" onclick="openEditLoanSheet(${idx})">
+                        <div class="fin-card-top">
+                            <div class="fin-card-title">
+                                <span>${l.name}</span>
+                                <span class="stock-badge">${l.periods}期</span>
+                            </div>
+                            <div class="fin-card-amt">每次 $${money(l.perAmount)}</div>
+                        </div>
+                        <div class="fin-card-meta">
+                            <span>總額: $${money(l.totalAmount)}</span>
+                            <span>· 期間: ${l.startDate || '-'} ~ ${l.endDate || '-'}</span>
+                            <span>· 還款: ${l.payTargetB || '現金'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 2c. 渲染保單與訂閱列表
+        const subsBox = document.getElementById("subsListBody");
+        subsBox.innerHTML = "";
+        if (!SUBSCRIPTIONS_DATA.length) {
+            subsBox.innerHTML = '<div class="empty">尚無保單與訂閱項目，點右上角可新增</div>';
+        } else {
+            SUBSCRIPTIONS_DATA.forEach((s, idx) => {
+                subsBox.innerHTML += `
+                    <div class="fin-card-item" onclick="openEditSubSheet(${idx})">
+                        <div class="fin-card-top">
+                            <div class="fin-card-title">
+                                <span>${s.name}</span>
+                                <span class="stock-badge">${s.cycle}</span>
+                            </div>
+                            <div class="fin-card-amt">$${money(s.fee)} / ${s.cycle === '年租' ? '年' : '月'}</div>
+                        </div>
+                        <div class="fin-card-meta">
+                            <span>期間: ${s.startDate || '-'} ~ ${s.endDate || '-'}</span>
+                            <span>· 繳款: ${s.payTargetB || '現金'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
     }
 
+    // 2a. 固定花費新增與編輯
     function openAddKnownBillSheet() {
         document.getElementById("knownBillTitle").innerText = "新增固定花費項目";
         document.getElementById("knownBillIdx").value = "-1";
         document.getElementById("kbName").value = "";
         document.getElementById("kbMonths").value = "每月";
+        document.getElementById("kbCycleA").value = "月繳";
+        setSharedPayB("kb", "cash");
         document.getElementById("kbAnnual").value = "";
         currentPeriodType = "month";
         tempPeriodValues = [];
@@ -2448,6 +2858,8 @@
         document.getElementById("knownBillIdx").value = idx;
         document.getElementById("kbName").value = item.name;
         document.getElementById("kbMonths").value = item.months;
+        document.getElementById("kbCycleA").value = item.payCycleA || "月繳";
+        setSharedPayB("kb", item.payTypeB || "cash", item.payTargetB || "");
         document.getElementById("kbAnnual").value = item.annual;
         currentPeriodType = item.periodType || "year";
         tempPeriodValues = Array.isArray(item.periodValues) ? [...item.periodValues] : [item.annual];
@@ -2459,6 +2871,151 @@
     function closeKnownBillSheet() {
         document.getElementById("knownBillBg").classList.remove("show");
         document.getElementById("knownBillSheet").classList.remove("show");
+    }
+
+    // 2b. 貸款新增與編輯
+    function openAddLoanSheet() {
+        document.getElementById("loanSheetTitle").innerText = "新增貸款";
+        document.getElementById("loanIdx").value = "-1";
+        document.getElementById("loanName").value = "";
+        document.getElementById("loanTotalAmt").value = "";
+        document.getElementById("loanStartYm").value = todayStr().slice(0, 7);
+        document.getElementById("loanEndYm").value = "";
+        document.getElementById("loanPeriods").value = "";
+        document.getElementById("loanPerAmt").value = "";
+        setSharedPayB("loan", "bank");
+        document.getElementById("loanDelBtn").style.display = "none";
+        document.getElementById("loanSheetBg").classList.add("show");
+        document.getElementById("loanSheet").classList.add("show");
+    }
+
+    function openEditLoanSheet(idx) {
+        const l = LOANS_DATA[idx];
+        if (!l) return;
+        document.getElementById("loanSheetTitle").innerText = "編輯貸款";
+        document.getElementById("loanIdx").value = idx;
+        document.getElementById("loanName").value = l.name;
+        document.getElementById("loanTotalAmt").value = l.totalAmount;
+        document.getElementById("loanStartYm").value = l.startDate || "";
+        document.getElementById("loanEndYm").value = l.endDate || "";
+        document.getElementById("loanPeriods").value = l.periods;
+        document.getElementById("loanPerAmt").value = l.perAmount;
+        setSharedPayB("loan", l.payTypeB || "cash", l.payTargetB || "");
+        document.getElementById("loanDelBtn").style.display = "block";
+        document.getElementById("loanSheetBg").classList.add("show");
+        document.getElementById("loanSheet").classList.add("show");
+    }
+
+    function closeLoanSheet() {
+        document.getElementById("loanSheetBg").classList.remove("show");
+        document.getElementById("loanSheet").classList.remove("show");
+    }
+
+    async function saveLoanItem() {
+        const idx = parseInt(document.getElementById("loanIdx").value, 10);
+        const name = document.getElementById("loanName").value.trim();
+        const totalAmount = parseFloat(document.getElementById("loanTotalAmt").value || "0");
+        const startDate = document.getElementById("loanStartYm").value;
+        const endDate = document.getElementById("loanEndYm").value;
+        const periods = parseInt(document.getElementById("loanPeriods").value || "0", 10);
+        const perAmount = parseFloat(document.getElementById("loanPerAmt").value || "0");
+
+        if (!name || perAmount <= 0) return toast("請填寫貸款項目與每次還款金額");
+        const payInfo = getSharedPayBValue("loan");
+
+        const row = {
+            name, totalAmount, startDate, endDate, periods, perAmount,
+            payTypeB: payInfo.typeB, payTargetB: payInfo.targetB
+        };
+
+        if (idx >= 0) LOANS_DATA[idx] = row;
+        else LOANS_DATA.push(row);
+
+        await savePortfolioState();
+        closeLoanSheet();
+        renderAllFixedModules();
+        toast("貸款資料已儲存");
+    }
+
+    async function deleteLoanItem() {
+        const idx = parseInt(document.getElementById("loanIdx").value, 10);
+        if (idx < 0 || !confirm("確定要刪除此筆貸款？")) return;
+        LOANS_DATA.splice(idx, 1);
+        await savePortfolioState();
+        closeLoanSheet();
+        renderAllFixedModules();
+        toast("已刪除貸款");
+    }
+
+    // 2c. 保單與訂閱新增與編輯
+    function openAddSubSheet() {
+        document.getElementById("subSheetTitle").innerText = "新增保單/訂閱";
+        document.getElementById("subIdx").value = "-1";
+        document.getElementById("subName").value = "";
+        document.getElementById("subCycle").value = "月租";
+        document.getElementById("subFee").value = "";
+        document.getElementById("subStartYm").value = todayStr().slice(0, 7);
+        document.getElementById("subEndYm").value = "";
+        setSharedPayB("sub", "card");
+        document.getElementById("subDelBtn").style.display = "none";
+        document.getElementById("subSheetBg").classList.add("show");
+        document.getElementById("subSheet").classList.add("show");
+    }
+
+    function openEditSubSheet(idx) {
+        const s = SUBSCRIPTIONS_DATA[idx];
+        if (!s) return;
+        document.getElementById("subSheetTitle").innerText = "編輯保單/訂閱";
+        document.getElementById("subIdx").value = idx;
+        document.getElementById("subName").value = s.name;
+        document.getElementById("subCycle").value = s.cycle || "月租";
+        document.getElementById("subFee").value = s.fee;
+        document.getElementById("subStartYm").value = s.startDate || "";
+        document.getElementById("subEndYm").value = s.endDate || "";
+        setSharedPayB("sub", s.payTypeB || "cash", s.payTargetB || "");
+        document.getElementById("subDelBtn").style.display = "block";
+        document.getElementById("subSheetBg").classList.add("show");
+        document.getElementById("subSheet").classList.add("show");
+    }
+
+    function closeSubSheet() {
+        document.getElementById("subSheetBg").classList.remove("show");
+        document.getElementById("subSheet").classList.remove("show");
+    }
+
+    async function saveSubItem() {
+        const idx = parseInt(document.getElementById("subIdx").value, 10);
+        const name = document.getElementById("subName").value.trim();
+        const cycle = document.getElementById("subCycle").value;
+        const fee = parseFloat(document.getElementById("subFee").value || "0");
+        const startDate = document.getElementById("subStartYm").value;
+        const endDate = document.getElementById("subEndYm").value;
+
+        if (!name || fee <= 0) return toast("請填寫項目名稱與租用費用");
+        const payInfo = getSharedPayBValue("sub");
+
+        const row = {
+            name, cycle, fee, startDate, endDate,
+            payTypeB: payInfo.typeB, payTargetB: payInfo.targetB
+        };
+
+        if (idx >= 0) SUBSCRIPTIONS_DATA[idx] = row;
+        else SUBSCRIPTIONS_DATA.push(row);
+
+        await savePortfolioState();
+        closeSubSheet();
+        renderAllFixedModules();
+        toast("保單/訂閱已儲存");
+    }
+
+    async function deleteSubItem() {
+        const idx = parseInt(document.getElementById("subIdx").value, 10);
+        if (idx < 0 || !confirm("確定要刪除此項目？")) return;
+        SUBSCRIPTIONS_DATA.splice(idx, 1);
+        await savePortfolioState();
+        closeSubSheet();
+        renderAllFixedModules();
+        toast("已刪除項目");
     }
 
     function openPeriodCalcModal() {
@@ -2476,7 +3033,6 @@
         document.getElementById("periodCalcSheet").classList.remove("show");
     }
 
-    // 3. 週期金額設定：雙月繳只顯示「第 1 期 ～ 第 6 期」，不顯示月份
     function setPeriodCalcType(type) {
         currentPeriodType = type;
         ["year", "quarter", "bimonth", "month"].forEach(t => {
@@ -2544,6 +3100,9 @@
             kbMonthsInput.value = monthTagMap[currentPeriodType];
         }
 
+        const cycleMapA = { year: "年繳", quarter: "季繳", bimonth: "月繳", month: "月繳" };
+        document.getElementById("kbCycleA").value = cycleMapA[currentPeriodType] || "月繳";
+
         closePeriodCalcModal();
         toast(`已計算帶入年度總額：$${money(Math.round(sum))}`);
     }
@@ -2552,6 +3111,8 @@
         const idx = parseInt(document.getElementById("knownBillIdx").value, 10);
         const name = document.getElementById("kbName").value.trim();
         const months = document.getElementById("kbMonths").value.trim();
+        const payCycleA = document.getElementById("kbCycleA").value;
+        const payInfo = getSharedPayBValue("kb");
         const annual = parseFloat(document.getElementById("kbAnnual").value || "0");
         if (!name || annual <= 0) return toast("請輸入項目名稱，並點選「設定週期金額」計算總額");
 
@@ -2562,7 +3123,10 @@
             annual, 
             monthlyAvg, 
             periodType: currentPeriodType, 
-            periodValues: tempPeriodValues.length ? tempPeriodValues : [annual] 
+            periodValues: tempPeriodValues.length ? tempPeriodValues : [annual],
+            payCycleA,
+            payTypeB: payInfo.typeB,
+            payTargetB: payInfo.targetB
         };
 
         if (idx >= 0) KNOWN_ANNUAL_EXPENSES[idx] = row;
@@ -2570,7 +3134,7 @@
 
         await savePortfolioState();
         closeKnownBillSheet();
-        openKnownBillsReport();
+        renderAllFixedModules();
         toast("固定花費項目已儲存");
     }
 
@@ -2580,7 +3144,7 @@
         KNOWN_ANNUAL_EXPENSES.splice(idx, 1);
         await savePortfolioState();
         closeKnownBillSheet();
-        openKnownBillsReport();
+        renderAllFixedModules();
         toast("已刪除項目");
     }
 
