@@ -640,7 +640,7 @@
 <div class="app">
     <div class="topbar">
         <div class="brand"><i class="fa-solid fa-sparkles"></i> 理財紀錄</div>
-        <div class="cloud" id="cloudStatus" title="連線狀態"><i class="fa-solid fa-cloud"></i></div>
+        <div class="cloud" id="cloudStatus" title="點擊診斷與同步雲端" onclick="runCloudDiagnostic()" style="cursor:pointer;"><i class="fa-solid fa-cloud"></i></div>
     </div>
 
     <div class="content-body">
@@ -904,7 +904,10 @@
             <!-- 固定花費面板 -->
             <div class="panel" id="fixedTab_bills">
                 <h3>固定花費清單 
-                    <span class="linkish" onclick="openAddKnownBillSheet()">＋ 新增項目</span>
+                    <span>
+                        <span class="linkish" onclick="refreshKnownBillsCloud()" style="margin-right:8px;"><i class="fa-solid fa-arrows-rotate"></i> 同步</span>
+                        <span class="linkish" onclick="openAddKnownBillSheet()">＋ 新增項目</span>
+                    </span>
                 </h3>
                 <table class="bill-table" id="knownBillsTable">
                     <thead>
@@ -1556,6 +1559,56 @@
     google.charts.setOnLoadCallback(() => { 
         chartsReady = true; 
         drawOverviewDonut();
+    });
+
+    // 雲端連線診斷與完整同步
+    async function runCloudDiagnostic() {
+        toast("正在檢測雲端連線與資料表…");
+        let report = [];
+        let hasError = false;
+
+        try {
+            const t1 = await _supabase.from("expenses").select("id").limit(1);
+            if (t1.error) { hasError = true; report.push("❌ 日常收支 (expenses): " + t1.error.message); }
+            else { report.push("✅ 日常收支 (expenses): 連線正常"); }
+
+            const t2 = await _supabase.from("accounts").select("id").limit(1);
+            if (t2.error) { hasError = true; report.push("❌ 銀行帳戶 (accounts): " + t2.error.message); }
+            else { report.push("✅ 銀行帳戶 (accounts): 連線正常"); }
+
+            const t3 = await _supabase.from("config").select("key, value").limit(10);
+            if (t3.error) {
+                hasError = true;
+                report.push("❌ 設定/固定花費 (config): " + t3.error.message);
+            } else {
+                const count = t3.data ? t3.data.length : 0;
+                report.push(`✅ 設定/固定花費 (config): 連線正常 (目前有 ${count} 筆設定紀錄)`);
+            }
+
+            if (hasError) {
+                await showConfirm(
+                    `診斷發現問題：\n\n${report.join("\n")}\n\n⚠️ 原因說明：您的 Supabase 中的「config」資料表無法正常讀寫，因此跨裝置無法同步固定花費！\n\n請至 Supabase Dashboard 的 SQL Editor 執行修復指令。`,
+                    "雲端連線檢測報告",
+                    "查看修復建議",
+                    "var(--navy)"
+                );
+            } else {
+                await loadPortfolioState();
+                renderAllFixedModules();
+                calcAndRenderOverviewNetWorth();
+                toast("雲端資料表連線完全正常，最新資料已同步！");
+            }
+        } catch (e) {
+            toast("檢測異常：" + e.message);
+        }
+    }
+
+    // 當切換回瀏覽器分頁時自動重新向雲端拉取最新資料
+    window.addEventListener("focus", () => {
+        loadPortfolioState().then(() => {
+            renderAllFixedModules();
+            calcAndRenderOverviewNetWorth();
+        });
     });
 
     window.onload = function () {
@@ -2220,14 +2273,35 @@
 
     async function executeUpdateBudget() {
         const val = document.getElementById("input_starting").value;
-        const { error } = await _supabase.from("config").upsert({ key: "monthly_budget", value: val });
-        if (error) toast("更新失敗");
-        else { toast("預算設定已更新"); loadDashboard(); }
+        try {
+            const { data: existRows, error: chkErr } = await _supabase.from("config").select("id").eq("key", "monthly_budget");
+            let error = chkErr;
+            if (!chkErr && existRows && existRows.length > 0) {
+                const res = await _supabase.from("config").update({ value: val }).eq("key", "monthly_budget");
+                error = res.error;
+            } else if (!chkErr) {
+                const res = await _supabase.from("config").insert([{ key: "monthly_budget", value: val }]);
+                error = res.error;
+            }
+            if (error) toast("更新失敗：" + (error.message || "權限錯誤"));
+            else { toast("預算設定已更新"); loadDashboard(); }
+        } catch (e) {
+            toast("更新失敗：" + e.message);
+        }
     }
 
     async function loadDashboard() {
-        const { data: configData, error: cErr } = await _supabase.from("config").select("value").eq("key", "monthly_budget").single();
-        const budget = configData ? parseFloat(configData.value) : 0;
+        let budget = 0;
+        let cErr = null;
+        try {
+            const { data: configRows, error } = await _supabase.from("config").select("value").eq("key", "monthly_budget");
+            cErr = error;
+            if (configRows && configRows.length > 0) {
+                budget = parseFloat(configRows[configRows.length - 1].value) || 0;
+            }
+        } catch (e) {
+            cErr = e;
+        }
         
         const { data: expenses, error } = await _supabase.from("expenses")
             .select("*")
@@ -2531,12 +2605,33 @@
             const local = JSON.parse(localStorage.getItem("portfolio_state") || "null");
             if (local) applyPortfolioState(local);
         } catch (e) {}
-        const { data } = await _supabase.from("config").select("value").eq("key", "portfolio_state").maybeSingle();
-        if (data && data.value) {
-            try {
-                const parsed = typeof data.value === "string" ? JSON.parse(data.value) : data.value;
-                if (parsed) applyPortfolioState(parsed);
-            } catch (e) {}
+
+        try {
+            // 使用陣列查詢而非 maybeSingle，避免多筆記錄時引發 PGRST116 錯誤中斷載入
+            const { data, error } = await _supabase.from("config").select("id, key, value").eq("key", "portfolio_state");
+            if (error) {
+                console.warn("無法取得雲端固定設定:", error);
+                setCloud(false);
+                return { success: false, error: error.message };
+            }
+            setCloud(true);
+            if (data && data.length > 0) {
+                const latest = data[data.length - 1];
+                const rawVal = latest.value;
+                const parsed = typeof rawVal === "string" ? JSON.parse(rawVal) : rawVal;
+                if (parsed) {
+                    applyPortfolioState(parsed);
+                    try {
+                        localStorage.setItem("portfolio_state", JSON.stringify(parsed));
+                    } catch (e) {}
+                    return { success: true, count: data.length };
+                }
+            }
+            return { success: true, count: 0 };
+        } catch (err) {
+            console.warn("連線例外:", err);
+            setCloud(false);
+            return { success: false, error: err.message };
         }
     }
 
@@ -2586,7 +2681,34 @@
         try {
             localStorage.setItem("portfolio_state", JSON.stringify(payload));
         } catch (e) {}
-        await _supabase.from("config").upsert({ key: "portfolio_state", value: JSON.stringify(payload) });
+
+        const valStr = JSON.stringify(payload);
+        let saveErr = null;
+
+        try {
+            // 先查詢既有資料，若存在則 update，不存在則 insert；繞過 upsert 需要資料庫特定主鍵約束的問題
+            const { data: existRows, error: chkErr } = await _supabase.from("config").select("id, key").eq("key", "portfolio_state");
+            if (chkErr) {
+                saveErr = chkErr;
+            } else if (existRows && existRows.length > 0) {
+                const { error: updErr } = await _supabase.from("config").update({ value: valStr }).eq("key", "portfolio_state");
+                saveErr = updErr;
+            } else {
+                const { error: insErr } = await _supabase.from("config").insert([{ key: "portfolio_state", value: valStr }]);
+                saveErr = insErr;
+            }
+        } catch (e) {
+            saveErr = e;
+        }
+
+        if (saveErr) {
+            console.error("雲端同步失敗:", saveErr);
+            setCloud(false);
+            toast("⚠️ 雲端同步失敗：" + (saveErr.message || "請檢查 config 資料表權限"));
+        } else {
+            setCloud(true);
+        }
+
         renderFxInputs();
         calcAndRenderOverviewNetWorth();
         renderInvestList();
@@ -2896,9 +3018,19 @@
     }
 
     // 固定花費四大主題視窗渲染 (固定花費 / 貸款 / 保險 / 訂閱)
-    function openKnownBillsReport() {
+    async function openKnownBillsReport() {
         switchTab("known-bills");
         renderAllFixedModules();
+        await loadPortfolioState();
+        renderAllFixedModules();
+    }
+
+    async function refreshKnownBillsCloud() {
+        toast("正在從雲端更新資料…");
+        await loadPortfolioState();
+        renderAllFixedModules();
+        calcAndRenderOverviewNetWorth();
+        toast("雲端資料同步完成！");
     }
 
     function switchFixedSubTab(sub, btn) {
