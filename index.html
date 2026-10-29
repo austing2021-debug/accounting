@@ -1211,6 +1211,7 @@
         <label>繳納週期 (A)</label>
         <select id="kbCycleA">
             <option value="月繳">月繳</option>
+            <option value="雙月繳">雙月繳</option>
             <option value="季繳">季繳</option>
             <option value="年繳">年繳</option>
         </select>
@@ -1289,6 +1290,7 @@
             <label>租約方式（繳費期別）</label>
             <select id="insCycle">
                 <option value="月繳">月繳</option>
+                <option value="雙月繳">雙月繳</option>
                 <option value="季繳">季繳</option>
                 <option value="年繳">年繳</option>
             </select>
@@ -1329,6 +1331,7 @@
             <label>租約方式</label>
             <select id="subCycle">
                 <option value="月租">月租</option>
+                <option value="雙月租">雙月租</option>
                 <option value="季租">季租</option>
                 <option value="年租">年租</option>
             </select>
@@ -1640,12 +1643,14 @@
             const fee = Number(ins.fee || 0);
             if (ins.cycle === "年繳") return s + (fee / 12);
             if (ins.cycle === "季繳") return s + (fee / 3);
+            if (ins.cycle === "雙月繳") return s + (fee / 2);
             return s + fee; // 月繳
         }, 0);
         const subsMonthly = SUBSCRIPTIONS_DATA.reduce((s, sub) => {
             const fee = Number(sub.fee || 0);
             if (sub.cycle === "年租") return s + (fee / 12);
             if (sub.cycle === "季租") return s + (fee / 3);
+            if (sub.cycle === "雙月租") return s + (fee / 2);
             return s + fee; // 月租
         }, 0);
         return billsAvg + loansMonthly + insMonthly + subsMonthly;
@@ -1658,12 +1663,14 @@
             const fee = Number(ins.fee || 0);
             if (ins.cycle === "年繳") return s + fee;
             if (ins.cycle === "季繳") return s + (fee * 4);
+            if (ins.cycle === "雙月繳") return s + (fee * 6);
             return s + (fee * 12); // 月繳
         }, 0);
         const subsAnn = SUBSCRIPTIONS_DATA.reduce((s, sub) => {
             const fee = Number(sub.fee || 0);
             if (sub.cycle === "年租") return s + fee;
             if (sub.cycle === "季租") return s + (fee * 4);
+            if (sub.cycle === "雙月租") return s + (fee * 6);
             return s + (fee * 12); // 月租
         }, 0);
         return billsAnn + loansAnn + insAnn + subsAnn;
@@ -2966,7 +2973,7 @@
             insBox.innerHTML = '<div class="empty">尚無保險項目，點右上角可新增</div>';
         } else {
             INSURANCE_DATA.forEach((ins, idx) => {
-                const unitStr = ins.cycle === '年繳' ? '年' : (ins.cycle === '季繳' ? '季' : '月');
+                const unitStr = ins.cycle === '年繳' ? '年' : (ins.cycle === '季繳' ? '季' : (ins.cycle === '雙月繳' ? '雙月' : '月'));
                 insBox.innerHTML += `
                     <div class="fin-card-item" onclick="openEditInsuranceSheet(${idx})">
                         <div class="fin-card-top">
@@ -2993,7 +3000,7 @@
             subsBox.innerHTML = '<div class="empty">尚無訂閱項目，點右上角可新增</div>';
         } else {
             SUBSCRIPTIONS_DATA.forEach((s, idx) => {
-                const unitStr = s.cycle === '年租' ? '年' : (s.cycle === '季租' ? '季' : '月');
+                const unitStr = s.cycle === '年租' ? '年' : (s.cycle === '季租' ? '季' : (s.cycle === '雙月租' ? '雙月' : '月'));
                 subsBox.innerHTML += `
                     <div class="fin-card-item" onclick="openEditSubSheet(${idx})">
                         <div class="fin-card-top">
@@ -3356,7 +3363,7 @@
             kbMonthsInput.value = monthTagMap[currentPeriodType];
         }
 
-        const cycleMapA = { year: "年繳", quarter: "季繳", bimonth: "月繳", month: "月繳" };
+        const cycleMapA = { year: "年繳", quarter: "季繳", bimonth: "雙月繳", month: "月繳" };
         document.getElementById("kbCycleA").value = cycleMapA[currentPeriodType] || "月繳";
 
         closePeriodCalcModal();
