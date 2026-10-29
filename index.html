@@ -2274,7 +2274,7 @@
     async function executeUpdateBudget() {
         const val = document.getElementById("input_starting").value;
         try {
-            const { data: existRows, error: chkErr } = await _supabase.from("config").select("id").eq("key", "monthly_budget");
+            const { data: existRows, error: chkErr } = await _supabase.from("config").select("key").eq("key", "monthly_budget");
             let error = chkErr;
             if (!chkErr && existRows && existRows.length > 0) {
                 const res = await _supabase.from("config").update({ value: val }).eq("key", "monthly_budget");
@@ -2608,7 +2608,7 @@
 
         try {
             // 使用陣列查詢而非 maybeSingle，避免多筆記錄時引發 PGRST116 錯誤中斷載入
-            const { data, error } = await _supabase.from("config").select("id, key, value").eq("key", "portfolio_state");
+            const { data, error } = await _supabase.from("config").select("key, value").eq("key", "portfolio_state");
             if (error) {
                 console.warn("無法取得雲端固定設定:", error);
                 setCloud(false);
@@ -2687,7 +2687,7 @@
 
         try {
             // 先查詢既有資料，若存在則 update，不存在則 insert；繞過 upsert 需要資料庫特定主鍵約束的問題
-            const { data: existRows, error: chkErr } = await _supabase.from("config").select("id, key").eq("key", "portfolio_state");
+            const { data: existRows, error: chkErr } = await _supabase.from("config").select("key").eq("key", "portfolio_state");
             if (chkErr) {
                 saveErr = chkErr;
             } else if (existRows && existRows.length > 0) {
