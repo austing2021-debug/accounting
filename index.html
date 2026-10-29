@@ -1570,33 +1570,34 @@
         try {
             const t1 = await _supabase.from("expenses").select("id").limit(1);
             if (t1.error) { hasError = true; report.push("❌ 日常收支 (expenses): " + t1.error.message); }
-            else { report.push("✅ 日常收支 (expenses): 連線正常"); }
+            else { report.push("✅ 日常收支 (expenses): 連線讀取正常"); }
 
             const t2 = await _supabase.from("accounts").select("id").limit(1);
             if (t2.error) { hasError = true; report.push("❌ 銀行帳戶 (accounts): " + t2.error.message); }
-            else { report.push("✅ 銀行帳戶 (accounts): 連線正常"); }
+            else { report.push("✅ 銀行帳戶 (accounts): 連線讀取正常"); }
 
             const t3 = await _supabase.from("config").select("key, value").limit(10);
             if (t3.error) {
                 hasError = true;
                 report.push("❌ 設定/固定花費 (config): " + t3.error.message);
             } else {
-                const count = t3.data ? t3.data.length : 0;
-                report.push(`✅ 設定/固定花費 (config): 連線正常 (目前有 ${count} 筆設定紀錄)`);
+                const hasPortfolio = (t3.data || []).some(r => r.key === "portfolio_state");
+                if (hasPortfolio) {
+                    report.push("✅ 設定/固定花費 (config): 連線正常，雲端【已有】portfolio_state 紀錄！");
+                } else {
+                    report.push("⚠️ 設定/固定花費 (config): 連線正常，但雲端目前【尚無】portfolio_state 紀錄！(A電腦尚未成功寫入)");
+                }
             }
 
-            if (hasError) {
-                await showConfirm(
-                    `診斷發現問題：\n\n${report.join("\n")}\n\n⚠️ 原因說明：您的 Supabase 中的「config」資料表無法正常讀寫，因此跨裝置無法同步固定花費！\n\n請至 Supabase Dashboard 的 SQL Editor 執行修復指令。`,
-                    "雲端連線檢測報告",
-                    "查看修復建議",
-                    "var(--navy)"
-                );
-            } else {
-                await loadPortfolioState();
-                renderAllFixedModules();
-                calcAndRenderOverviewNetWorth();
-                toast("雲端資料表連線完全正常，最新資料已同步！");
+            await showConfirm(
+                `【雲端診斷報告】\n\n${report.join("\n\n")}`,
+                hasError ? "⚠️ 雲端連線有異常" : "☁️ 雲端狀態診斷",
+                hasError ? "查看修復" : "立即拉取",
+                hasError ? "var(--danger)" : "var(--ok)"
+            );
+
+            if (!hasError) {
+                await refreshKnownBillsCloud();
             }
         } catch (e) {
             toast("檢測異常：" + e.message);
@@ -2607,7 +2608,6 @@
         } catch (e) {}
 
         try {
-            // 使用陣列查詢而非 maybeSingle，避免多筆記錄時引發 PGRST116 錯誤中斷載入
             const { data, error } = await _supabase.from("config").select("key, value").eq("key", "portfolio_state");
             if (error) {
                 console.warn("無法取得雲端固定設定:", error);
@@ -2624,10 +2624,17 @@
                     try {
                         localStorage.setItem("portfolio_state", JSON.stringify(parsed));
                     } catch (e) {}
-                    return { success: true, count: data.length };
+                    return { 
+                        success: true, 
+                        count: data.length,
+                        billsCount: (parsed.knownBills || []).length,
+                        insCount: (parsed.insurance || []).length,
+                        subsCount: (parsed.subs || []).length,
+                        loansCount: (parsed.loans || []).length
+                    };
                 }
             }
-            return { success: true, count: 0 };
+            return { success: true, count: 0, billsCount: 0 };
         } catch (err) {
             console.warn("連線例外:", err);
             setCloud(false);
@@ -2636,22 +2643,22 @@
     }
 
     function applyPortfolioState(st) {
+        if (!st || typeof st !== "object") return;
         if (Array.isArray(st.holdings)) PORTFOLIO_DATA = st.holdings;
         if (st.fxRates) FX_RATES = st.fxRates;
         if (st.quoteUpdatedAt !== undefined) quoteUpdatedAt = st.quoteUpdatedAt;
         if (Array.isArray(st.knownBills)) KNOWN_ANNUAL_EXPENSES = st.knownBills;
         if (Array.isArray(st.loans)) LOANS_DATA = st.loans;
         
-        // 兼容舊版與新版資料架構
         if (Array.isArray(st.insurance)) {
             INSURANCE_DATA = st.insurance;
+            if (Array.isArray(st.subs)) SUBSCRIPTIONS_DATA = st.subs;
         } else if (Array.isArray(st.subs)) {
-            // 自動將原本合併在 subs 的保險提取出
             const ins = st.subs.filter(s => (s.name && s.name.includes("保險")) || s.cycle === "月繳" || s.cycle === "年繳");
             if (ins.length) {
                 INSURANCE_DATA = ins.map(i => ({
                     name: i.name,
-                    cycle: i.cycle === "年租" ? "年繳" : (i.cycle === "季租" ? "季繳" : (i.cycle || "月繳")),
+                    cycle: i.cycle === "年租" ? "年繳" : (i.cycle === "季租" ? "季繳" : (i.cycle === "雙月租" ? "雙月繳" : (i.cycle || "月繳"))),
                     fee: i.fee,
                     startDate: i.startDate,
                     endDate: i.endDate,
@@ -2659,12 +2666,8 @@
                     payTargetB: i.payTargetB || "現金"
                 }));
             }
-        }
-
-        if (Array.isArray(st.subs)) {
-            // 過濾掉保險項目做為純訂閱
             const purelySubs = st.subs.filter(s => !(s.name && s.name.includes("保險")));
-            if (purelySubs.length) SUBSCRIPTIONS_DATA = purelySubs;
+            SUBSCRIPTIONS_DATA = purelySubs;
         }
     }
 
@@ -2686,7 +2689,6 @@
         let saveErr = null;
 
         try {
-            // 先查詢既有資料，若存在則 update，不存在則 insert；繞過 upsert 需要資料庫特定主鍵約束的問題
             const { data: existRows, error: chkErr } = await _supabase.from("config").select("key").eq("key", "portfolio_state");
             if (chkErr) {
                 saveErr = chkErr;
@@ -2701,18 +2703,17 @@
             saveErr = e;
         }
 
-        if (saveErr) {
-            console.error("雲端同步失敗:", saveErr);
-            setCloud(false);
-            toast("⚠️ 雲端同步失敗：" + (saveErr.message || "請檢查 config 資料表權限"));
-        } else {
-            setCloud(true);
-        }
-
+        setCloud(!saveErr);
         renderFxInputs();
         calcAndRenderOverviewNetWorth();
         renderInvestList();
         renderAccountsList();
+
+        if (saveErr) {
+            console.error("雲端同步失敗:", saveErr);
+            return { success: false, error: saveErr.message || "權限不足或資料庫錯誤" };
+        }
+        return { success: true };
     }
 
     function renderFxInputs() {
@@ -3026,11 +3027,27 @@
     }
 
     async function refreshKnownBillsCloud() {
-        toast("正在從雲端更新資料…");
-        await loadPortfolioState();
+        toast("正在從雲端拉取最新資料…");
+        const res = await loadPortfolioState();
         renderAllFixedModules();
         calcAndRenderOverviewNetWorth();
-        toast("雲端資料同步完成！");
+        if (!res || !res.success) {
+            await showConfirm(
+                `無法從雲端同步！\n\n錯誤原因：${res ? res.error : "連線逾時"}\n\n請點擊頂部【雲朵圖示】進行完整檢測，或檢查 Supabase 權限。`,
+                "❌ 同步失敗",
+                "我知道了",
+                "var(--danger)"
+            );
+        } else if (res.count === 0) {
+            await showConfirm(
+                `雲端目前【沒有儲存任何固定花費紀錄】！\n\n這代表 A 電腦剛才的修改「並未真正寫入雲端」。\n\n💡 請回到 A 電腦：\n1. 點擊任一固定花費編輯並重新「儲存」。\n2. 若跳出【雲端同步失敗】視窗，請先至 Supabase 關閉 RLS。\n3. A 電腦成功上傳後，B/C 裝置再按「同步」即可！`,
+                "⚠️ 雲端無資料",
+                "我知道了",
+                "var(--navy)"
+            );
+        } else {
+            toast(`✅ 雲端同步完成！(固定花費 ${res.billsCount} 項、保險 ${res.insCount} 項、訂閱 ${res.subsCount} 項)`);
+        }
     }
 
     function switchFixedSubTab(sub, btn) {
@@ -3249,10 +3266,14 @@
         if (idx >= 0) LOANS_DATA[idx] = row;
         else LOANS_DATA.push(row);
 
-        await savePortfolioState();
+        const syncRes = await savePortfolioState();
         closeLoanSheet();
         renderAllFixedModules();
-        toast("貸款資料已儲存");
+        if (syncRes && !syncRes.success) {
+            await showConfirm(`本機已存檔，但【雲端同步失敗】：${syncRes.error}`, "⚠️ 雲端未同步");
+        } else {
+            toast("✅ 貸款資料已儲存並同步至雲端！");
+        }
     }
 
     async function deleteLoanItem() {
@@ -3322,10 +3343,14 @@
         if (idx >= 0) INSURANCE_DATA[idx] = row;
         else INSURANCE_DATA.push(row);
 
-        await savePortfolioState();
+        const syncRes = await savePortfolioState();
         closeInsuranceSheet();
         renderAllFixedModules();
-        toast("保險項目已儲存");
+        if (syncRes && !syncRes.success) {
+            await showConfirm(`本機已存檔，但【雲端同步失敗】：${syncRes.error}`, "⚠️ 雲端未同步");
+        } else {
+            toast("✅ 保險項目已儲存並同步至雲端！");
+        }
     }
 
     async function deleteInsuranceItem() {
@@ -3395,10 +3420,14 @@
         if (idx >= 0) SUBSCRIPTIONS_DATA[idx] = row;
         else SUBSCRIPTIONS_DATA.push(row);
 
-        await savePortfolioState();
+        const syncRes = await savePortfolioState();
         closeSubSheet();
         renderAllFixedModules();
-        toast("訂閱項目已儲存");
+        if (syncRes && !syncRes.success) {
+            await showConfirm(`本機已存檔，但【雲端同步失敗】：${syncRes.error}`, "⚠️ 雲端未同步");
+        } else {
+            toast("✅ 訂閱項目已儲存並同步至雲端！");
+        }
     }
 
     async function deleteSubItem() {
@@ -3527,10 +3556,19 @@
         if (idx >= 0) KNOWN_ANNUAL_EXPENSES[idx] = row;
         else KNOWN_ANNUAL_EXPENSES.push(row);
 
-        await savePortfolioState();
+        const syncRes = await savePortfolioState();
         closeKnownBillSheet();
         renderAllFixedModules();
-        toast("固定花費項目已儲存");
+        if (syncRes && !syncRes.success) {
+            await showConfirm(
+                `本機已存檔，但【雲端同步失敗】！\n\n失敗原因：${syncRes.error}\n\n⚠️ 這就是為什麼 B電腦與手機看不到更新的原因！\n請至 Supabase 關閉 RLS 或建立開放權限。`,
+                "⚠️ 雲端未同步",
+                "查看修復方式",
+                "var(--danger)"
+            );
+        } else {
+            toast("✅ 固定花費已儲存並成功同步至雲端！");
+        }
     }
 
     async function deleteKnownBillItem() {
