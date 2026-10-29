@@ -451,7 +451,7 @@
         .bill-table td { padding: 10px 3px; border-bottom: 1px dashed var(--line); color: var(--ink); cursor: pointer; vertical-align: middle; }
         .bill-table tr:hover td { background: #FAFBFD; }
 
-        /* 貸款與保單卡片列表樣式 */
+        /* 貸款、保險與訂閱卡片列表樣式 */
         .fin-card-item {
             padding: 12px 2px;
             border-bottom: 1px dashed var(--line);
@@ -476,7 +476,7 @@
             padding: 4px 8px 4px 0;
         }
 
-        /* 1. iOS 系統設定列表大方格樣式 */
+        /* iOS 系統設定列表大方格樣式 */
         .ios-settings-card {
             background: var(--card);
             border-radius: 20px;
@@ -769,7 +769,7 @@
             </div>
         </section>
 
-        <!-- 1. 頁面 4: 設定主選單 (iOS 系統設定列表大方格) -->
+        <!-- 頁面 4: 設定主選單 (iOS 系統設定列表大方格) -->
         <section id="page-assets" class="page">
             <p class="page-kicker">設定</p>
             <div class="ios-settings-card">
@@ -801,7 +801,7 @@
                     <div class="set-ico" style="background:#2BB3A0;"><i class="fa-solid fa-calendar-check"></i></div>
                     <div class="set-main">
                         <b>固定花費</b>
-                        <span>固定花費 · 貸款 · 保單與訂閱</span>
+                        <span>固定花費 · 貸款 · 保險 · 訂閱</span>
                     </div>
                     <i class="fa-solid fa-chevron-right"></i>
                 </div>
@@ -883,7 +883,7 @@
             </button>
         </section>
 
-        <!-- 2. 子視窗 4-4: 固定花費 (三大主題：固定花費、貸款、保單與訂閱) -->
+        <!-- 子視窗 4-4: 固定花費 (四大主題：固定花費、貸款、保險、訂閱) -->
         <section id="page-known-bills" class="page">
             <div class="page-kicker">
                 <span class="back-nav-btn" onclick="switchTab('assets')"><i class="fa-solid fa-chevron-left"></i> 設定</span>
@@ -897,10 +897,11 @@
             <div class="seg" id="fixedSubSeg">
                 <button class="on" onclick="switchFixedSubTab('bills', this)">固定花費</button>
                 <button onclick="switchFixedSubTab('loans', this)">貸款</button>
-                <button onclick="switchFixedSubTab('subs', this)">保單與訂閱</button>
+                <button onclick="switchFixedSubTab('insurance', this)">保險</button>
+                <button onclick="switchFixedSubTab('subs', this)">訂閱</button>
             </div>
 
-            <!-- 2a. 固定花費面板 (新增「繳納方式」A/B 欄) -->
+            <!-- 固定花費面板 -->
             <div class="panel" id="fixedTab_bills">
                 <h3>固定花費清單 
                     <span class="linkish" onclick="openAddKnownBillSheet()">＋ 新增項目</span>
@@ -919,7 +920,7 @@
                 </table>
             </div>
 
-            <!-- 2b. 貸款面板 -->
+            <!-- 貸款面板 -->
             <div class="panel" id="fixedTab_loans" style="display:none;">
                 <h3>貸款清單 
                     <span class="linkish" onclick="openAddLoanSheet()">＋ 新增貸款</span>
@@ -927,10 +928,18 @@
                 <div id="loansListBody"></div>
             </div>
 
-            <!-- 2c. 保單與訂閱面板 -->
+            <!-- 保險面板 -->
+            <div class="panel" id="fixedTab_insurance" style="display:none;">
+                <h3>保險清單 
+                    <span class="linkish" onclick="openAddInsuranceSheet()">＋ 新增保險</span>
+                </h3>
+                <div id="insuranceListBody"></div>
+            </div>
+
+            <!-- 訂閱面板 -->
             <div class="panel" id="fixedTab_subs" style="display:none;">
-                <h3>保單與訂閱清單 
-                    <span class="linkish" onclick="openAddSubSheet()">＋ 新增項目</span>
+                <h3>訂閱清單 
+                    <span class="linkish" onclick="openAddSubSheet()">＋ 新增訂閱</span>
                 </h3>
                 <div id="subsListBody"></div>
             </div>
@@ -986,7 +995,7 @@
                     <div class="set-main">
                         <div>
                             <b style="color:var(--danger);">重置每年固定花費</b>
-                            <span style="display:block; margin-top:2px;">清空固定花費、貸款、保單與訂閱所有設定</span>
+                            <span style="display:block; margin-top:2px;">清空固定花費、貸款、保險與訂閱所有設定</span>
                         </div>
                     </div>
                     <i class="fa-solid fa-chevron-right"></i>
@@ -1186,7 +1195,7 @@
     <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="addNewFxRate()">確認新增</button>
 </div>
 
-<!-- 2a. 每年已知固定花費 編輯/新增彈窗 (含 A/B 繳納方式選擇) -->
+<!-- 每年已知固定花費 編輯/新增彈窗 (含 A/B 繳納方式選擇) -->
 <div class="sheet-bg" id="knownBillBg" onclick="closeKnownBillSheet()"></div>
 <div class="sheet" id="knownBillSheet">
     <div class="grab"></div>
@@ -1198,7 +1207,6 @@
     <div class="field"><label>項目名稱</label><input id="kbName" placeholder="例如: 幼稚園學雜費"></div>
     <div class="field"><label>繳納月份標記</label><input id="kbMonths" placeholder="例如: 每月 或 1,3,5,7,9,11月"></div>
     
-    <!-- 2a. 新增繳納方式 A/B -->
     <div class="field">
         <label>繳納週期 (A)</label>
         <select id="kbCycleA">
@@ -1232,7 +1240,7 @@
     <button class="btn-ghost" id="kbDelBtn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteKnownBillItem()">刪除此項目</button>
 </div>
 
-<!-- 2b. 貸款 編輯/新增彈窗 -->
+<!-- 貸款 編輯/新增彈窗 -->
 <div class="sheet-bg" id="loanSheetBg" onclick="closeLoanSheet()"></div>
 <div class="sheet" id="loanSheet">
     <div class="grab"></div>
@@ -1266,25 +1274,66 @@
     <button class="btn-ghost" id="loanDelBtn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteLoanItem()">刪除此貸款</button>
 </div>
 
-<!-- 2c. 保單與訂閱 編輯/新增彈窗 -->
+<!-- 保險 編輯/新增彈窗 -->
+<div class="sheet-bg" id="insuranceSheetBg" onclick="closeInsuranceSheet()"></div>
+<div class="sheet" id="insuranceSheet">
+    <div class="grab"></div>
+    <div class="sheet-head">
+        <h2 id="insuranceSheetTitle">保險設定</h2>
+        <button class="icon-btn" onclick="closeInsuranceSheet()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <input type="hidden" id="insIdx" value="-1">
+    <div class="field"><label>保險項目</label><input id="insName" placeholder="例如: 個人保險 / 醫療險 / 意外險"></div>
+    <div class="grid-2" style="margin-bottom:0;">
+        <div class="field">
+            <label>租約方式（繳費期別）</label>
+            <select id="insCycle">
+                <option value="月繳">月繳</option>
+                <option value="季繳">季繳</option>
+                <option value="年繳">年繳</option>
+            </select>
+        </div>
+        <div class="field"><label>保險費 (TWD)</label><input type="number" id="insFee" placeholder="0" inputmode="decimal"></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:0;">
+        <div class="field"><label>開始 (年/月)</label><input type="month" id="insStartYm"></div>
+        <div class="field"><label>結束 (年/月)</label><input type="month" id="insEndYm"></div>
+    </div>
+    <div class="field">
+        <label>繳款方式</label>
+        <div class="pay-method-tabs">
+            <button type="button" class="pay-method-btn on" id="insPayB_cash" onclick="setSharedPayB('ins', 'cash')">現金</button>
+            <button type="button" class="pay-method-btn" id="insPayB_bank" onclick="setSharedPayB('ins', 'bank')">戶頭</button>
+            <button type="button" class="pay-method-btn" id="insPayB_card" onclick="setSharedPayB('ins', 'card')">信用卡</button>
+        </div>
+        <div id="insPayBTargetWrap" style="display:none; margin-top:8px;">
+            <select id="insPayBTarget"></select>
+        </div>
+    </div>
+    <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="saveInsuranceItem()">儲存保險項目</button>
+    <button class="btn-ghost" id="insDelBtn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteInsuranceItem()">刪除此保險</button>
+</div>
+
+<!-- 訂閱 編輯/新增彈窗 -->
 <div class="sheet-bg" id="subSheetBg" onclick="closeSubSheet()"></div>
 <div class="sheet" id="subSheet">
     <div class="grab"></div>
     <div class="sheet-head">
-        <h2 id="subSheetTitle">保單與訂閱設定</h2>
+        <h2 id="subSheetTitle">訂閱設定</h2>
         <button class="icon-btn" onclick="closeSubSheet()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <input type="hidden" id="subIdx" value="-1">
-    <div class="field"><label>項目名稱</label><input id="subName" placeholder="例如: 個人保險 / Netflix / AI 訂閱"></div>
+    <div class="field"><label>訂閱項目</label><input id="subName" placeholder="例如: Netflix / Spotify / ChatGPT Plus"></div>
     <div class="grid-2" style="margin-bottom:0;">
         <div class="field">
             <label>租約方式</label>
             <select id="subCycle">
                 <option value="月租">月租</option>
+                <option value="季租">季租</option>
                 <option value="年租">年租</option>
             </select>
         </div>
-        <div class="field"><label>租用費用 (TWD)</label><input type="number" id="subFee" placeholder="0" inputmode="decimal"></div>
+        <div class="field"><label>租金 (TWD)</label><input type="number" id="subFee" placeholder="0" inputmode="decimal"></div>
     </div>
     <div class="grid-2" style="margin-bottom:0;">
         <div class="field"><label>開始 (年/月)</label><input type="month" id="subStartYm"></div>
@@ -1301,8 +1350,8 @@
             <select id="subPayBTarget"></select>
         </div>
     </div>
-    <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="saveSubItem()">儲存項目</button>
-    <button class="btn-ghost" id="subDelBtn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteSubItem()">刪除此項目</button>
+    <button class="btn-gold" style="width:100%;padding:14px;font-size:16px;" onclick="saveSubItem()">儲存訂閱項目</button>
+    <button class="btn-ghost" id="subDelBtn" style="width:100%;margin-top:8px;display:none;color:var(--danger);" onclick="deleteSubItem()">刪除此訂閱</button>
 </div>
 
 <!-- 設定週期金額視窗 -->
@@ -1335,6 +1384,19 @@
         </div>
     </div>
     <button type="button" class="btn-gold" style="width:100%; padding:14px; font-size:16px;" onclick="applyPeriodCalc()">確認帶入年度總額</button>
+</div>
+
+<!-- 通用確認對話框 (非同步 In-page Modal，相容所有瀏覽器與沙盒環境) -->
+<div class="sheet-bg" id="confirmModalBg" style="z-index:95;" onclick="closeConfirmModal(false)"></div>
+<div class="sheet" id="confirmModalSheet" style="z-index:96; max-width:380px; border-radius:24px; padding:20px 20px 24px; text-align:center;">
+    <div class="grab" style="margin-bottom:12px;"></div>
+    <div style="font-size:32px; color:var(--gold); margin-bottom:10px;"><i class="fa-solid fa-circle-question"></i></div>
+    <h3 id="confirmModalTitle" style="margin:0 0 8px; font-size:17px; color:var(--ink);">請確認操作</h3>
+    <p id="confirmModalMsg" style="font-size:13px; color:var(--muted); margin:0 0 20px; line-height:1.5; white-space:pre-line;"></p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <button type="button" class="btn-ghost" style="padding:12px; font-weight:700;" onclick="closeConfirmModal(false)">取消</button>
+        <button type="button" class="btn-solid" id="confirmModalOkBtn" style="padding:12px; font-weight:700; background:var(--danger);" onclick="closeConfirmModal(true)">確定</button>
+    </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1402,15 +1464,21 @@
         { name: "幼稚園羊奶費", annual: 8058, months: "每月", monthlyAvg: 672, periodType: "month", periodValues: [680, 680, 680, 680, 680, 680, 680, 680, 680, 680, 544, 714], payCycleA: "月繳", payTypeB: "bank", payTargetB: "LINE BANK(824) 111016268459" }
     ];
 
-    // 2b. 貸款預設資料 (對應 Excel LINK BANK 信貸)
+    // 2b. 貸款預設資料
     let LOANS_DATA = [
         { name: "LINE BANK 信貸", totalAmount: 108600, startDate: "2023-09", endDate: "2028-08", periods: 60, perAmount: 1810, payTypeB: "bank", payTargetB: "LINE BANK(824) 111016268459" }
     ];
 
-    // 2c. 保單與訂閱預設資料 (對應 Excel 個人與女兒保險)
+    // 2c. 保險預設資料 (項目、租約方式[年繳/季繳/月繳]、保險費、日期[開始~結束]、繳款方式[現金/戶頭/信用卡])
+    let INSURANCE_DATA = [
+        { name: "保險費(個人)", cycle: "月繳", fee: 1909, startDate: "2024-01", endDate: "2044-12", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" },
+        { name: "保險費(女兒)", cycle: "月繳", fee: 1596, startDate: "2024-01", endDate: "2044-12", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" }
+    ];
+
+    // 2d. 訂閱預設資料 (項目、租約方式[年租/季租/月租]、租金、日期[開始~結束]、繳款方式[現金/戶頭/信用卡])
     let SUBSCRIPTIONS_DATA = [
-        { name: "保險費(個人)", cycle: "月租", fee: 1909, startDate: "2024-01", endDate: "2044-12", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" },
-        { name: "保險費(女兒)", cycle: "月租", fee: 1596, startDate: "2024-01", endDate: "2044-12", payTypeB: "bank", payTargetB: "華南SnY(008) 777209496032" }
+        { name: "Netflix 影音串流", cycle: "月租", fee: 390, startDate: "2024-01", endDate: "2026-12", payTypeB: "card", payTargetB: "國泰CUBE卡(2288)" },
+        { name: "ChatGPT Plus", cycle: "月租", fee: 650, startDate: "2024-01", endDate: "2026-12", payTypeB: "card", payTargetB: "國泰CUBE卡(2288)" }
     ];
 
     const subData = {
@@ -1443,8 +1511,8 @@
     let currentPayMethod = "cash";
     let currentPeriodType = "year";
     let tempPeriodValues = [];
-    let fixedSubTab = "bills"; // 'bills', 'loans', 'subs'
-    let sharedPayBState = { kb: "cash", loan: "cash", sub: "cash" };
+    let fixedSubTab = "bills"; // 'bills', 'loans', 'insurance', 'subs'
+    let sharedPayBState = { kb: "cash", loan: "cash", ins: "cash", sub: "cash" };
 
     let dashboardData = { budget: 0, spent: 0, income: 0, leftover: 0, breakdown: {}, recent: [] };
     let yearBreakdown = {};
@@ -1457,6 +1525,29 @@
     let isDeleteMode = false;
     let lastHistoryMode = "recent7";
     let chartsReady = false;
+
+    // 自訂非同步確認彈窗邏輯
+    let confirmResolver = null;
+    function showConfirm(msg, title = "請確認操作", okText = "確定", okColor = "var(--danger)") {
+        return new Promise(resolve => {
+            confirmResolver = resolve;
+            document.getElementById("confirmModalTitle").innerText = title;
+            document.getElementById("confirmModalMsg").innerText = msg;
+            const okBtn = document.getElementById("confirmModalOkBtn");
+            okBtn.innerText = okText;
+            okBtn.style.background = okColor;
+            document.getElementById("confirmModalBg").classList.add("show");
+            document.getElementById("confirmModalSheet").classList.add("show");
+        });
+    }
+    function closeConfirmModal(result) {
+        document.getElementById("confirmModalBg").classList.remove("show");
+        document.getElementById("confirmModalSheet").classList.remove("show");
+        if (confirmResolver) {
+            confirmResolver(result);
+            confirmResolver = null;
+        }
+    }
 
     google.charts.load("current", { packages: ["corechart"] });
     google.charts.setOnLoadCallback(() => { 
@@ -1514,7 +1605,8 @@
 
     function switchTab(name, el) {
         document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-        document.getElementById("page-" + name).classList.add("active");
+        const targetPage = document.getElementById("page-" + name);
+        if (targetPage) targetPage.classList.add("active");
         document.querySelectorAll(".tabbar .tab").forEach(t => t.classList.remove("active"));
         
         if (el) el.classList.add("active");
@@ -1540,25 +1632,41 @@
         if (name === "records") loadHistory(lastHistoryMode);
     }
 
-    // 計算「固定花費 + 貸款 + 保單與訂閱」的每月總應付預備金
+    // 計算「固定花費 + 貸款 + 保險 + 訂閱」的每月總應付預備金
     function getAllFixedMonthlySum() {
         const billsAvg = KNOWN_ANNUAL_EXPENSES.reduce((s, b) => s + Number(b.monthlyAvg || 0), 0);
         const loansMonthly = LOANS_DATA.reduce((s, l) => s + Number(l.perAmount || 0), 0);
+        const insMonthly = INSURANCE_DATA.reduce((s, ins) => {
+            const fee = Number(ins.fee || 0);
+            if (ins.cycle === "年繳") return s + (fee / 12);
+            if (ins.cycle === "季繳") return s + (fee / 3);
+            return s + fee; // 月繳
+        }, 0);
         const subsMonthly = SUBSCRIPTIONS_DATA.reduce((s, sub) => {
             const fee = Number(sub.fee || 0);
-            return s + (sub.cycle === "年租" ? fee / 12 : fee);
+            if (sub.cycle === "年租") return s + (fee / 12);
+            if (sub.cycle === "季租") return s + (fee / 3);
+            return s + fee; // 月租
         }, 0);
-        return billsAvg + loansMonthly + subsMonthly;
+        return billsAvg + loansMonthly + insMonthly + subsMonthly;
     }
 
     function getAllFixedAnnualSum() {
         const billsAnn = KNOWN_ANNUAL_EXPENSES.reduce((s, b) => s + Number(b.annual || 0), 0);
         const loansAnn = LOANS_DATA.reduce((s, l) => s + Number(l.perAmount || 0) * 12, 0);
+        const insAnn = INSURANCE_DATA.reduce((s, ins) => {
+            const fee = Number(ins.fee || 0);
+            if (ins.cycle === "年繳") return s + fee;
+            if (ins.cycle === "季繳") return s + (fee * 4);
+            return s + (fee * 12); // 月繳
+        }, 0);
         const subsAnn = SUBSCRIPTIONS_DATA.reduce((s, sub) => {
             const fee = Number(sub.fee || 0);
-            return s + (sub.cycle === "年租" ? fee : fee * 12);
+            if (sub.cycle === "年租") return s + fee;
+            if (sub.cycle === "季租") return s + (fee * 4);
+            return s + (fee * 12); // 月租
         }, 0);
-        return billsAnn + loansAnn + subsAnn;
+        return billsAnn + loansAnn + insAnn + subsAnn;
     }
 
     // 共用「現金 / 戶頭(銀行與其帳號) / 信用卡(卡片銀行)」選擇器邏輯
@@ -1619,9 +1727,10 @@
         return { typeB: mode, targetB: (sel && sel.value) ? sel.value : (mode === "bank" ? "戶頭" : "信用卡") };
     }
 
-    // 1a. 重置「消費紀錄、轉帳紀錄」
+    // 重置「消費紀錄、轉帳紀錄」
     async function resetRecordsOnly() {
-        if (!confirm("確定要清空所有「消費紀錄」與「轉帳紀錄」嗎？\n（您的銀行餘額、持股與固定花費不會被刪除）")) return;
+        const ok = await showConfirm("確定要清空所有「消費紀錄」與「轉帳紀錄」嗎？\n（您的銀行餘額、持股與固定花費不會被刪除）", "重置收支紀錄");
+        if (!ok) return;
         toast("正在清空消費與轉帳紀錄…");
         try {
             await _supabase.from("expenses").delete().gt("id", 0);
@@ -1634,9 +1743,10 @@
         }
     }
 
-    // 1b. 重置「資產」
+    // 重置「資產」
     async function resetAssetsOnly() {
-        if (!confirm("確定要重置「資產」嗎？\n這會將所有銀行帳戶、信用卡餘額歸零，並清空所有投資持股！（日常消費紀錄與固定花費會保留）")) return;
+        const ok = await showConfirm("確定要重置「資產」嗎？\n這會將所有銀行帳戶、信用卡餘額歸零，並清空所有投資持股！（日常消費紀錄與固定花費會保留）", "重置資產帳戶");
+        if (!ok) return;
         toast("正在重置資產與投資持倉…");
         try {
             await _supabase.from("accounts").update({ balance: 0 }).gt("id", 0);
@@ -1651,17 +1761,20 @@
         }
     }
 
-    // 1c. 重置「每年固定花費」 (固定花費 + 貸款 + 保單與訂閱)
+    // 重置「每年固定花費」 (固定花費 + 貸款 + 保險 + 訂閱)
     async function resetFixedExpensesOnly() {
-        if (!confirm("確定要清空「固定花費、貸款、保單與訂閱」的所有項目嗎？\n（消費紀錄與銀行資產不會受影響）")) return;
+        const ok = await showConfirm("確定要清空「固定花費、貸款、保險與訂閱」的所有項目嗎？\n（消費紀錄與銀行資產不會受影響）", "清空固定支出設定");
+        if (!ok) return;
         toast("正在清空固定花費與合約…");
         try {
             KNOWN_ANNUAL_EXPENSES = [];
             LOANS_DATA = [];
+            INSURANCE_DATA = [];
             SUBSCRIPTIONS_DATA = [];
             await savePortfolioState();
             await loadDashboard();
-            toast("固定花費、貸款與保單已全數清空！");
+            renderAllFixedModules();
+            toast("固定花費、貸款、保險與訂閱已全數清空！");
         } catch (e) {
             toast("重置失敗：" + e.message);
         }
@@ -1985,9 +2098,8 @@
         if (!card || !bank) return toast("帳戶資料錯誤");
 
         if (Number(bank.balance || 0) < amt) {
-            if (!confirm(`銀行可用餘額 ($${money(bank.balance)}) 小於繳款金額 ($${money(amt)})，確定要扣款嗎？`)) {
-                return;
-            }
+            const proceed = await showConfirm(`銀行可用餘額 ($${money(bank.balance)}) 小於繳款金額 ($${money(amt)})，確定要扣款嗎？`, "餘額不足提醒", "繼續扣款");
+            if (!proceed) return;
         }
 
         const nextBankBal = Number(bank.balance || 0) - amt;
@@ -2076,11 +2188,17 @@
         });
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(loanRows), "貸款");
 
-        const subRows = [["保單/訂閱項目", "租約方式", "租用費用", "期間(起~迄)", "繳款方式"]];
+        const insRows = [["保險項目", "繳費方式", "保險費", "期間(起~迄)", "繳款方式"]];
+        INSURANCE_DATA.forEach(ins => {
+            insRows.push([ins.name, ins.cycle, ins.fee, `${ins.startDate}~${ins.endDate}`, ins.payTargetB || "現金"]);
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(insRows), "保險");
+
+        const subRows = [["訂閱項目", "租約方式", "租金", "期間(起~迄)", "繳款方式"]];
         SUBSCRIPTIONS_DATA.forEach(s => {
             subRows.push([s.name, s.cycle, s.fee, `${s.startDate}~${s.endDate}`, s.payTargetB || "現金"]);
         });
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(subRows), "保單與訂閱");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(subRows), "訂閱");
 
         const expenseRows = [["日期", "類別", "子項目", "金額", "備註"]];
         (records || []).forEach(r => {
@@ -2421,7 +2539,31 @@
         if (st.quoteUpdatedAt !== undefined) quoteUpdatedAt = st.quoteUpdatedAt;
         if (Array.isArray(st.knownBills)) KNOWN_ANNUAL_EXPENSES = st.knownBills;
         if (Array.isArray(st.loans)) LOANS_DATA = st.loans;
-        if (Array.isArray(st.subs)) SUBSCRIPTIONS_DATA = st.subs;
+        
+        // 兼容舊版與新版資料架構
+        if (Array.isArray(st.insurance)) {
+            INSURANCE_DATA = st.insurance;
+        } else if (Array.isArray(st.subs)) {
+            // 自動將原本合併在 subs 的保險提取出
+            const ins = st.subs.filter(s => (s.name && s.name.includes("保險")) || s.cycle === "月繳" || s.cycle === "年繳");
+            if (ins.length) {
+                INSURANCE_DATA = ins.map(i => ({
+                    name: i.name,
+                    cycle: i.cycle === "年租" ? "年繳" : (i.cycle === "季租" ? "季繳" : (i.cycle || "月繳")),
+                    fee: i.fee,
+                    startDate: i.startDate,
+                    endDate: i.endDate,
+                    payTypeB: i.payTypeB || "cash",
+                    payTargetB: i.payTargetB || "現金"
+                }));
+            }
+        }
+
+        if (Array.isArray(st.subs)) {
+            // 過濾掉保險項目做為純訂閱
+            const purelySubs = st.subs.filter(s => !(s.name && s.name.includes("保險")));
+            if (purelySubs.length) SUBSCRIPTIONS_DATA = purelySubs;
+        }
     }
 
     async function savePortfolioState() {
@@ -2431,9 +2573,12 @@
             quoteUpdatedAt, 
             knownBills: KNOWN_ANNUAL_EXPENSES,
             loans: LOANS_DATA,
+            insurance: INSURANCE_DATA,
             subs: SUBSCRIPTIONS_DATA
         };
-        localStorage.setItem("portfolio_state", JSON.stringify(payload));
+        try {
+            localStorage.setItem("portfolio_state", JSON.stringify(payload));
+        } catch (e) {}
         await _supabase.from("config").upsert({ key: "portfolio_state", value: JSON.stringify(payload) });
         renderFxInputs();
         calcAndRenderOverviewNetWorth();
@@ -2609,7 +2754,9 @@
     }
     async function deleteHolding() {
         const idx = parseInt(document.getElementById("holdIndex").value, 10);
-        if (idx < 0 || !confirm("刪除這檔持股？")) return;
+        if (idx < 0) return;
+        const ok = await showConfirm("確定要刪除這檔持股資料嗎？", "刪除持股");
+        if (!ok) return;
         PORTFOLIO_DATA.splice(idx, 1);
         await savePortfolioState();
         loadAssetsData();
@@ -2668,7 +2815,9 @@
     }
     async function deleteAccountItem() {
         const id = document.getElementById("accEditId").value;
-        if (!id || !confirm("確定要刪除此帳戶？")) return;
+        if (!id) return;
+        const ok = await showConfirm("確定要刪除此帳戶資料嗎？", "刪除帳戶");
+        if (!ok) return;
         const res = await _supabase.from("accounts").delete().eq("id", id);
         if (res.error) toast("刪除失敗: " + res.error.message);
         else {
@@ -2739,7 +2888,7 @@
         calcAndRenderOverviewNetWorth();
     }
 
-    // 2. 固定花費三大主題視窗渲染 (固定花費 / 貸款 / 保單與訂閱)
+    // 固定花費四大主題視窗渲染 (固定花費 / 貸款 / 保險 / 訂閱)
     function openKnownBillsReport() {
         switchTab("known-bills");
         renderAllFixedModules();
@@ -2752,6 +2901,7 @@
 
         document.getElementById("fixedTab_bills").style.display = sub === "bills" ? "block" : "none";
         document.getElementById("fixedTab_loans").style.display = sub === "loans" ? "block" : "none";
+        document.getElementById("fixedTab_insurance").style.display = sub === "insurance" ? "block" : "none";
         document.getElementById("fixedTab_subs").style.display = sub === "subs" ? "block" : "none";
         renderAllFixedModules();
     }
@@ -2761,7 +2911,7 @@
         document.getElementById("kpiAnnualBills").innerText = "NT$" + money(Math.round(getAllFixedAnnualSum()));
         document.getElementById("kpiMonthlyBillsAvg").innerText = "NT$" + money(Math.round(getAllFixedMonthlySum()));
 
-        // 2a. 渲染固定花費列表 (新增繳納方式 A/B)
+        // 渲染固定花費列表
         const tbody = document.getElementById("knownBillsBody");
         tbody.innerHTML = "";
         if (!KNOWN_ANNUAL_EXPENSES.length) {
@@ -2783,7 +2933,7 @@
             });
         }
 
-        // 2b. 渲染貸款列表
+        // 渲染貸款列表
         const loansBox = document.getElementById("loansListBody");
         loansBox.innerHTML = "";
         if (!LOANS_DATA.length) {
@@ -2809,13 +2959,41 @@
             });
         }
 
-        // 2c. 渲染保單與訂閱列表
+        // 渲染保險列表
+        const insBox = document.getElementById("insuranceListBody");
+        insBox.innerHTML = "";
+        if (!INSURANCE_DATA.length) {
+            insBox.innerHTML = '<div class="empty">尚無保險項目，點右上角可新增</div>';
+        } else {
+            INSURANCE_DATA.forEach((ins, idx) => {
+                const unitStr = ins.cycle === '年繳' ? '年' : (ins.cycle === '季繳' ? '季' : '月');
+                insBox.innerHTML += `
+                    <div class="fin-card-item" onclick="openEditInsuranceSheet(${idx})">
+                        <div class="fin-card-top">
+                            <div class="fin-card-title">
+                                <span>${ins.name}</span>
+                                <span class="stock-badge">${ins.cycle}</span>
+                            </div>
+                            <div class="fin-card-amt">$${money(ins.fee)} / ${unitStr}</div>
+                        </div>
+                        <div class="fin-card-meta">
+                            <span>期間: ${ins.startDate || '-'} ~ ${ins.endDate || '-'}</span>
+                            <span>· 繳費方式: ${ins.cycle}</span>
+                            <span>· 繳款: ${ins.payTargetB || '現金'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 渲染訂閱列表
         const subsBox = document.getElementById("subsListBody");
         subsBox.innerHTML = "";
         if (!SUBSCRIPTIONS_DATA.length) {
-            subsBox.innerHTML = '<div class="empty">尚無保單與訂閱項目，點右上角可新增</div>';
+            subsBox.innerHTML = '<div class="empty">尚無訂閱項目，點右上角可新增</div>';
         } else {
             SUBSCRIPTIONS_DATA.forEach((s, idx) => {
+                const unitStr = s.cycle === '年租' ? '年' : (s.cycle === '季租' ? '季' : '月');
                 subsBox.innerHTML += `
                     <div class="fin-card-item" onclick="openEditSubSheet(${idx})">
                         <div class="fin-card-top">
@@ -2823,10 +3001,11 @@
                                 <span>${s.name}</span>
                                 <span class="stock-badge">${s.cycle}</span>
                             </div>
-                            <div class="fin-card-amt">$${money(s.fee)} / ${s.cycle === '年租' ? '年' : '月'}</div>
+                            <div class="fin-card-amt">$${money(s.fee)} / ${unitStr}</div>
                         </div>
                         <div class="fin-card-meta">
                             <span>期間: ${s.startDate || '-'} ~ ${s.endDate || '-'}</span>
+                            <span>· 租約方式: ${s.cycle}</span>
                             <span>· 繳款: ${s.payTargetB || '現金'}</span>
                         </div>
                     </div>
@@ -2835,7 +3014,7 @@
         }
     }
 
-    // 2a. 固定花費新增與編輯
+    // 固定花費新增與編輯
     function openAddKnownBillSheet() {
         document.getElementById("knownBillTitle").innerText = "新增固定花費項目";
         document.getElementById("knownBillIdx").value = "-1";
@@ -2873,7 +3052,7 @@
         document.getElementById("knownBillSheet").classList.remove("show");
     }
 
-    // 2b. 貸款新增與編輯
+    // 貸款新增與編輯
     function openAddLoanSheet() {
         document.getElementById("loanSheetTitle").innerText = "新增貸款";
         document.getElementById("loanIdx").value = "-1";
@@ -2939,7 +3118,9 @@
 
     async function deleteLoanItem() {
         const idx = parseInt(document.getElementById("loanIdx").value, 10);
-        if (idx < 0 || !confirm("確定要刪除此筆貸款？")) return;
+        if (idx < 0) return;
+        const ok = await showConfirm("確定要刪除此筆貸款紀錄嗎？", "刪除貸款");
+        if (!ok) return;
         LOANS_DATA.splice(idx, 1);
         await savePortfolioState();
         closeLoanSheet();
@@ -2947,9 +3128,82 @@
         toast("已刪除貸款");
     }
 
-    // 2c. 保單與訂閱新增與編輯
+    // 保險新增與編輯 (項目、租約/繳費方式[年繳/季繳/月繳]、保險費、日期[開始~結束]、繳款方式[現金/戶頭/信用卡])
+    function openAddInsuranceSheet() {
+        document.getElementById("insuranceSheetTitle").innerText = "新增保險項目";
+        document.getElementById("insIdx").value = "-1";
+        document.getElementById("insName").value = "";
+        document.getElementById("insCycle").value = "月繳";
+        document.getElementById("insFee").value = "";
+        document.getElementById("insStartYm").value = todayStr().slice(0, 7);
+        document.getElementById("insEndYm").value = "";
+        setSharedPayB("ins", "bank");
+        document.getElementById("insDelBtn").style.display = "none";
+        document.getElementById("insuranceSheetBg").classList.add("show");
+        document.getElementById("insuranceSheet").classList.add("show");
+    }
+
+    function openEditInsuranceSheet(idx) {
+        const ins = INSURANCE_DATA[idx];
+        if (!ins) return;
+        document.getElementById("insuranceSheetTitle").innerText = "編輯保險項目";
+        document.getElementById("insIdx").value = idx;
+        document.getElementById("insName").value = ins.name;
+        document.getElementById("insCycle").value = ins.cycle || "月繳";
+        document.getElementById("insFee").value = ins.fee;
+        document.getElementById("insStartYm").value = ins.startDate || "";
+        document.getElementById("insEndYm").value = ins.endDate || "";
+        setSharedPayB("ins", ins.payTypeB || "cash", ins.payTargetB || "");
+        document.getElementById("insDelBtn").style.display = "block";
+        document.getElementById("insuranceSheetBg").classList.add("show");
+        document.getElementById("insuranceSheet").classList.add("show");
+    }
+
+    function closeInsuranceSheet() {
+        document.getElementById("insuranceSheetBg").classList.remove("show");
+        document.getElementById("insuranceSheet").classList.remove("show");
+    }
+
+    async function saveInsuranceItem() {
+        const idx = parseInt(document.getElementById("insIdx").value, 10);
+        const name = document.getElementById("insName").value.trim();
+        const cycle = document.getElementById("insCycle").value;
+        const fee = parseFloat(document.getElementById("insFee").value || "0");
+        const startDate = document.getElementById("insStartYm").value;
+        const endDate = document.getElementById("insEndYm").value;
+
+        if (!name || fee <= 0) return toast("請填寫保險項目名稱與保險費");
+        const payInfo = getSharedPayBValue("ins");
+
+        const row = {
+            name, cycle, fee, startDate, endDate,
+            payTypeB: payInfo.typeB, payTargetB: payInfo.targetB
+        };
+
+        if (idx >= 0) INSURANCE_DATA[idx] = row;
+        else INSURANCE_DATA.push(row);
+
+        await savePortfolioState();
+        closeInsuranceSheet();
+        renderAllFixedModules();
+        toast("保險項目已儲存");
+    }
+
+    async function deleteInsuranceItem() {
+        const idx = parseInt(document.getElementById("insIdx").value, 10);
+        if (idx < 0) return;
+        const ok = await showConfirm("確定要刪除此保險項目嗎？", "刪除保險");
+        if (!ok) return;
+        INSURANCE_DATA.splice(idx, 1);
+        await savePortfolioState();
+        closeInsuranceSheet();
+        renderAllFixedModules();
+        toast("已刪除保險項目");
+    }
+
+    // 訂閱新增與編輯 (項目、租約方式[年租/季租/月租]、租金、日期[開始~結束]、繳款方式[現金/戶頭/信用卡])
     function openAddSubSheet() {
-        document.getElementById("subSheetTitle").innerText = "新增保單/訂閱";
+        document.getElementById("subSheetTitle").innerText = "新增訂閱項目";
         document.getElementById("subIdx").value = "-1";
         document.getElementById("subName").value = "";
         document.getElementById("subCycle").value = "月租";
@@ -2965,7 +3219,7 @@
     function openEditSubSheet(idx) {
         const s = SUBSCRIPTIONS_DATA[idx];
         if (!s) return;
-        document.getElementById("subSheetTitle").innerText = "編輯保單/訂閱";
+        document.getElementById("subSheetTitle").innerText = "編輯訂閱項目";
         document.getElementById("subIdx").value = idx;
         document.getElementById("subName").value = s.name;
         document.getElementById("subCycle").value = s.cycle || "月租";
@@ -2991,7 +3245,7 @@
         const startDate = document.getElementById("subStartYm").value;
         const endDate = document.getElementById("subEndYm").value;
 
-        if (!name || fee <= 0) return toast("請填寫項目名稱與租用費用");
+        if (!name || fee <= 0) return toast("請填寫訂閱項目名稱與租金費用");
         const payInfo = getSharedPayBValue("sub");
 
         const row = {
@@ -3005,17 +3259,19 @@
         await savePortfolioState();
         closeSubSheet();
         renderAllFixedModules();
-        toast("保單/訂閱已儲存");
+        toast("訂閱項目已儲存");
     }
 
     async function deleteSubItem() {
         const idx = parseInt(document.getElementById("subIdx").value, 10);
-        if (idx < 0 || !confirm("確定要刪除此項目？")) return;
+        if (idx < 0) return;
+        const ok = await showConfirm("確定要刪除此訂閱項目嗎？", "刪除訂閱");
+        if (!ok) return;
         SUBSCRIPTIONS_DATA.splice(idx, 1);
         await savePortfolioState();
         closeSubSheet();
         renderAllFixedModules();
-        toast("已刪除項目");
+        toast("已刪除訂閱項目");
     }
 
     function openPeriodCalcModal() {
@@ -3140,7 +3396,9 @@
 
     async function deleteKnownBillItem() {
         const idx = parseInt(document.getElementById("knownBillIdx").value, 10);
-        if (idx < 0 || !confirm("確定要刪除此固定項目？")) return;
+        if (idx < 0) return;
+        const ok = await showConfirm("確定要刪除此固定項目？", "刪除項目");
+        if (!ok) return;
         KNOWN_ANNUAL_EXPENSES.splice(idx, 1);
         await savePortfolioState();
         closeKnownBillSheet();
@@ -3260,7 +3518,8 @@
     async function executeDelete() {
         const checked = document.querySelectorAll(".row-checkbox:checked");
         if (!checked.length) return toast("請勾選要刪除的項目");
-        if (!confirm(`確定要刪除這 ${checked.length} 筆資料嗎？`)) return;
+        const ok = await showConfirm(`確定要刪除這 ${checked.length} 筆明細資料嗎？`, "刪除明細紀錄");
+        if (!ok) return;
         const ids = Array.from(checked).map(cb => cb.value);
         const { error } = await _supabase.from("expenses").delete().in("id", ids);
         if (error) toast("刪除失敗：" + error.message);
